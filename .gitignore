@@ -1,0 +1,15 @@
+AMI.sln
+
+.vs/*
+AMI/bin/*
+AMI/Core/*
+AMI/Data/*
+AMI/Settings/*
+AMI/obj/*
+AMI/Properties/*
+
+AMI/AMI.csproj
+AMI/AMI.csproj.user
+AMI/App.config
+
+AMI/Log.log
