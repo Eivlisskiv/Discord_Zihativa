@@ -21,12 +21,7 @@ namespace AMYPrototype
             get;
             private set;
         }
-
-        private static bool _firstBoot = true;
-        public static bool FirstBoot
-        {
-            get => _firstBoot;
-        }
+        public static bool FirstBoot { get; private set; } = true;
 
         internal static bool isDev;
         internal static Tokens tokens;
@@ -58,7 +53,6 @@ namespace AMYPrototype
 
         private DiscordSocketClient _client;
         private CommandHandler _handler;
-        
 
         Dictionary<string, Thread> threads = new Dictionary<string, Thread>();
 
@@ -67,7 +61,6 @@ namespace AMYPrototype
             try
             {
                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-                WebServer.CreateHostBuilder(args);
                 new Program().Start().GetAwaiter().GetResult();
             }
             catch (Exception e)
@@ -146,6 +139,8 @@ namespace AMYPrototype
             {
                 isDev = _client.CurrentUser.Id == 535577053651664897;
 
+                WebServer.CreateHost(isDev); 
+
                 CheckMissingPerkEffects();
 
                 data = data ?? new ProgramData();
@@ -163,7 +158,7 @@ namespace AMYPrototype
             }
             SetState(State.Ready);
             Log.LogS("Ready");
-            _firstBoot = false;
+            FirstBoot = false;
         }
 
         private Task LogAsync(LogMessage log)

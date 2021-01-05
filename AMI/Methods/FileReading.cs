@@ -13,13 +13,15 @@ namespace AMI.Methods
             {
                 try
                 {
-                    StreamReader file = new StreamReader(path);
-                    Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                    string data = file.ReadToEnd();
-                    file.Close();
-                    T a = JsonConvert.DeserializeObject<T>(data);
-                    Thread.CurrentThread.Priority = ThreadPriority.Normal;
-                    return a;
+                    using (StreamReader file = new StreamReader(path))
+                    {
+                        Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                        string data = file.ReadToEnd();
+                        file.Close();
+                        T a = JsonConvert.DeserializeObject<T>(data);
+                        Thread.CurrentThread.Priority = ThreadPriority.Normal;
+                        return a;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -37,10 +39,12 @@ namespace AMI.Methods
                 try
                 {
                     string json = JsonConvert.SerializeObject(item);
-                    StreamWriter file = new StreamWriter(path);
-                    Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                    file.Write(json);
-                    file.Close();
+                    using (StreamWriter file = new StreamWriter(path))
+                    {
+                        Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                        file.Write(json);
+                        file.Close();
+                    }
                     done = true;
                     Thread.CurrentThread.Priority = ThreadPriority.Normal;
                 }

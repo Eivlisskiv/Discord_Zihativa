@@ -19,9 +19,9 @@ namespace AMI.Handlers
         {
             channels = new Dictionary<string, IMessageChannel>();
 
-            GetChannel("Suggestion", Program.isDev ? (ulong)716800277814050837 : 531191291543945227, 201877884313403392);
-            GetChannel("BugReport", Program.isDev ? (ulong)716800277814050837 : 741897200317104149, 201877884313403392);
-            GetChannel("Population", Program.isDev ? (ulong)741896956296691802 : 795706716137586738, 201877884313403392);
+            GetChannel("Suggestion", Program.isDev ? (ulong)795723733615509534 : 531191291543945227, 201877884313403392);
+            GetChannel("BugReport", Program.isDev ? (ulong)795723756731498506 : 741897200317104149, 201877884313403392);
+            GetChannel("Population", Program.isDev ? (ulong)795723814259392544 : 795706716137586738, 201877884313403392);
         }
 
         public IMessageChannel GetChannel(string name, ulong? id = null, ulong? gid = null)
