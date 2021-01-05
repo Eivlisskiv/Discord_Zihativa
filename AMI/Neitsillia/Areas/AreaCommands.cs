@@ -677,7 +677,7 @@ namespace AMI.Neitsillia.Commands
         #region StrongHolds
         [Command("Create Stronghold")]
         [Summary("Create a new stronghold near your current area. Your current area and floor level will become requirements to access the area.")]
-        async Task Request_Stronghold(int size, params string[] areaCustomName)
+        public async Task Request_Stronghold(int size, params string[] areaCustomName)
         {
             Player player = Context.Player;
             int junctedStrongholds = 0;
@@ -725,7 +725,7 @@ namespace AMI.Neitsillia.Commands
 
         [Command("Stronghold")][Alias("sh")]
         [Summary("View stronghold menu and execute related actions such as building, using stronghold storage and more.")]
-        async Task StrongholdInfo(string action = "info", string target = null, string argument = null)
+        public async Task StrongholdInfo(string action = "info", string target = null, string argument = null)
         {
             Player player = Player.Load(Context.BotUser, Player.IgnoreException.Resting);
             if (player.Area.type != AreaType.Stronghold)

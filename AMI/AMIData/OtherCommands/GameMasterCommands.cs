@@ -315,7 +315,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("SimulateLotteryEnd"), Alias("SimLottery")]
-        async Task SimulateLotteryEnd()
+        public async Task SimulateLotteryEnd()
         {
             if(await IsGMLevel(4))
             {
@@ -327,7 +327,7 @@ namespace AMI.AMIData.OtherCommands
 
         #region Server Management
         [Command("Disable Channel")]
-        async Task DisableChannel() => await EnableChannel(0);
+        public async Task DisableChannel() => await EnableChannel(0);
         [Command("Enable Channel")]
         public async Task EnableChannel(int value = 1)
         {
@@ -731,7 +731,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Building Schem")]
         [Alias("grantbs")]
-        async Task GrantBuildingSchem(IUser user, params string[] args)
+        public async Task GrantBuildingSchem(IUser user, params string[] args)
         {
             if (await IsGMLevel(4))
             {
@@ -823,7 +823,7 @@ namespace AMI.AMIData.OtherCommands
             }
         }
         [Command("AutoInvade")]
-        async Task AutoInvade(IUser user = null)
+        public async Task AutoInvade(IUser user = null)
         {
             if (await IsGMLevel(4))
             {
@@ -1006,7 +1006,7 @@ namespace AMI.AMIData.OtherCommands
             Console.WriteLine("Notification sent to " + sentTo + " server's channels");
         }
         [Command("DeleteMessage")]
-        async Task DeleteMessage(string messageURL)
+        public async Task DeleteMessage(string messageURL)
         {
             if(await IsGMLevel(4))
             {
@@ -1222,7 +1222,7 @@ namespace AMI.AMIData.OtherCommands
             }
         }
         [Command("IgnoreServer")]
-        async Task IgnoreServer(string serverId, bool ignore = true)
+        public async Task IgnoreServer(string serverId, bool ignore = true)
         {
             if (await IsGMLevel(4))
             {

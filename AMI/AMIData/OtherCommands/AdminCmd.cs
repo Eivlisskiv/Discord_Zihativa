@@ -711,7 +711,7 @@ namespace AMI.AMIData.OtherCommands
                 foreach (var guild in guilds)
                 {
                     GuildSettings gs = GuildSettings.Load(guild);
-                    if (gs == null || gs.activityScore < 1)
+                    if (gs == null || gs.activityScore < 1 || guild.Users.Count == 1)
                     {
                         await guild.LeaveAsync();
                         await ReplyAsync($"Left {guild.Name}");

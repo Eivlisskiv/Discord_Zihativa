@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class GuildCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class GuildCommands : ModuleBase<Commands.CustomSocketCommandContext>
     {
         [Command("View Permissions")]
         [Alias("View Perms")]
-        async Task ViewPermissions(IUser user)
+        public async Task ViewPermissions(IUser user)
         {
             var perms = ((IGuildUser)user).GuildPermissions;
             var list = Enum.GetValues(typeof(GuildPermission));
@@ -22,7 +22,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("Prefix")]
-        async Task Prefix(string newPrefix = null)
+        public async Task Prefix(string newPrefix = null)
         {
             if (Context.guildSettings != null)
             {
@@ -54,7 +54,7 @@ namespace AMI.AMIData.OtherCommands
 
         [RequireUserPermission(GuildPermission.Administrator)]
         [Command("Memberships")]
-        async Task Memberships(string isAdd, IRole role, int price = 1)
+        public async Task Memberships(string isAdd, IRole role, int price = 1)
         {
             switch(isAdd.ToLower())
             {

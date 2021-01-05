@@ -142,7 +142,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("Random Item")]
-        async Task RandomItem(int tier, int type = -1)
+        public async Task RandomItem(int tier, int type = -1)
         {
             Context.AdminCheck();
 
@@ -151,7 +151,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("AbilityTree")]
-        async Task AbilityTree()
+        public async Task AbilityTree()
         {
             Context.AdminCheck();
             await ReplyAsync(Ability.StarterAbilityTree());
