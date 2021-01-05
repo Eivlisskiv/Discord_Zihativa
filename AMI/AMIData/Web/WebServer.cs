@@ -27,7 +27,7 @@ namespace AMI.AMIData.Webhooks
 
             var host = new WebHostBuilder()
                 .UseKestrel()
-                .UseUrls("http://*:5000")
+                .UseUrls($"http://*: {(isDev ? "5080" : "5000")}")
                 .UseConfiguration(config)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<WebServer>()

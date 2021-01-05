@@ -1141,7 +1141,7 @@ namespace AMI.AMIData.OtherCommands
                     await Events.OngoingEvent.StartWait();
                     break;
                 case "start":
-                    if(eventName == null) { await ReplyAsync(""); return; }
+                    if(eventName == null) { await ReplyAsync("No event name given"); return; }
                     await Events.OngoingEvent.StartUnscheduledEvent(eventName, length);
                     break;
                 case "extend":

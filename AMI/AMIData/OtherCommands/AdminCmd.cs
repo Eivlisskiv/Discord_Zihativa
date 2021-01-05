@@ -1,4 +1,5 @@
-﻿using AMI.Methods;
+﻿using AMI.AMIData.Servers;
+using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia;
 using AMI.Neitsillia.Areas.AreaPartials;
@@ -685,10 +686,38 @@ namespace AMI.AMIData.OtherCommands
         }
         #endregion
 
-        [Command("cdblwb")]
-        public async Task ConnectDBLWebhook()
+        [Command("LeaveServer")]
+        public async Task LeaveServer(ulong id)
         {
-            if (!Context.AdminCheck()) return;
+            if (Context.AdminCheck())
+            {
+                var guild = Program.clientCopy.GetGuild(id);
+                if (guild == null)
+                {
+                    await ReplyAsync("Guild not found");
+                    return;
+                }
+
+                await guild.LeaveAsync();
+                await ReplyAsync($"Left {guild.Name}");
+            }
+        }
+        [Command("LeaveInactiveServers")]
+        public async Task LeaveInactiveServers()
+        {
+            if (Context.AdminCheck())
+            {
+                var guilds = Program.clientCopy.Guilds;
+                foreach (var guild in guilds)
+                {
+                    GuildSettings gs = GuildSettings.Load(guild);
+                    if (gs == null || gs.activityScore < 1)
+                    {
+                        await guild.LeaveAsync();
+                        await ReplyAsync($"Left {guild.Name}");
+                    }
+                }
+            }
         }
     }
 }

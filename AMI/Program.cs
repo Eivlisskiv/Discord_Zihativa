@@ -156,6 +156,7 @@ namespace AMYPrototype
 
                 TaskHandler.Add("Refresh", 60 * 5, AppConnectionAndData);
             }
+
             SetState(State.Ready);
             Log.LogS("Ready");
             FirstBoot = false;
@@ -168,20 +169,6 @@ namespace AMYPrototype
             else Log.LogS(log.ToString());
 
             return Task.CompletedTask;
-        }
-
-        internal void AddThread(string key, Func<Thread> func, bool background = true)
-        {
-            if (!threads.TryGetValue(key, out Thread thread) || !thread.IsAlive)
-            {
-                if (thread != null && !thread.IsAlive) thread.Join();
-
-                thread = func();
-                thread.Start();
-                thread.IsBackground = background;
-                thread.Priority = ThreadPriority.BelowNormal;
-                threads.Add(key, thread);
-            }
         }
 
         internal async Task AppConnectionAndData()
@@ -233,10 +220,10 @@ namespace AMYPrototype
         }
 
         internal static bool Chance(int i) 
-            => i <= 0 ? false : rng.Next(101) <= i;
+            => i > 0 && rng.Next(101) <= i;
 
         internal static bool Chance(double i) 
-            => i <= 0 ? false : rng.Next(100) + rng.NextDouble() <= i;
+            => i > 0 && rng.Next(100) + rng.NextDouble() <= i;
 
         internal static int RandomInterval(int i, double m)
             => rng.Next(NumbersM.NParse<int>(i * (1 - m)), NumbersM.NParse<int>(i * (1 + m)));

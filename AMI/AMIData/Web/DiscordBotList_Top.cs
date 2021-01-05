@@ -30,11 +30,12 @@ namespace AMI.AMIData
         public DiscordBotList_Top(string token)
         {
             accountKey = token;
+            connected = false;
         }
 
         internal async Task Connect()
         {
-            connected = false;
+            if (connected) return;
             try
             {
                 DblApiAuth = new AuthDiscordBotListApi(botID, accountKey);
@@ -88,10 +89,7 @@ namespace AMI.AMIData
                 if (sinceCycle <= 1) return await DblApiAuth.HasVoted(id);
                 return await DblApiAuth.HasVoted(id);
 
-            } catch (Exception)
-            {
-                return true;
-            }
+            } catch (Exception) { return true; }
         }
 
         public void HandleRequest(string result)

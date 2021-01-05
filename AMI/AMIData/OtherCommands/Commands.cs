@@ -369,6 +369,7 @@ namespace AMI.AMIData.OtherCommands
         public async Task ConnectDBL()
         {
             await Program.dblAPI?.Connect();
+            Program.dblAPI?.UpdateServerCount(Program.clientCopy);
             await ReplyAsync(Program.dblAPI?.connected ?? false ? "Connected to top.gg API" : "Could not connect to top.gg API");
         }
 
