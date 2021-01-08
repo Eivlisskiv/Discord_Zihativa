@@ -10,6 +10,8 @@ using AMI.AMIData;
 using System.Collections.Generic;
 using AMI.Handlers;
 using AMI.AMIData.Webhooks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AMYPrototype
 {
@@ -139,8 +141,6 @@ namespace AMYPrototype
             {
                 isDev = _client.CurrentUser.Id == 535577053651664897;
 
-                WebServer.CreateHost(isDev); 
-
                 CheckMissingPerkEffects();
 
                 data = data ?? new ProgramData();
@@ -155,6 +155,10 @@ namespace AMYPrototype
                 else botActivity.SetClient(_client);
 
                 TaskHandler.Add("Refresh", 60 * 5, AppConnectionAndData);
+
+                await (tokens.platform == Tokens.Platforms.Linux ?
+                    WebServer.CreateKestrelHost(isDev) :
+                    WebServer.CreateHostW());
             }
 
             SetState(State.Ready);

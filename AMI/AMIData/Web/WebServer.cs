@@ -18,26 +18,34 @@ namespace AMI.AMIData.Webhooks
 {
     public class WebServer
     {
-        public static IWebHost CreateHost(bool isDev)
+        static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
+        public static async Task CreateKestrelHost(bool isDev)
         {
             var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("hosting.json", optional: true)
             .Build();
 
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseUrls($"http://*: {(isDev ? "5080" : "5000")}")
-                .UseConfiguration(config)
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<WebServer>()
-                .Build();
+            var host = new WebHostBuilder().UseConfiguration(config)
+                .UseContentRoot(Directory.GetCurrentDirectory()).UseStartup<WebServer>();
+            if (Program.tokens.platform == Tokens.Platforms.Linux) {
+                host.UseKestrel()
+                .UseUrls($"http://*:{(isDev ? "5080" : "5000")}");
+            }
 
-            host.RunAsync();
-
-            return host;
+            await host.Build().RunAsync();
         }
-        
+
+        public static async Task CreateHostW()
+        {
+            var server = Host.CreateDefaultBuilder().ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<WebServer>();
+            });
+
+            await server.Build().RunAsync();
+        }
+
         IConfiguration _config;
 
         public WebServer(IConfiguration config)
@@ -48,6 +56,7 @@ namespace AMI.AMIData.Webhooks
         public void ConfigureServices(IServiceCollection service)
         {
             service.AddRouting();
+            service.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -57,7 +66,9 @@ namespace AMI.AMIData.Webhooks
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseAuthorization();
 
             //To use static files in folder wwwroot
             //app.UseStaticFiles();
@@ -73,12 +84,29 @@ namespace AMI.AMIData.Webhooks
 
                 endpoints.MapPost("/registerVote", RegisterVote);
                 endpoints.MapPost("/query/:query/:fields", GeneralQuery);
+
+                endpoints.MapControllers();
             });
+        }
+
+        private async Task<bool> ValidateToken(HttpContext context)
+        {
+            string auth = context.Request.Headers["Authorization"];
+            var result = await Database.LoadRecordAsync<object>("Sessions", $"{{ token: {auth} }}");
+
+            if(result == null)
+            {
+                //context.Response.
+                return false;
+            }
+
+            return true;
         }
 
         private async Task RegisterVote(HttpContext context)
         {
-            Log.LogS(context.Request.Headers["Authorization"]);
+            if (!context.Request.Headers["Authorization"].Equals(Program.tokens.dblAuth)) return;
+
             BotUser user = null;
             try
             {
@@ -102,7 +130,11 @@ namespace AMI.AMIData.Webhooks
 
         private async Task GeneralQuery(HttpContext context)
         {
+            if (!await ValidateToken(context)) return;
 
+            //context.Request.
+
+            //string json = Database.Query()
         }
     }
 }

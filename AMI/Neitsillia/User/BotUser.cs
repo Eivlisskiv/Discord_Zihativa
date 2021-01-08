@@ -1,5 +1,4 @@
 ﻿using AMI.AMIData;
-using AMI.AMIData.Database;
 using AMI.Methods;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
@@ -11,7 +10,6 @@ using Neitsillia.Items.Item;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User

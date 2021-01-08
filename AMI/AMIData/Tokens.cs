@@ -7,7 +7,9 @@ namespace AMI.AMIData
         public enum Platforms { Windows, Linux}
 
         public string discord;
+
         public string dbl;
+        public string dblAuth;
 
         public string mongoUser;
         public string mongoPass;

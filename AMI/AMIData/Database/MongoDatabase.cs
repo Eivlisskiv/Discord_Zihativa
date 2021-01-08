@@ -180,30 +180,33 @@ namespace AMI.AMIData
 
         internal string Query(string tableKey, string jsonQuery, string fields = null)
         {
-            if (BsonDocument.TryParse(jsonQuery, out BsonDocument query))
+            try
             {
-                try
+                var collection = database.GetCollection<BsonDocument>(tableKey);
+
+                BsonDocument query = null;
+                if (jsonQuery != null && !BsonDocument.TryParse(jsonQuery, out query))
                 {
-                    var collection = database.GetCollection<BsonDocument>(tableKey);
-
-                    var filter = collection.Find(query);
-
-                    if (fields != null)
-                    {
-                        var project = Builders<BsonDocument>.Projection.Include(fields);
-                        filter = filter.Project(project);
-                    }
-
-                    return filter.CountDocuments() > 1 ? filter.ToList().ToJson() 
-                        : filter.FirstOrDefault().ToJson();
+                    Log.LogS("Could not parse query " + jsonQuery);
+                    return "{ \"error\": \"invalid query\" }";
                 }
-                catch (Exception e)
+                var filter = jsonQuery != null ? collection.Find(query) : collection.Find("{}");
+
+                if (fields != null)
                 {
-                    Log.LogS(e);
+                    var project = Builders<BsonDocument>.Projection.Include(fields);
+                    filter = filter.Project(project);
                 }
+
+                return filter.CountDocuments() > 1 ? filter.ToList().ToJson()
+                    : filter.FirstOrDefault().ToJson();
+
             }
-            Log.LogS("Could not parse query " + jsonQuery);
-            return "";
+            catch (Exception e)
+            {
+                Log.LogS(e);
+                return $"{{ \"error\": \"{e.Message}\" }}";
+            }
         }
 
 
