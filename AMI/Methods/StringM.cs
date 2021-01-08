@@ -1,4 +1,7 @@
 ﻿using AMI.Methods.Graphs;
+using AMI.Neitsillia.Areas.Arenas;
+using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace AMI.Methods
@@ -51,6 +54,7 @@ namespace AMI.Methods
                 x => x.Value.ToUpper());
             
         }
+
         public static string UpperFormat(params string[] s)
         {
             return s != null && s.Length > 0 ?

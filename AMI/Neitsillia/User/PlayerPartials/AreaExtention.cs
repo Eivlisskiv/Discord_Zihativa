@@ -80,7 +80,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
             Area = Area.Load(areaPath);
 
             //Area.FloorEffects(areaPath.floor);
-            if (Area == null)
+            if (_area == null)
             {
                 if (areaPath.data == "Nest")
                 {
@@ -107,7 +107,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
                 };
 
                 Area = Area.Load(areaPath);
-                if (Area == null)
+                if (_area == null)
                 {
                     areaPath = new AreaPath()
                     {

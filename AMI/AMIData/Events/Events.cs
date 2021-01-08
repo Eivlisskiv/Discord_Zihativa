@@ -93,7 +93,7 @@ namespace AMI.AMIData.Events
             {
                 try
                 {
-                    DateTime wait = await GetWaitDate();
+                    DateTime wait = GetWaitDate();
 
                     TimeSpan span = (wait - DateTime.UtcNow);
                     while (span.TotalMilliseconds > 0)
@@ -134,7 +134,7 @@ namespace AMI.AMIData.Events
             return nextScheduled.Count == 0 ? scheduledEvents[0] : nextScheduled[0];
         }
 
-        private static async Task<DateTime> GetWaitDate()
+        private static DateTime GetWaitDate()
         {
             if (Ongoing != null) return Ongoing.endTime;
             EventInfo nextEvent = CheckScheduledEvent();

@@ -1,5 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Module;
+using AMI.Neitsillia.Combat;
 using AMI.Neitsillia.NeitsilliaCommands.Social;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
@@ -128,7 +129,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 string cost = null;
                 if (p.IsEncounter("Combat"))
                     cost = Environment.NewLine + "Party left during combat: " + 
-                        Combat.Combat.DefeatCost(p, p.Encounter.mobs[AMYPrototype.Program.rng.Next(p.Encounter.mobs.Length)]);
+                        CombatEndHandler.DefeatCost(p, p.Encounter.mobs[AMYPrototype.Program.rng.Next(p.Encounter.mobs.Length)]);
                 p.EncounterKey?.Null();
                 p.PartyKey = null;
                 p.SaveFileMongo();

@@ -2,6 +2,7 @@
 using AMYPrototype;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AMI.Methods
 {
@@ -283,21 +284,12 @@ namespace AMI.Methods
             }
             return result;
         }
-        public static string ToString<T>(IEnumerable<T> array, string seperator = " ")
+        public static string ToString<T>(this IEnumerable<T> array, string seperator = " ")
         {
             if (array == null || System.Linq.Enumerable.Count(array) == 0)
                 return null;
             return string.Join(seperator, array);
         }
-        //public static string ToString<T>(T[][] array)
-        //{
-        //    if (array == null)
-        //        return null;
-        //    string result = null;
-        //    for (int i = 0; i < array.Length; i++)
-        //        result += ToString(array[i]) + Environment.NewLine;
-        //    return result;
-        //}
         public static string ToString<T>(List<T>[] array, string sep1 = "\r\n", string sep2 = ", ")
         {
             if (array == null)
@@ -307,6 +299,18 @@ namespace AMI.Methods
                 r += string.Join(sep2, a) + sep1;
             return r;
         }
+
+        internal static string Join<T>(this IEnumerable<T> items, string seperator, Func<T, string> func)
+            => items.Select(func).ToString(seperator);
+        internal static string Join<T>(this IEnumerable<T> items, string seperator, Func<T, int, string> func)
+        {
+            string s = null;
+            int l = items.Count();
+            for (int i = 0; i < l; i++)
+                s += func(items.ElementAt(i), i) + (i + 1 < l ? seperator : "");
+            return s;
+        }
+
         public static List<T> ToList<T>(T[] array)
         {
             List<T> list = new List<T>();

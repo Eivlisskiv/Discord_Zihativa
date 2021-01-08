@@ -32,7 +32,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
         private async Task<EmbedBuilder> ExploreDungeon(Player player, EmbedBuilder explore)
         {
-            int.TryParse(player.Party != null ? player.Party.areaKey.data : player.areaPath.data, out int i);
+            int.TryParse((player.Party != null ? player.Party.areaKey : player.areaPath).data, out int i);
             if (Program.Chance(i * 13))
             {
                 player.NewEncounter(new Encounter(Encounter.Names.Floor, player));
@@ -89,7 +89,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         {
             int x = Program.rng.Next(eLootRate + eMobRate + ePassiveRate + 1);
 
-            int.TryParse(player.Party != null ? player.Party.areaKey.data : player.areaPath.data, out int floorChances);
+            int.TryParse((player.Party != null ? player.Party.areaKey : player.areaPath).data, out int floorChances);
 
             if (player.areaPath.floor < floors && (floorChances * 5) + 10 >= Program.rng.Next(101))
             {

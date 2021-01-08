@@ -43,7 +43,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
         public int eQuestRate;
 
-        public string realm, continent, kingdom, parent;
+        public string realm, continent, kingdom, grandparent, parent;
         public string native, faction;
         public AreaType type;
 
@@ -127,7 +127,9 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             realm = parentArea.realm;
             continent = parentArea.continent;
             kingdom = parentArea.kingdom;
+            grandparent = parentArea.parent;
             parent = parentArea.name;
+
             AreaId = GeneratePath(true);
 
             level = parentArea.level;
@@ -174,19 +176,21 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         {
             string areaPath = null;
 
-            if (realm != null) areaPath += realm + @"\";
+            if (realm != null) areaPath += realm + "\\";
 
-            if (continent != null) areaPath += continent + @"\";
+            if (continent != null) areaPath += continent + "\\";
 
-            if (kingdom != null)  areaPath += kingdom + @"\";
+            if (kingdom != null)  areaPath += kingdom + "\\";
 
-            if (parent != null)  areaPath += parent + @"\";
-            else areaPath += name + @"\";
+            if (grandparent != null)  areaPath += grandparent + "\\";
+            else if (parent != null)  areaPath += parent + "\\";
+            else areaPath += name + "\\";
 
             if (addAreaName) areaPath += name;
 
             return areaPath;
         }
+
         public override string ToString()
         {
             if (parent == null)
@@ -194,6 +198,8 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             else
                 return name + " Of " + parent;
         }
+
+        public bool IsDungeon => type == AreaType.Dungeon || type == AreaType.Arena;
         #endregion
 
         #region Sets

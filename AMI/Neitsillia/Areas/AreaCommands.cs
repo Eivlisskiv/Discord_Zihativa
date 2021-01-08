@@ -24,6 +24,7 @@ using AMI.Neitsillia.Areas.Arenas;
 using AMI.Neitsillia.Areas.AreaExtentions;
 using AMI.Module;
 using AMI.Neitsillia.Areas.AreaPartials;
+using AMI.Neitsillia.Areas.InteractiveAreas;
 
 namespace AMI.Neitsillia.Commands
 {
@@ -362,7 +363,6 @@ namespace AMI.Neitsillia.Commands
             }
         }
 
-        #region Area Specific Action
         [Command("Service"), Alias("Services"), Summary("Checks the available services for the current area.")]
         public async Task CheckServices()
         => await CheckServices(Context.Player, Context.Channel);
@@ -375,16 +375,16 @@ namespace AMI.Neitsillia.Commands
             switch(player.Area.type)
             {
                 
-                case AreaType.Arena:
-                    await chan.SendMessageAsync("Use the `Enter Arena` command to participate.");
+                case AreaType.ArenaLobby:
+                    await Arena.Service(player, chan);
                     break;
                     
                 case AreaType.BeastMasterShop:
-                    await PetShopUi(player, chan);
+                    await PetShopInteractive.PetShopUi(player, chan);
                     break;
 
                 case AreaType.Tavern:
-                    await TavernUI(player, chan);
+                    await TavernInteractive.TavernUI(player, chan);
                     break;
                 default:
                     await chan.SendMessageAsync("No extra features available in this area.");
@@ -392,7 +392,8 @@ namespace AMI.Neitsillia.Commands
             }
         }
 
-        static EmbedField AvailableQuests(Player player, ref string data, params (int a, int b, int c)[] questGiven)
+        internal static EmbedField AvailableQuests(Player player, ref string data, 
+            params (int a, int b, int c)[] questGiven)
         {
             int availableQuests = 0;
             foreach (var i in questGiven)
@@ -407,101 +408,6 @@ namespace AMI.Neitsillia.Commands
             return DUtils.NewField("Quests " + EUI.mainQuest, availableQuests == 0 ? "No available quests." : $"{availableQuests} Available Quests").Build();
         }
 
-        #region Pet Shop
-        internal static async Task PetShopUi(Player player, ISocketMessageChannel chan)
-        {
-            string data = "";
-
-            EmbedField[] fields =
-            {
-                DUtils.NewField("Services",
-                $"{EUI.eggPocket} Upgrade Egg Pocket"
-                    + Environment.NewLine + $"{EUI.pets} Sell Companions"
-                    + Environment.NewLine + $"{EUI.pets} Modify Companion"
-                    + Environment.NewLine + $"{EUI.pets} Evolve Companion").Build(),
-                //new int[]{
-                AvailableQuests(player, ref data, (0,3,0) )
-            };
-
-            await player.NewUI(
-                await chan.SendMessageAsync(
-                    embed: player.UserEmbedColor(DUtils.BuildEmbed("Beast Master Store", 
-                    "Welcome to my store, Traveler! What service may I offer you?", 
-                    fields: fields
-                    )).Build())
-                    , MsgType.PetShop, data);
-        }
-        
-        #endregion
-
-        #region Tavern
-        internal static async Task TavernUI(Player player, ISocketMessageChannel chan)
-        {
-            await player.NewUI(
-                await chan.SendMessageAsync(
-                    embed: DUtils.BuildEmbed("Tavern",
-                    "Welcome, Traveler! What service may I offer you?",
-                    null, player.userSettings.Color(), 
-                    DUtils.NewField("Services", 
-                    $"{EUI.bounties} Bounties"
-                    + $"{Environment.NewLine} {EUI.sideQuest} Quests Board"
-                    + $"{Environment.NewLine} {EUI.Dice(1)} Games"
-                    )
-                    ).Build())
-                    , MsgType.Tavern);
-        }
-
-        internal static async Task GenerateBountyFile(Player player, Area area, int i, ISocketMessageChannel chan)
-        {
-            if (i >= area.junctions.Count)
-                i = -1;
-
-            EmbedFieldBuilder field = i < 0 ? GetAreaBounties(area.name, area.AreaId) : null;
-
-            if (field == null)
-                i++;
-
-            for (; i < area.junctions.Count && field == null; i++)
-            {
-                field = GetAreaBounties(area.junctions[i].destination, area.junctions[i].filePath);
-            }
-            if (field != null)
-            {
-                EmbedBuilder em = new EmbedBuilder()
-                {
-                    Title = "Bounty Board",
-                    Description = "Bounty are creature who've grown in power by defeating a player or were born from another bounty."
-                    + Environment.NewLine + "Hunt down the bounty by finding it in it's area while being on or above their floor.",
-                };
-                em.AddField(field);
-                await player.NewUI(await chan.SendMessageAsync(embed: em.Build()), MsgType.BountyBoard, i.ToString());
-            }
-            else
-                await chan.SendMessageAsync("There are no bounties on this board");
-        }
-        static EmbedFieldBuilder GetAreaBounties(string name, string area)
-        {
-            var bounties = Population.Load(Population.Type.Bounties, area);
-            if (bounties == null || bounties.Count <= 0)
-                return null;
-
-            string content = null;
-
-            foreach (var b in bounties.population)
-                    content += (b.displayName);
-
-            return content != null ?
-                new EmbedFieldBuilder()
-                {
-                    Name = $"**{name} Bounties [{bounties.Count}]**",
-                    Value = content,
-                }
-            : null;
-        }
-
-        #endregion
-
-        #endregion
         //
         [Command("Adventure")][Alias("Advt")]
         [Summary("Start an automatic adventure in your current location.")]

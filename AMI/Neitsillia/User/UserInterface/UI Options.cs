@@ -11,15 +11,15 @@ namespace AMI.Neitsillia.User.UserInterface
 {
     partial class UI
     {
+        static Action[] OptionsInitializers = { InitO_Events, InitO_Area};
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 
         public static void InitialiseOptionLoaderDict()
         {
             OptionsLoad = new Dictionary<MsgType, Action<UI>>();
-            InitialiseOptionDelegates();
+            for (int i = 0; i < OptionsInitializers.Length; i++)
+                OptionsInitializers[i].Invoke();
         }
-
-        static partial void InitialiseOptionDelegates();
 
         partial void InitialiseOption()
         {

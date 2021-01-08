@@ -1,39 +1,17 @@
 ﻿using AMI.Methods;
-using AMI.Neitsillia.Areas;
-using AMI.Neitsillia.Areas.AreaPartials;
-using AMI.Neitsillia.Areas.Nests;
-using AMI.Neitsillia.Collections;
-using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
-using AMI.Neitsillia.NeitsilliaCommands;
 using AMI.Neitsillia.NPCSystems;
-using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
-using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using Discord;
-using Neitsillia.Items.Item;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Combat
 {
     public class Combat
     {
         static AMIData.MongoDatabase Database => Program.data.database;
-
-        internal static string DefeatCost(Player player, NPC mob, double intensity = 1)
-        {
-            long xpDropped = NumbersM.NParse<long>(player.XPDrop(mob.level) * intensity);
-            player.experience -= xpDropped;
-            long coinsLost = Verify.Max(NumbersM.NParse<long>(((mob.Rank() + mob.level) * 2) * intensity), player.KCoins);
-            player.KCoins -= coinsLost;
-            //Log.CombatData(mob, player, xpDropped);
-            mob.XPGain(xpDropped);
-            return $"{player.name} lost {xpDropped} XP And {coinsLost} Kuts";
-        }
 
         internal static CombatResult GetTargetCR(CombatResult caster, CombatResult[] friends, CombatResult[] foes)
         {
@@ -212,7 +190,8 @@ namespace AMI.Neitsillia.Combat
             { result += m.GetResultInfo(s+i) + Environment.NewLine; i++; }
             return result;
         }
-        //
+
+        /*
         internal async Task<MsgType> FightReward(Party party, Encounter currentencounter, Area currentArea, EmbedBuilder result, MsgType msgType)
         {
             Player partyLeader = ((Player)playerParty[0].character);
@@ -224,25 +203,19 @@ namespace AMI.Neitsillia.Combat
             {
                 NPC mob = (NPC)Utils.RandomElement(mobParty).character;
                 string lostInfo = allMobsDead ? "No one is left standing to claim victory." : "You have been defeated." + Environment.NewLine;
-                if (endDungeon)
-                    await Database.DeleteRecord<Area>("Dungeons", partyLeader.areaPath.path, "AreaId");
+
+                if (endDungeon) await Database.DeleteRecord<Area>("Dungeons", partyLeader.areaPath.path, "AreaId");
 
                 foreach (var cb in playerParty)
                 {
                     PerkLoad.CheckPerks(cb.character, Perk.Trigger.EndFight, cb.character);
                     if (cb.character is Player player)
                     {
-                        if(!allMobsDead) lostInfo += DefeatCost(player, mob, 0.5) + Environment.NewLine;
+                        if(!allMobsDead) lostInfo += CombatEndHandler.DefeatCost(player, mob, 0.5) + Environment.NewLine;
 
                         await player.Respawn(false);
 
-                        if (endDungeon)
-                            player.areaPath = new AreaPath()
-                            {
-                                path = currentArea.GeneratePath(false) + currentArea.parent,
-                                name = currentArea.parent,
-                                floor = player.areaPath.floor
-                            };
+                        if (endDungeon) player.areaPath = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
                         player.SaveFileMongo();
                     }
                     else if (cb.character is NPC n)
@@ -289,58 +262,7 @@ namespace AMI.Neitsillia.Combat
 
                     if (cb.character is Player player)
                     {
-                        if(specialCurrencyReward != null) player.Currency.Mod(specialCurrencyReward, 1);
-
-                        if (currentencounter.Name == Encounter.Names.FloorJump)
-                        {
-                            int f = int.Parse(currentencounter.data);
-                            player.areaPath.floor += f;
-                            lootDisplay += $"{player.name} has advanced {f} floors." + Environment.NewLine;
-
-                            player.Quest_Trigger(Items.Quests.Quest.QuestTrigger.EnterFloor,
-                            $"{player.areaPath.path};{player.areaPath.floor}");
-                            player.EggPocket_Trigger(NPCSystems.Companions.Egg.EggChallenge.Exploration);
-                        }
-                        else if(!hasDied)
-                        {
-                            //XP
-                            long xpGained = hasDied ? 0 : player.XPGain(xpToGain, player.level);
-                            lootDisplay += $" |-|{player.name} +{Utils.Display(xpGained)} XP {Environment.NewLine}";
-
-                            if (currentArea.type == AreaType.Nest)
-                                await NestReward(player, currentArea);
-                        }
-
-                        if (hasDied)
-                        {
-                            if (party != null)
-                            {
-                                await party.Remove(player);
-                                player.PartyKey = null;
-                            }
-                            else player.EndEncounter();
-                            await player.Respawn(true);
-
-                        }
-                        else //Is still alive
-                        {
-                            CompletedObjectives(player, kills);
-
-                            if (endDungeon)//Complete dungeon
-                            {
-                                player.areaPath = new AreaPath()
-                                {
-                                    path = currentArea.GeneratePath(false) + currentArea.parent,
-                                    name = currentArea.parent,
-                                    floor = player.areaPath.floor
-                                };
-                                player.Quest_Trigger(Items.Quests.Quest.QuestTrigger.ClearDungeon);
-                            }
-                            //Give the loot encounter
-                            player.Encounter = enc;
-                        }
-
-                        player.SaveFileMongo(party == null);
+                        
                     }
                     else if (cb.character is NPC follower)
                     {
@@ -380,21 +302,21 @@ namespace AMI.Neitsillia.Combat
             }
             if (party != null)
             {
-                if(endDungeon)
-                {
-                    party.areaKey = new AreaPath()
-                    {
-                        path = currentArea.GeneratePath(false) + currentArea.parent,
-                        name = currentArea.parent,
-                        floor = partyLeader.areaPath.floor
-                    };
-                }
+                if(endDungeon) party.areaKey = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
                 await party.SaveData();
                 if(currentencounter != null && !allPlayersDead)
                     currentencounter.Save();
             }
             return msgType;
         }
+
+        AreaPath ParentAreaPath(Area area, int floor = 0)
+            => new AreaPath()
+            {
+                path = area.GeneratePath(false) + area.parent,
+                name = area.parent,
+                floor = floor
+            };
 
         internal void FollowerCheck(NPC n, Party party, bool allPlayersDead)
         {
@@ -478,20 +400,10 @@ namespace AMI.Neitsillia.Combat
             return (kills, koinsToGain, xpToGain);
         }
 
-        void CompletedObjectives(Player player, string[] kills)
-        {
-            foreach (string k in kills)
-                player.Quest_Trigger(Items.Quests.Quest.QuestTrigger.Kill, k);
+        */
 
-            player.EggPocket_Trigger(NPCSystems.Companions.Egg.EggChallenge.Combat);
-        }
 
-        async Task NestReward(Player player, Area area)
-        {
-            Nest nest = Nest.GetNest(area.GeneratePath(false));
-            if (nest == null) return;
 
-            await nest.Vicotry(player);
-        }
+
     }
 }

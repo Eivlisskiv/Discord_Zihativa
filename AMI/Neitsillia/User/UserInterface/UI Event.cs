@@ -11,7 +11,7 @@ namespace AMI.Neitsillia.User.UserInterface
 {
     partial class UI
     {
-        static partial void InitialiseOptionDelegates()
+        static void InitO_Events()
         {
             OptionsLoad.Add(MsgType.Event, ui =>
             {

@@ -174,7 +174,7 @@ namespace AMI.Neitsillia.Combat
 
                     PerkLoad.CheckPerks(player, Perk.Trigger.EndFight, player);
 
-                    if (player.Area.type == AreaType.Dungeon && player.areaPath.floor >= player.Area.floors)
+                    if (player.Area.IsDungeon && player.areaPath.floor >= player.Area.floors)
                     {
                         await Program.data.database.DeleteRecord<Area>("Area", player.Area.AreaId, "AreaId");
                         await player.SetArea(Area.LoadArea(player.Area.GeneratePath(false) + player.Area.parent, null), player.areaPath.floor);
@@ -308,7 +308,9 @@ namespace AMI.Neitsillia.Combat
                     DUtils.NewField("__Creature Party__", m, true)
                     );
 
-                MsgType resultType = await combat.FightReward(player.Party, player.Encounter, player.Area, fight, MsgType.Combat);
+
+                CombatEndHandler ceh = new CombatEndHandler(combat, player.Party, player.Encounter, player.Area);
+                MsgType resultType = await ceh.Handle(fight, MsgType.Combat);
 
                 if (ability == null && player.ui != null &&
                     player.ui.type == MsgType.Combat && player.ui.data != null)

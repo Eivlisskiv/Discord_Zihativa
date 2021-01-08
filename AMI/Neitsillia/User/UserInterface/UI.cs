@@ -23,6 +23,7 @@ using System.Linq;
 using AMI.AMIData;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
+using AMI.Neitsillia.Areas.InteractiveAreas;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
@@ -167,7 +168,7 @@ namespace AMI.Neitsillia.User.UserInterface
             try
             {
                 var msg = await GetUiMessage();
-                _ = msg.DeleteAsync();
+                _ = msg?.DeleteAsync();
             }
             catch (Exception) { }
             channelID = 0; msgId = 0; type = MsgType.Main;
@@ -780,11 +781,11 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 case EUI.prev:
                     if (player.Area.type == Areas.AreaType.Tavern)
-                        await Commands.Areas.GenerateBountyFile(player, player.Area, int.Parse(data) - 1, reaction.Channel);
+                        await TavernInteractive.GenerateBountyFile(player, player.Area, int.Parse(data) - 1, reaction.Channel);
                     break;
                 case EUI.next:
                     if (player.Area.type == Areas.AreaType.Tavern)
-                        await Commands.Areas.GenerateBountyFile(player, player.Area, int.Parse(data) + 1, reaction.Channel);
+                        await TavernInteractive.GenerateBountyFile(player, player.Area, int.Parse(data) + 1, reaction.Channel);
                     break;
             }
         }

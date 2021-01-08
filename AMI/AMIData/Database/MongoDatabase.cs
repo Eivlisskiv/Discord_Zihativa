@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using AMI.Methods;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace AMI.AMIData
         }
 
 
-        readonly bool islocal = false;
+        //readonly bool islocal = false;
         readonly string user;
         readonly string pw;
         readonly string name;
@@ -52,7 +53,7 @@ namespace AMI.AMIData
         }
         public MongoDatabase(string dbName)
         {
-            islocal = true;
+            //islocal = true;
             name = dbName;
             Connect("mongodb://localhost");
         }
@@ -63,32 +64,35 @@ namespace AMI.AMIData
             database = client.GetDatabase(name);
         }
 
+        string TableName<T>(string given) => given ?? typeof(T).Name + "s";
+        string TableName<T>() => typeof(T).Name + "s";
+
         //Save
         internal async Task SaveRecordAsync<T>(string tableKey, T record)
-          => await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").InsertOneAsync(record);
+          => await database.GetCollection<T>(TableName<T>(tableKey)).InsertOneAsync(record);
         internal void SaveRecord<T>(string tableKey, T record)
-          => database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").InsertOne(record);
+          => database.GetCollection<T>(TableName<T>(tableKey)).InsertOne(record);
         internal async Task SaveRecord<T>(string tableKey, params T[] records)
-          => await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").InsertManyAsync(records);
+          => await database.GetCollection<T>(TableName<T>(tableKey)).InsertManyAsync(records);
 
         //Update
         internal async Task UpdateRecordAsync<T>(string tableKey, string idVariableName, string id, T record)
-        => await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").ReplaceOneAsync(
+        => await database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOneAsync(
                 new BsonDocument(idVariableName, id), record, new ReplaceOptions
                 { IsUpsert = true });
 
         internal async Task UpdateRecordAsync<T>(string tableKey, FilterDefinition<T> filter, T record)
-       => await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").ReplaceOneAsync(filter, record, new ReplaceOptions
+       => await database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOneAsync(filter, record, new ReplaceOptions
        { IsUpsert = true });
 
         internal void UpdateRecord<T>(string tableKey, FilterDefinition<T> filter, T record)
-            => database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").ReplaceOne(
+            => database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOne(
                 filter ?? FilterEqual<T, string>("_id", Methods.Utils.GetVar<string, T>(record, "_id") ?? throw new Exception($"{typeof(T).Name} does not have default _id property"))
                 , record, new ReplaceOptions
             { IsUpsert = true });
 
         internal void UpdateRecord<T>(string tableKey, string idVariableName, string id, T record) 
-            => database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").ReplaceOne(
+            => database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOne(
                            new BsonDocument(idVariableName, id), record, new ReplaceOptions
                            { IsUpsert = true });
 
@@ -107,24 +111,21 @@ namespace AMI.AMIData
         //Delete
         internal async Task DeleteRecord<T>(string tableKey, string targetId, string idVariableName = "_id")
         {
-            var result = await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").DeleteOneAsync
+            var result = await database.GetCollection<T>(TableName<T>(tableKey)).DeleteOneAsync
                 (Builders<T>.Filter.Eq(idVariableName, targetId));
         }
         internal async Task DeleteRecord<T, U>(string tableKey, U targetId, string idVariableName = "_id")
         {
-            var result = await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").DeleteOneAsync
+            var result = await database.GetCollection<T>(TableName<T>(tableKey)).DeleteOneAsync
                 (Builders<T>.Filter.Eq(idVariableName, targetId));
         }
 
         internal async Task<T> LoadRecordAsync<T>(string tableKey, FilterDefinition<T> filter)
         {
-            var result = await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").FindAsync(filter);
             try
             {
-                if (await result.AnyAsync())
-                    return result.First();
-                else
-                    return default;
+                var result = await database.GetCollection<T>(TableName<T>(tableKey)).FindAsync(filter);
+                return await result.FirstOrDefaultAsync();
             }
             catch (Exception e)
             {
@@ -132,49 +133,41 @@ namespace AMI.AMIData
                 return default;
             }
         }
-        internal async Task<List<T>> LoadRecordsAsync<T>(string tableKey, FilterDefinition<T> filter)
-        {
-            var result = await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").FindAsync(filter);
-            return await result.ToListAsync();
-        }
-        internal async Task<List<T>> LoadRecordsAsync<T>(string tableKey)
-        {
-            var result = await database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").FindAsync(new BsonDocument());
-            return result.ToList();
-        }
+
+        internal async Task<T> LoadRecordAsync<T, I>(I id)
+            => await LoadRecordAsync<T>(TableName<T>(), FilterEqual<T, I>("_id", id));
 
         internal T LoadRecord<T>(string tableKey, FilterDefinition<T> filter, bool notifyOnDefault = false)
         {
 
-            tableKey = tableKey ?? typeof(T).Name + "s";
+            tableKey = TableName<T>(tableKey);
             var result = database.GetCollection<T>(tableKey).Find(filter);
 
             if (result.Any()) return result.First();
 
-            if(notifyOnDefault)  Console.WriteLine($"Failed to load Database entry from {tableKey} Table with filter: {Environment.NewLine} {filter.ToJson()}");
+            if (notifyOnDefault) Console.WriteLine($"Failed to load Database entry from {tableKey} Table with filter: {Environment.NewLine} {filter.ToJson()}");
 
             return default;
         }
 
         internal T LoadRecord<T, I>(string tableKey, I id)
+            => LoadRecord(TableName<T>(tableKey), FilterEqual<T, I>("_id", id));
+
+        internal async Task<List<T>> LoadRecordsAsync<T>(string tableKey, FilterDefinition<T> filter = null)
         {
-
-            tableKey = tableKey ?? typeof(T).Name + "s";
-            var result = database.GetCollection<T>(tableKey).Find(FilterEqual<T, I>("_id", id));
-
-            if (result.Any())  return result.First();
-            return default;
+            var result = await database.GetCollection<T>(TableName<T>(tableKey)).FindAsync(filter ?? "{}");
+            return await result.ToListAsync();
         }
 
         internal List<T> LoadRecords<T>(string tableKey, FilterDefinition<T> filter = null)
         {
-            var docs = database.GetCollection<T>(tableKey ?? typeof(T).Name + "s");
-            var result = filter != null ? docs.Find(filter) : docs.Find(_ => true);
+            var docs = database.GetCollection<T>(TableName<T>(tableKey));
+            var result = filter != null ? docs.Find(filter ?? "{}") : docs.Find(_ => true);
             return result.ToList();
         }
         internal List<T> LoadSortRecords<T>(string tableKey, FilterDefinition<T> filter, string sort)
         {
-            var result = database.GetCollection<T>(tableKey ?? typeof(T).Name + "s").Find(filter).Sort(sort);
+            var result = database.GetCollection<T>(TableName<T>(tableKey)).Find(filter).Sort(sort);
             return result.ToList();
         }
 
@@ -183,6 +176,57 @@ namespace AMI.AMIData
 
         //Verify Existence
         internal bool IdExists<T, U>(string tableKey, U targetID, string idVariableName = "_id")
-            => database.GetCollection<T>(tableKey = tableKey ?? typeof(T).Name + "s").Find(FilterEqual<T, U>(idVariableName, targetID)).CountDocuments() > 0;
+            => database.GetCollection<T>(tableKey = TableName<T>(tableKey)).Find(FilterEqual<T, U>(idVariableName, targetID)).CountDocuments() > 0;
+
+        internal string Query(string tableKey, string jsonQuery, string fields = null)
+        {
+            if (BsonDocument.TryParse(jsonQuery, out BsonDocument query))
+            {
+                try
+                {
+                    var collection = database.GetCollection<BsonDocument>(tableKey);
+
+                    var filter = collection.Find(query);
+
+                    if (fields != null)
+                    {
+                        var project = Builders<BsonDocument>.Projection.Include(fields);
+                        filter = filter.Project(project);
+                    }
+
+                    return filter.CountDocuments() > 1 ? filter.ToList().ToJson() 
+                        : filter.FirstOrDefault().ToJson();
+                }
+                catch (Exception e)
+                {
+                    Log.LogS(e);
+                }
+            }
+            Log.LogS("Could not parse query " + jsonQuery);
+            return "";
+        }
+
+
+        internal R Query<T, R>(string jsonQuery, string field)
+        {
+            if (BsonDocument.TryParse(jsonQuery, out BsonDocument query))
+            {
+                try
+                {
+                    var collection = database.GetCollection<T>(TableName<T>());
+
+                    var project = Builders<T>.Projection.Include(field);
+                    var filter = collection.Find(query).Project<R>(project);
+
+                    return filter.FirstOrDefault();
+                }
+                catch (Exception e)
+                {
+                    Log.LogS(e);
+                }
+            }
+            Log.LogS("Could not parse query " + jsonQuery);
+            return default;
+        }
     }
 }

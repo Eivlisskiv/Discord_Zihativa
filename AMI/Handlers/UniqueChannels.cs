@@ -77,7 +77,7 @@ namespace AMI.Handlers
                             await GetChannel("Log", 610529221017600071, 201877884313403392)?.SendMessageAsync($"``` {msg} ```");
                             break;
                         case 535577053651664897:
-                            await GetChannel("Log", 721563922372755524, 201877884313403392)?.SendMessageAsync($"``` {msg} ```");
+                            await GetChannel("Log", 796556989811523596, 201877884313403392)?.SendMessageAsync($"``` {msg} ```");
                             break;
                     }
                 }

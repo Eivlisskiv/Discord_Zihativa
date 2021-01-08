@@ -36,6 +36,8 @@
         Puzzle,
 
         Event,
-        EventShop
+        EventShop,
+        ArenaService,
+        ArenaFights
     }
 }

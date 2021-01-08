@@ -72,11 +72,13 @@ namespace AMI.AMIData.Webhooks
                 });
 
                 endpoints.MapPost("/registerVote", RegisterVote);
+                endpoints.MapPost("/query/:query/:fields", GeneralQuery);
             });
         }
 
         private async Task RegisterVote(HttpContext context)
         {
+            Log.LogS(context.Request.Headers["Authorization"]);
             BotUser user = null;
             try
             {
@@ -96,6 +98,11 @@ namespace AMI.AMIData.Webhooks
 
             if (user != null) await user.NewVote();
             else Log.LogS("Failed to register vote");
+        }
+
+        private async Task GeneralQuery(HttpContext context)
+        {
+
         }
     }
 }

@@ -5,7 +5,6 @@ using AMI.Neitsillia;
 using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
-using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using Discord;
@@ -13,7 +12,6 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Neitsillia.Items.Item
 {

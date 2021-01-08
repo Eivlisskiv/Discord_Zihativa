@@ -24,6 +24,14 @@ namespace AMI.Neitsillia.Areas.Arenas
             "Test Mode 5.",
         };
             
+        internal static async Task Service(Player player, ISocketMessageChannel chan)
+        {
+            await player.NewUI("", DUtils.BuildEmbed("Arena Lobby Services",
+                $"{EUI.sideQuest} View arena quests" /*+ Environment.NewLine +
+                $"{EUI.bounties} View arena challenges"*/,
+                null, player.userSettings.Color()).Build(), chan, MsgType.ArenaService);
+        }
+
         internal static async Task SelectMode(Player player, int i, ISocketMessageChannel chan, bool edit = false)
         {
             Array modes = Enum.GetValues(typeof(ArenaMode));
@@ -100,13 +108,12 @@ namespace AMI.Neitsillia.Areas.Arenas
             return dungeon;
         }
 
+        //This instance for for per player/party data
 
         public string ParentID;
         public ArenaMode gameMode;
         public ArenaModifier Modifiers;
         
-        
-
         public Arena(ArenaMode mode)
         {
             gameMode = mode;
@@ -137,7 +144,7 @@ namespace AMI.Neitsillia.Areas.Arenas
 
         
     }
-
+    //TEST - IGNORE
     class ArenaScoreList
     {
         //same as area (ArenaLobby) id
@@ -150,6 +157,7 @@ namespace AMI.Neitsillia.Areas.Arenas
 
         }
     }
+    //TEST - IGNORE
     class ArenaModifier
     {
         internal enum ArenaModifiers { };
