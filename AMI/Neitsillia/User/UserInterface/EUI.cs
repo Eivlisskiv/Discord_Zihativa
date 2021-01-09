@@ -7,6 +7,7 @@ namespace AMI.Neitsillia.User.UserInterface
     static class EUI
     {
         #region Emotes
+        internal const string info = "ℹ️";
 
         internal const string prev = "◀";
         internal const string next = "▶";

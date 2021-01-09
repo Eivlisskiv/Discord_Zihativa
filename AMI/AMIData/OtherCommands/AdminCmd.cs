@@ -1,4 +1,5 @@
 ﻿using AMI.AMIData.Servers;
+using AMI.AMIData.Webhooks;
 using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia;
@@ -196,83 +197,76 @@ namespace AMI.AMIData.OtherCommands
         {
             if (AdminCheck())
             {
-                string path = null;
-                using (var client = new WebClient())
+                foreach (var att in Context.Message.Attachments)
                 {
-                    foreach (var att in Context.Message.Attachments)
-                    {
-                        path = $"./Temp/{att.Filename.Replace('_', ' ')}";
-                        string url = att.Url;
-                        client.DownloadFile(url, path);
-                        //
-                        if (path == null)
-                            await ReplyAsync("No file found and downloaded");
-                        else
-                            switch (fileType.ToLower())
-                            {
-                                case "area":
-                                    {
-                                        Area temp = FileReading.LoadJSON<Area>(path);
-                                        temp.AreaId = temp.GeneratePath();
+                    string json = WebServer.GetFileContent(att.Url);
+                    //
+                    if (json == null) await ReplyAsync("No file found and downloaded");
+                    else
+                        switch (fileType.ToLower())
+                        {
+                            case "area":
+                                {
+                                    Area temp = Utils.JSON<Area>(json);
+                                    temp.AreaId = temp.GeneratePath();
 
-                                        await temp.UploadToDatabase();
-                                        await ReplyAsync($"{temp} Uploaded/Updated");
-                                    }
-                                    break;
-                                case "item":
-                                    {
-                                        Item temp = FileReading.LoadJSON<Item>(path);
-                                        temp.VerifyItem(true);
-                                        if (argument == null)
-                                            await temp.SaveItemSync();
-                                        else
-                                            switch (argument.ToLower())
-                                            {
-                                                case "item":
-                                                    await temp.SaveItemSync();
-                                                    await ReplyAsync($"{temp} Uploaded/Updated");
-                                                    break;
-                                                case "skavi":
-                                                    await temp.SaveItemSync("Skavi");
-                                                    await ReplyAsync($"{temp} Uploaded/Updated");
-                                                    break;
-                                                case "event":
-                                                    await temp.SaveItemSync("Event Items");
-                                                    await ReplyAsync($"{temp} Uploaded/Updated");
-                                                    break;
-                                                default: throw NeitsilliaError.ReplyError("Database Table Name is invalid: Item OR Skavi (Unique Items are automatic if unique == true)");
-                                            }
+                                    await temp.UploadToDatabase();
+                                    await ReplyAsync($"{temp} Uploaded/Updated");
+                                }
+                                break;
+                            case "item":
+                                {
+                                    Item temp = Utils.JSON<Item>(json);
+                                    temp.VerifyItem(true);
+                                    if (argument == null)
+                                        await temp.SaveItemAsync();
+                                    else
+                                        switch (argument.ToLower())
+                                        {
+                                            case "item":
+                                                await temp.SaveItemAsync();
+                                                await ReplyAsync($"{temp} Uploaded/Updated");
+                                                break;
+                                            case "skavi":
+                                                await temp.SaveItemAsync("Skavi");
+                                                await ReplyAsync($"{temp} Uploaded/Updated");
+                                                break;
+                                            case "event":
+                                                await temp.SaveItemAsync("Event Items");
+                                                await ReplyAsync($"{temp} Uploaded/Updated");
+                                                break;
+                                            default: throw NeitsilliaError.ReplyError("Database Table Name is invalid: Item OR Skavi (Unique Items are automatic if unique == true)");
+                                        }
 
-                                    }
-                                    break;
-                                case "skavi":
-                                    {
-                                        Item temp = FileReading.LoadJSON<Item>(path);
-                                        temp.VerifyItem(true);
-                                        await temp.SaveItemSync("Skavi");
-                                    }
-                                    break;
-                                case "creature":
-                                case "mob":
-                                case "character":
-                                    {
-                                        NPC temp = FileReading.LoadJSON<NPC>(path);
-                                        await Database.UpdateRecordAsync<NPC>(
-                                            "Creature", AMIData.MongoDatabase.FilterEqual<NPC, string>("_id", temp.name), temp);
-                                        await ReplyAsync($"{temp} Uploaded/Updated");
-                                    }
-                                    break;
-                                case "player":
-                                    {
-                                        Player player = FileReading.LoadJSON<Player>(path);
-                                        await Database.UpdateRecordAsync("Character",
-                                            MongoDatabase.FilterEqual<Player, string>("_id", player._id), player);
-                                        await ReplyAsync($"{player} Uploaded/Updated");
-                                    }
-                                    break;
-                                default: await ReplyAsync("Type entered is incompatible"); break;
-                            }
-                    }
+                                }
+                                break;
+                            case "skavi":
+                                {
+                                    Item temp = Utils.JSON<Item>(json);
+                                    temp.VerifyItem(true);
+                                    await temp.SaveItemAsync("Skavi");
+                                }
+                                break;
+                            case "creature":
+                            case "mob":
+                            case "character":
+                                {
+                                    NPC temp = Utils.JSON<NPC>(json);
+                                    await Database.UpdateRecordAsync<NPC>(
+                                        "Creature", AMIData.MongoDatabase.FilterEqual<NPC, string>("_id", temp.name), temp);
+                                    await ReplyAsync($"{temp} Uploaded/Updated");
+                                }
+                                break;
+                            case "player":
+                                {
+                                    Player player = Utils.JSON<Player>(json);
+                                    await Database.UpdateRecordAsync("Character",
+                                        MongoDatabase.FilterEqual<Player, string>("_id", player._id), player);
+                                    await ReplyAsync($"{player} Uploaded/Updated");
+                                }
+                                break;
+                            default: await ReplyAsync("Type entered is incompatible"); break;
+                        }
                 }
 
             }
@@ -343,17 +337,6 @@ namespace AMI.AMIData.OtherCommands
             }
         }
 
-        async Task UploadAreaToDatabase(params string[] args)
-        {
-            if (AdminCheck())
-            {
-                string areaName = StringM.UpperAt(ArrayM.ToString(args));
-                Area area = Area.LoadArea(areaName, null);
-                await area.UploadToDatabase();
-                await ReplyAsync($"{area} Loaded from file and saved into database");
-            }
-        }
-
         [Command("Database All Items")]
         [Summary("Uploads all item files located in bot files into the database.")]
         public async Task DatabaseAllItems()
@@ -372,7 +355,7 @@ namespace AMI.AMIData.OtherCommands
                             {
                                 Item item = FileReading.LoadJSON<Item>(unique.FullName);
                                 item.VerifyItem(true);
-                                await item.SaveItemSync();
+                                await item.SaveItemAsync();
                             }
                             catch (Exception) { Console.WriteLine("Failed to save Unique item: " + unique.FullName); }
                         }
@@ -389,7 +372,7 @@ namespace AMI.AMIData.OtherCommands
                                 {
                                     Item item = FileReading.LoadJSON<Item>(file.FullName);
                                     item.VerifyItem(true);
-                                    await item.SaveItemSync("Skavi");
+                                    await item.SaveItemAsync("Skavi");
                                 }
                                 catch (Exception) { Console.WriteLine("Failed to save item: " + file.FullName); }
                             }
@@ -407,7 +390,7 @@ namespace AMI.AMIData.OtherCommands
                                 {
                                     Item item = FileReading.LoadJSON<Item>(file.FullName);
                                     item.VerifyItem(true);
-                                    await item.SaveItemSync();
+                                    await item.SaveItemAsync();
                                 }
                                 catch (Exception) { Console.WriteLine("Failed to save item: " + file.FullName); }
                             }
@@ -500,7 +483,7 @@ namespace AMI.AMIData.OtherCommands
 
             entry.name = newName;
             entry.originalName = newName;
-            await entry.SaveItemSync();
+            await entry.SaveItemAsync();
             Console.WriteLine($"{newName}'s entry was saved");
         }
         static async Task UpdateAllEntires<T, I>(string table, Func<T, (bool, I)> func)

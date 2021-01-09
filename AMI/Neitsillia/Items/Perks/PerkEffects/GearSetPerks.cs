@@ -11,7 +11,7 @@ namespace AMI.Neitsillia.Items
             {
                 int set = GearSets.GetSetPower("Hunter Trap", owner.character.equipment);
                 target.character.Status("Ensnared", 3 + set, set * 5);
-                target.perkProcs.Add($"Ensnared in {owner}'s trap");
+                target.perkProcs.Add($"Ensnared in {owner.Name}'s trap");
                 rank = 0;
             }
 

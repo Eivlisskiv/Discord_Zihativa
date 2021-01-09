@@ -1,5 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Collections;
+using AMI.Neitsillia.Items;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
@@ -63,10 +64,14 @@ namespace AMI.AMIData.Events
                 case "Rune": return Item.CreateRune(int.Parse(data[1]));
                 case "Repair Kit": return Item.CreateRepairKit(int.Parse(data[1]));
 
-                //case "GearSet": 
+                case "GearSet":
+                    string name = GearSets.Drop(data[1]);
+                    return Item.LoadItem(name);
+
                 case "~Random": return Item.RandomItem(level * 5, data.Length == 2 ? int.Parse(data[1]) : Program.rng.Next(6, 12));
 
-                default: return Item.LoadItem(Utils.RandomElement(data));
+                default: 
+                    return Item.LoadItem(Utils.RandomElement(data));
             }
         }
 

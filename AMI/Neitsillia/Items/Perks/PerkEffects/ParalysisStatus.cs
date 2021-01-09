@@ -15,7 +15,7 @@ namespace AMI.Neitsillia.Items
 
         public object[] Ensnared(CombatResult owner)
         {
-            if (Program.Chance(50 - tier + owner.character.stats.GetDEX()))
+            if (Program.Chance((50 + owner.character.stats.GetDEX()) - (rank + tier)))
                 rank = 0;
             else if (owner.action == CombatResult.Action.Cast)
                 owner.Paralyse("Ensnared");

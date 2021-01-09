@@ -815,9 +815,6 @@ namespace AMI.AMIData.OtherCommands
         {
             if (IsGMLevel(4).Result)
             {
-                string content = Context.Message.Content.Substring(Context.Prefix.Length + notification.Length + 6);
-                if (content.Length == 0) throw NeitsilliaError.ReplyError("There is no content to write in this notification");
-
                 EmbedBuilder noti;
                 switch (notification)
                 {
@@ -830,7 +827,16 @@ namespace AMI.AMIData.OtherCommands
                             noti = OtherCommands.UpdateLog();
                         break;
 
-                    default: noti = DUtils.BuildEmbed(notification, content); break;
+                    default:
+                        string content = Context.Message.Content.Substring(Context.Prefix.Length + "Notify".Length);
+                        int i1 = content.IndexOf('"');
+                        int i2 = content.IndexOf('"', i1 + 1);
+                        content = content.Substring( notification.Length +
+                            (i1 == 0 && i2 == notification.Length + 1 ? 2 : 0));
+
+                        if (content.Length == 0) throw NeitsilliaError.ReplyError("There is no content to write in this notification");
+                        noti = DUtils.BuildEmbed(notification, content); 
+                        break;
                 }
                 //
                 noti.WithFooter("~Help Server |> To view server settings commands");

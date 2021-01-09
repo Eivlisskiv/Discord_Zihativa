@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using AMI.Neitsillia.User;
 using AMYPrototype;
 using AMI.Handlers;
+using System.Net;
 
 namespace AMI.AMIData.Webhooks
 {
@@ -44,6 +45,38 @@ namespace AMI.AMIData.Webhooks
             });
 
             await server.Build().RunAsync();
+        }
+
+        public static string GetFileContent(string url)
+        {
+            try
+            { return ReadRequest(Request(url)); } 
+            catch (Exception e) {  Log.LogS(e); }
+            return null;
+        }
+
+        public static HttpWebRequest Request(string url)
+        {
+            try
+            { return (HttpWebRequest)WebRequest.Create(url); }
+            catch (Exception e)
+            { Log.LogS(e); }
+            return null;
+        }
+
+        public static string ReadRequest(HttpWebRequest request)
+        {
+            try
+            {
+                using HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                using StreamReader stIn = new StreamReader(response.GetResponseStream());
+                return stIn.ReadToEnd();
+            }
+            catch (Exception e)
+            {
+                Log.LogS(e);
+            }
+            return null;
         }
 
         IConfiguration _config;
@@ -83,7 +116,9 @@ namespace AMI.AMIData.Webhooks
                 });
 
                 endpoints.MapPost("/registerVote", RegisterVote);
-                endpoints.MapPost("/query/:query/:fields", GeneralQuery);
+                endpoints.MapPost("/empty", async (ctx) => {
+                    
+                });
 
                 endpoints.MapControllers();
             });
@@ -126,15 +161,6 @@ namespace AMI.AMIData.Webhooks
 
             if (user != null) await user.NewVote();
             else Log.LogS("Failed to register vote");
-        }
-
-        private async Task GeneralQuery(HttpContext context)
-        {
-            if (!await ValidateToken(context)) return;
-
-            //context.Request.
-
-            //string json = Database.Query()
         }
     }
 }

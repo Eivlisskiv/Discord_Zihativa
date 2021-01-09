@@ -1,38 +1,32 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Collections;
 using AMYPrototype;
-using Neitsillia.Items.Item;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Items
 {
     static class GearSets
     {
-        static KeyValuePair<string, string[]>  WriteSet(string name, string chest, string pants, string helm = null, string mask = null, string boots = null)
-        => new KeyValuePair<string, string[]>(name, new string[] { helm, mask, chest, pants, boots});
-
+        static string[] SetContent(string chest, string pants, string helm = null, string mask = null, string boots = null)
+            => new string[] { helm, mask, chest, pants, boots };
 
         static Dictionary<string, string[]> sets = new Dictionary<string, string[]>()
         {
-
+            { "Hunter Trap", SetContent("Trapper Tunic", "Trapper Leg Patches", "Trapper Cap", null, "Trapper Boots") },
         };
 
         public static string Drop(string name)
         {
             if (sets.ContainsKey(name))
             {
+                if (sets[name][2] != null && Program.Chance(2)) return sets[name][2];
+                if (sets[name][3] != null && Program.Chance(8)) return sets[name][3];
+
                 List<int> others = new List<int>();
 
                 if (sets[name][0] != null) others.Add(0);
                 if (sets[name][1] != null) others.Add(1);
                 if (sets[name][4] != null) others.Add(4);
-
-                if (sets[name][2] != null && Program.Chance(1)) return sets[name][2];
-                if (others.Count == 0 && sets[name][3] != null && Program.Chance(5)) return sets[name][3];
 
                 return others.Count > 0 ? sets[name][Utils.RandomElement(others)] : null;
             }

@@ -6,26 +6,26 @@ namespace AMI.Neitsillia
     {
         public static string GeneralPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
+                $"Ongoing Event: Bounty Hunter Festival : Added the Hunter Trap Gear Set to the event shop {Environment.NewLine}"
                 + $" {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Dexterity no longer grant an Agility multiplier {Environment.NewLine}"
-                + $"Lowered Agility's stamina buff from 150% to 80% agility {Environment.NewLine}"
-                + $"Fixed event shop {Environment.NewLine}"
+                $" {Environment.NewLine}"
+                + $" {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string ItemsPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Gear of tier lower than rank 20 now gain up to 20 extra durability. (No applicable to existing gear) {Environment.NewLine}"
+                $" {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()
@@ -46,8 +46,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Fixed Dungeon Bosses not spawning while in a party {Environment.NewLine}"
-                + $"Fixed the increase in floors climbed while being higher level than the area's level {Environment.NewLine}"
+                $"A new arena was built in Atsauka. Use the `service` command to use the arena once you enter it. {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string MobsPatchNotes()
@@ -82,7 +82,7 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                 $"Fixed Whispers Of The Wind quest line not being given after completing the required quest. If you've missed this quest due to this, contact an admin {Environment.NewLine}"
+                 $" {Environment.NewLine}"
                 ;
         }
     }

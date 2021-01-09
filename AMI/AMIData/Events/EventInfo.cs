@@ -11,7 +11,7 @@ namespace AMI.AMIData.Events
         {
             var list = new List<EventInfo>()
             {
-                HalloweenEvent(), //HuntEvent(), ThanksgivingEvent(), ChristmasEvent()
+                 HuntEvent(), 
             };
 
             foreach (EventInfo e in list)
@@ -25,6 +25,7 @@ namespace AMI.AMIData.Events
                 shop = new EventShop("Bounty Trophy",
                     ("Repair Kit;1", 5),
                     ("Rune;1", 30),
+                    ("GearSet;Hunter Trap", 30),
                     ("~Random", 10),
                     ("~Random;5", 30)
                 ),

@@ -279,6 +279,10 @@ namespace AMI.Neitsillia.User.UserInterface
                                 options.Add(GetNum(i));
                     }
                     break;
+                case MsgType.AutoNewCharacter:
+                    options = new List<string>()
+                    { ok, next, info };
+                    break;
                 #endregion
 
                 #region Area
@@ -499,7 +503,6 @@ namespace AMI.Neitsillia.User.UserInterface
                 case MsgType.NewStronghold:
                 case MsgType.AcceptBuilding:
                 case MsgType.ConfirmEggDiscard:
-                case MsgType.AutoNewCharacter:
                     options = new List<string> { ok, cancel };
                     break;
                 #endregion

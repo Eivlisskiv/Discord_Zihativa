@@ -10,8 +10,6 @@ using AMI.AMIData;
 using System.Collections.Generic;
 using AMI.Handlers;
 using AMI.AMIData.Webhooks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Hosting;
 
 namespace AMYPrototype
 {
@@ -143,7 +141,7 @@ namespace AMYPrototype
 
                 CheckMissingPerkEffects();
 
-                data = data ?? new ProgramData();
+                data ??= new ProgramData();
 
                 await new DatabaseCleaner(data.database).StartCleaning();
 
@@ -156,7 +154,7 @@ namespace AMYPrototype
 
                 TaskHandler.Add("Refresh", 60 * 5, AppConnectionAndData);
 
-                await (tokens.platform == Tokens.Platforms.Linux ?
+                _ = (tokens.platform == Tokens.Platforms.Linux ?
                     WebServer.CreateKestrelHost(isDev) :
                     WebServer.CreateHostW());
             }

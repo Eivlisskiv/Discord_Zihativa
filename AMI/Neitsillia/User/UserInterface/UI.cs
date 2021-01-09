@@ -467,6 +467,13 @@ namespace AMI.Neitsillia.User.UserInterface
                 case cancel:
                     await CharacterCommands.SetSkills(player, reaction.Channel, 0, null, new[] { false, false, false, false, false, false });
                     break;
+                case info:
+                    EmbedBuilder em = DUtils.BuildEmbed("Character Creation",
+                    $"{EUI.ok} - Randomize {Environment.NewLine} {EUI.next} - Manual (Advanced)", null, default,
+                    DUtils.NewField("Use the reactions to make your choice", "Making a character can be complicated for new users, use this to skip this step and start playing."
+                    + Environment.NewLine + "You can always make another new character once you are more comfortable with the system."));
+                    await EditMessage(null, em.Build(), removeReactions: false);
+                    break;
             }
         }
 

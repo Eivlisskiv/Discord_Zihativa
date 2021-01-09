@@ -367,10 +367,9 @@ namespace Neitsillia.Items.Item
             Database.UpdateRecord(table, MongoDatabase.FilterEqual<Item, string>("_id", originalName), this);
             Console.WriteLine(type + " : " + name + " Verified, Updated and Registered");
         }
-        public async System.Threading.Tasks.Task SaveItemSync(string table = "Item")
+        public async System.Threading.Tasks.Task SaveItemAsync(string table = "Item")
         {
-            if (table == "Item" && isUnique)
-                table = "Unique Item";
+            if (table == "Item" && isUnique)  table = "Unique Item";
             await Database.UpdateRecordAsync(table, MongoDatabase.FilterEqual<Item, string>
                 ("_id", originalName), this);
             Console.WriteLine(type + " : " + name + " Verified, Updated and Registered");

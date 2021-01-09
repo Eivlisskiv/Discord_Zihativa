@@ -104,9 +104,11 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             int[] rolls = new int[6];
             int total = 0;
             int i = 0;
-            for (; i < 3; i++)
+            for (; i < 2; i++)
                 total += rolls[i] = rng.Next(1, ReferenceData.maxSkillRoll + 1);
 
+            total += rolls[i] = rng.Next(1, ReferenceData.maxSkillRoll);
+            i++;
             int ibase = Verify.MinMax(ReferenceData.maxSkillRoll - (total / (i + 1)), 6, 3);
             total += rolls[i] = rng.Next(ibase - 2, ibase + 3);
 
@@ -121,9 +123,9 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         {
             if (ask)
             {
-                EmbedBuilder em = DUtils.BuildEmbed("Randomize Character?", "Would you like your character to be randomly generated?", null, default,
-                    DUtils.NewField("Use the reactions to make your choice", "Making a character can be complicated for new users, use this to skip this step and start playing."
-                    + Environment.NewLine + "You can always make another new character once you are more comfortable with the system."));
+                EmbedBuilder em = DUtils.BuildEmbed("Character Creation",
+                    $"{EUI.ok} - Randomize {Environment.NewLine} {EUI.next} - Manual (Advanced)"
+                    + Environment.NewLine + Environment.NewLine + $"{EUI.info} - More Info", null, default);
                 await player.NewUI(null, em.Build(), channel, MsgType.AutoNewCharacter);
             }
             else
