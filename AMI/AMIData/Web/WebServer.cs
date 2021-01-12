@@ -90,6 +90,17 @@ namespace AMI.AMIData.Webhooks
         {
             service.AddRouting();
             service.AddControllers();
+
+            service.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("*")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                    });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -99,9 +110,11 @@ namespace AMI.AMIData.Webhooks
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
+
+            app.UseCors();
 
             //To use static files in folder wwwroot
             //app.UseStaticFiles();

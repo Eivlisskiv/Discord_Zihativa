@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AMI.AMIData.Webhooks;
 using AMI.Methods;
 using AMI.Neitsillia.User;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -16,12 +17,10 @@ namespace AMI.AMIData.Web.Controllers
     public class LoginController : ControllerBase
     {
         [HttpGet("discord/{token}")]
-        public async Task<string> GetDiscord(string token)
+        public IActionResult GetDiscord(string token)
         {
             HttpWebRequest request = WebServer.Request("https://discord.com/api/users/@me");
             request.Headers.Add(HttpRequestHeader.Authorization, "Bearer " + token);
-            request.Headers.Add("Access-Control-Allow-Origin", "*");
-            request.Headers.Add("Access-Control-Allow-Headers", "*");
             string discordResponse = WebServer.ReadRequest(request);
 
             //Parse discord user data
@@ -30,13 +29,11 @@ namespace AMI.AMIData.Web.Controllers
             ulong userId = ulong.Parse(data["id"]);
             BotUser botUser = BotUser.Load(userId);
 
-            
-
-            return "{" +
+            return Ok("{" +
                 $"discord: {discordResponse}," + Environment.NewLine +
                 $"server: {{ {Utils.JSON(botUser)} }}," +
                 $"characters: {{ {Utils.JSON(BotUser.GetCharFiles(userId))} }}," +
-                "}";
+                "}");
         }
 
         // POST api/<ValuesController>

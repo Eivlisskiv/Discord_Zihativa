@@ -90,8 +90,8 @@ namespace AMI.Methods
         internal static T JSON<T>(string json) => JsonConvert.DeserializeObject<T>(json);
         internal static T JSONFromFile<T>(string path)
         {
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(path))
-                 return JSON<T>(sr.ReadToEnd());
+            using System.IO.StreamReader sr = new System.IO.StreamReader(path);
+            return JSON<T>(sr.ReadToEnd());
         }
 
         internal static object[] RunExecutable(string exePath, string arguments = null, bool wait = false)

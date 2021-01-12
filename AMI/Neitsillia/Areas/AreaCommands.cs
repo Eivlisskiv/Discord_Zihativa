@@ -107,15 +107,6 @@ namespace AMI.Neitsillia.Commands
                         }
                         return "There are no dungeons currently available";
                     }
-                case "Arena":
-                    {
-                        if(player.Area.type == AreaType.ArenaLobby)
-                        {
-                            await EnterArena(player, chan);
-                            return null;
-                        }
-                        return "You must be in an Arena Lobby to enter arena challenges.";
-                    }
                 default:
                     {
                         Junction j = player.Area.junctions.Find(Junction.FindName(areaName));
@@ -269,7 +260,7 @@ namespace AMI.Neitsillia.Commands
             else if (!player.IsLeader) message = $"{player.name} is not party leader";
             else if (player.Area.type == AreaType.ArenaLobby)
                 message = $"There is nothing to explore here. " +
-                    $"Instead use ``~Enter Arena`` to participate in the arena.";
+                    $"Instead use the ``Service`` command to participate in the arena.";
             else
             {
                 Area area = player.Area;

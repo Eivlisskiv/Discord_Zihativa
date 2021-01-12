@@ -110,8 +110,8 @@ namespace AMI.Module
         internal static string Stats_Advanced(Player player)
         {
             return "**Agility:** " + player.Agility() + Environment.NewLine +
-                        "**Crit Chance:** " + player.CritChance() + '%' + Environment.NewLine +
-                        "**Crit Damage:** " + player.CritMult() + '%' + Environment.NewLine;
+                        "**Crit Chance:** " + Math.Round(player.CritChance(), 2) + '%' + Environment.NewLine +
+                        "**Crit Damage:** " + Math.Round(player.CritMult(), 2) + '%' + Environment.NewLine;
         }
         internal static string Stats_Skills(Player player)
         {

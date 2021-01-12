@@ -464,7 +464,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 case ok:
                     await CharacterCommands.AutoCharacter(player, reaction.Channel, false);
                     break;
-                case cancel:
+                case next:
                     await CharacterCommands.SetSkills(player, reaction.Channel, 0, null, new[] { false, false, false, false, false, false });
                     break;
                 case info:
