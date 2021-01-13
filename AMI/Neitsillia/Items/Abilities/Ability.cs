@@ -8,7 +8,7 @@ using System;
 namespace AMI.Neitsillia.Items
 {
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
-    class Ability
+    public class Ability
     {
         private static AMIData.ReflectionCache<Ability> reflectionCache = new AMIData.ReflectionCache<Ability>();
 

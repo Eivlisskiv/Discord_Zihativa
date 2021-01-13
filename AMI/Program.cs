@@ -154,9 +154,9 @@ namespace AMYPrototype
 
                 TaskHandler.Add("Refresh", 60 * 5, AppConnectionAndData);
 
-                _ = (tokens.platform == Tokens.Platforms.Linux ?
-                    WebServer.CreateKestrelHost(isDev) :
-                    WebServer.CreateHostW());
+                //_ = (tokens.platform == Tokens.Platforms.Linux ?
+                //WebServer.CreateKestrelHost(isDev) :
+                _ = WebServer.CreateHostW(isDev);
             }
 
             SetState(State.Ready);

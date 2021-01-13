@@ -53,7 +53,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 $"Lottery current Total Value: {TotalValue} {Environment.NewLine}" +
                 $"Ticket cost: {ticketValue} {Environment.NewLine}" +
                 $"Ends in {Math.Floor(time.TotalDays)}Days" +
-                    $" {time.ToString("h'h 'm'm 's's'")}"
+                    $" {time:h'h 'm'm 's's'}"
                 );
             info.WithColor(225, 0, 0);
             return info;
@@ -62,7 +62,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         {
             EmbedBuilder info = Info();
             info.Description += Environment.NewLine + 
-                "Enter ``~Lottery`` to view current worth and buy a ticket.";
+                "Enter `~Lottery` to view current worth and buy a ticket.";
             return (await GameMasterCommands.SendToSubscribed(
                 message, info.Build())).ToArray();
         }

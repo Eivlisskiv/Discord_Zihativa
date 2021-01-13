@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Adventures
 {
-    class Adventure
+    public class Adventure
     {
         Random Rng => Program.rng;
 

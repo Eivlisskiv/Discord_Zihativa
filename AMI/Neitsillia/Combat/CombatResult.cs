@@ -233,7 +233,7 @@ namespace AMI.Neitsillia.Combat
 
         internal string GetResultInfo(string targetIndex)
         {
-            string r = $"**{Name}** | ``{targetIndex}`` |" +
+            string r = $"**{Name}** | `{targetIndex}` |" +
                 Environment.NewLine +
                 GetAction();
             character.HealthStatus(out string temp, false);
@@ -263,7 +263,7 @@ namespace AMI.Neitsillia.Combat
                 case Action.Missed: return action.ToString() + Environment.NewLine;
                 default:
                     if (results[0] != null)
-                        return $" ``{results[0]}``" + Environment.NewLine;
+                        return $" `{results[0]}`" + Environment.NewLine;
                     else return null;
             }
         }

@@ -1,6 +1,6 @@
 ﻿namespace AMI.Neitsillia.Areas
 {
-    internal enum AreaType
+    public enum AreaType
     {
         Unknown, Dungeon, Stronghold, Arena, Tavern, Town,
         Mines, Ruins, Caves,

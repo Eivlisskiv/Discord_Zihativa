@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AMI.Neitsillia.NeitsilliaCommands
 {
-    class PartyMember
+    public class PartyMember
     {
         public ulong id; 
         public string characterName;

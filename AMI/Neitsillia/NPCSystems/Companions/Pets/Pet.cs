@@ -12,9 +12,9 @@ using Neitsillia.Items.Item;
 
 namespace AMI.Neitsillia.NPCSystems.Companions.Pets
 {
-    class Pet
+    public class Pet
     {
-        internal enum PetStatus
+        public enum PetStatus
         {
             Idle, InParty,
             Resting, Fetching

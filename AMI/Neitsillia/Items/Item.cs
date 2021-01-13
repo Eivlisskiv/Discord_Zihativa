@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace Neitsillia.Items.Item
 {
     [BsonIgnoreExtraElements]
-    internal class Item
+    public class Item
     {
         internal static MongoDatabase Database => Program.data.database;
         internal static StatsWeights sw = new StatsWeights();
@@ -377,7 +377,7 @@ namespace Neitsillia.Items.Item
         //
         public static Item RandomItem(int tier, int type = -1, bool cap = true)
         {
-            if (tier < 25) tier = 25;
+            if (tier < 20) tier = 20;
             else if (cap) tier = Math.Min(tier, 38 * 5);
 
             if (type < 0) type = Utils.RandomElement(0, 1, 2, 5, 6, 7, 8, 9, 10, 11);

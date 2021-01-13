@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NPCSystems.Companions
 {
-    class EggPocket
+    public class EggPocket
     {
         public string _id;
 

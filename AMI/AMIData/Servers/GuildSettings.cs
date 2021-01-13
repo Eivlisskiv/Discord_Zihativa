@@ -135,7 +135,7 @@ namespace AMI.AMIData.Servers
                 $"Channel Count: {Guild.Channels.Count}", 
                 Guild.Id.ToString(), Color.DarkRed,
                     DUtils.NewField("Bot Data",
-                    $"Prefix: ``{prefix}`` {Environment.NewLine}" +
+                    $"Prefix: `{prefix}` {Environment.NewLine}" +
                     $"Main Channel: {mainChannel?.ToString() ?? "None"} {Environment.NewLine}" +
                     $"Bot Notification Channel: {notificationChannel?.ToString() ?? "None"} {Environment.NewLine}" +
                     $"Game Notification Channel: {gameNotification?.ToString() ?? "None"}{Environment.NewLine}" +

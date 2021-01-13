@@ -27,7 +27,7 @@ using AMI.Neitsillia.Areas.InteractiveAreas;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
-    partial class UI
+    public partial class UI
     {
         private static ReflectionCache<UI> reflectionCache = new ReflectionCache<UI>();
 

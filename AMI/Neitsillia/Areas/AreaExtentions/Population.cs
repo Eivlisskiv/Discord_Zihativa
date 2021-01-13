@@ -1,13 +1,10 @@
 ﻿using AMI.Neitsillia.NPCSystems;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.AreaExtentions
 {
-    class Population
+    public class Population
     {
         static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
 

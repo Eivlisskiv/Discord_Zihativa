@@ -20,15 +20,17 @@ namespace AMI.AMIData.Webhooks
     public class WebServer
     {
         static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
+        static IConfigurationRoot CreateConfig()
+            => new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("hosting.json", optional: true).Build();
         public static async Task CreateKestrelHost(bool isDev)
         {
-            var config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("hosting.json", optional: true)
-            .Build();
+            var config = CreateConfig();
 
             var host = new WebHostBuilder().UseConfiguration(config)
                 .UseContentRoot(Directory.GetCurrentDirectory()).UseStartup<WebServer>();
+
             if (Program.tokens.platform == Tokens.Platforms.Linux) {
                 host.UseKestrel()
                 .UseUrls($"http://*:{(isDev ? "5080" : "5000")}");
@@ -37,11 +39,18 @@ namespace AMI.AMIData.Webhooks
             await host.Build().RunAsync();
         }
 
-        public static async Task CreateHostW()
+        public static async Task CreateHostW(bool isDev)
         {
+            var config = CreateConfig();
+
             var server = Host.CreateDefaultBuilder().ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseStartup<WebServer>();
+                webBuilder.UseStartup<WebServer>().UseContentRoot(Directory.GetCurrentDirectory());
+                if (Program.tokens.platform == Tokens.Platforms.Linux)
+                {
+                    webBuilder.UseKestrel()
+                    .UseUrls($"http://*:{(isDev ? "5080" : "5000")}");
+                }
             });
 
             await server.Build().RunAsync();

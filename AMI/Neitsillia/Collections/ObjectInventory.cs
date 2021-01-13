@@ -2,7 +2,7 @@
 
 namespace AMI.Neitsillia.Collections
 {
-    class ObjectInventory<T, C>
+    public class ObjectInventory<T, C>
     {
         public int Count => list.Count;
         List<StackedObject<T, C>> list = new List<StackedObject<T, C>>();

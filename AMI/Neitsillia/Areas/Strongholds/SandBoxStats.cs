@@ -1,6 +1,6 @@
 ﻿namespace AMI.Neitsillia.Areas
 {
-    class SandBoxStats
+    public class SandBoxStats
     {
         public int MaximumPopulation;
         public int StorageSpace;

@@ -74,11 +74,11 @@ namespace AMI.Neitsillia.InventoryCommands
         {
             string message = null;
             Player player = Player.Load(Context.BotUser);
-            EmbedBuilder loot = new EmbedBuilder();
+            
             if (player.userTimers.dailyLoot <= DateTime.UtcNow || 
                 (player.userTimers.dailyLoot.Day == DateTime.UtcNow.Day))
             {
-                loot = DailyReward(player);
+                EmbedBuilder loot = DailyReward(player);
                 if (loot.Footer != null)
                 {
                     message = loot.Footer.Text;
@@ -123,11 +123,11 @@ namespace AMI.Neitsillia.InventoryCommands
             else temp = dailyressource.ToString();
             itemsLoot += temp + Environment.NewLine;
             //
-            int tier = Program.rng.Next(Verify.Min(player.level, 5), Verify.Min(player.level, 8));
-            itemsLoot += GetDailyGear(player, tier) + Environment.NewLine;
+            int tier = Program.RandomInterval(player.level, 0.15);
+            itemsLoot += GetDailyGear(player, tier * 5) + Environment.NewLine;
 
             if(player.level < 9)
-            itemsLoot += GetDailyGear(player, Program.rng.Next(Verify.Min(player.level, 5), Verify.Min(player.level, 8)), (int)Item.IType.Weapon) + Environment.NewLine;
+                itemsLoot += GetDailyGear(player, 20, (int)Item.IType.Weapon) + Environment.NewLine;
 
             EmbedBuilder loot = new EmbedBuilder();
             //
@@ -152,8 +152,7 @@ namespace AMI.Neitsillia.InventoryCommands
         }
         string GetDailyGear(Player player, int tier, int type = -1)
         {
-            if (type < 0)
-                type = Program.rng.Next(6, 12);
+            if (type < 0) type = Program.rng.Next(6, 12);
             Item dailyGear = Item.RandomItem(tier, type);
             if (!player.CollectItem(dailyGear, 1))
             {

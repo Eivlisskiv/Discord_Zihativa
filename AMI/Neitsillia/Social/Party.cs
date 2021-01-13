@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NeitsilliaCommands
 {
-    class Party
+    public class Party
     {
         public string _id;
         public string partyName;

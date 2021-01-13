@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace AMI.Neitsillia.Areas.Strongholds
 {
-    class Building
+    public class Building
     {
         public static readonly string[][] AvailableBuildingSchematics = new string[][]
         {

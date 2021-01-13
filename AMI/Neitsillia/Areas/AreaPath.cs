@@ -2,7 +2,7 @@
 
 namespace AMI.Neitsillia.Areas
 {
-    class AreaPath
+    public class AreaPath
     {
         public enum Table { Area, Dungeons,
            // Nest

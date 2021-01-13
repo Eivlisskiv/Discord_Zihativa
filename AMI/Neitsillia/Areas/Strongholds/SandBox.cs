@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace AMI.Neitsillia.Areas.Strongholds
 {
     [BsonIgnoreExtraElements]
-    class SandBox
+    public class SandBox
     {
         public ulong leader;
         //
@@ -142,7 +142,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
         {
             EmbedBuilder em = new EmbedBuilder();
             em.WithTitle("Stronghold Schematics:");
-            em.WithDescription($"example: ``~sh build Warehouse`` to build a warehouse");
+            em.WithDescription($"example: `~sh build Warehouse` to build a warehouse");
             string list = null;
             for (int i = 0; i < buildingBlueprints.Count; i++)
                 list += $"{i}|{buildingBlueprints[i]}{Environment.NewLine}";

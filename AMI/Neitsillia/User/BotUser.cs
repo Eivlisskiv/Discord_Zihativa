@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace AMI.Neitsillia.User
 {
     [BsonIgnoreExtraElements]
-    class BotUser
+    public class BotUser
     {
         //private static Cache<ulong, BotUser> cache = new Cache<ulong, BotUser>();
 

@@ -2,7 +2,7 @@
 
 namespace AMI.Neitsillia.Gambling.Cards
 {
-    class Hand
+    public class Hand
     {
         public enum Game { Blackjack };
 

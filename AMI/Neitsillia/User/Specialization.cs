@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User.Specialization
 {
-    class Specialization
+    public class Specialization
     {
-        internal enum Specs { Joker, Fighter, Healer, Blacksmith,
+        public enum Specs { Joker, Fighter, Healer, Blacksmith,
             //Rogue, Caster
         };
         internal static string[] SpecDescription =

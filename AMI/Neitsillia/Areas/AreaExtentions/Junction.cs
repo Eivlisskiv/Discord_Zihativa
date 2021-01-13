@@ -6,7 +6,7 @@ using System;
 
 namespace NeitsilliaEngine
 {
-    class Junction
+    public class Junction
     {
         public string destination;
         public int floorRequirement;

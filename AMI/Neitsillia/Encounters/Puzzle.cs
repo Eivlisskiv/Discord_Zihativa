@@ -1,19 +1,14 @@
 ﻿using AMI.Methods;
-using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Neitsillia.Items.Item;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Encounters
 {
-    class Puzzle
+    public class Puzzle
     {
         public enum Reward { Random, Loot, Combat, /*Dungeon*/ }
         static Random Rng => Program.rng;

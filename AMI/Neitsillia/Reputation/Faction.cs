@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AMI.Neitsillia.Reputation
+﻿namespace AMI.Neitsillia.Reputation
 {
-    class Faction
+    public class Faction
     {
         public enum Factions
         {

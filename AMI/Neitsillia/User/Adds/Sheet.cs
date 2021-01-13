@@ -1,12 +1,8 @@
-﻿using AMI.Methods;
-using AMYPrototype;
-using AMYPrototype.Commands;
-using System;
-using System.IO;
+﻿using System;
 
 namespace AMI.Neitsillia.User
 {
-    class Sheet
+    public class Sheet
     {
         public int age;
         public string gender = "Unknown";

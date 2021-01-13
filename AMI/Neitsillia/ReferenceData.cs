@@ -53,8 +53,8 @@ namespace AMI.Neitsillia
             Child, Peasant, Merchant, Gladiator, Adventurer, //Fighter
             Blacksmith, //Blacksmith
             Alchemist, Tapster //Healer
-        }; 
-        internal enum CombatRole { None, Healer, Fighter}
+        };
+        public enum CombatRole { None, Healer, Fighter}
         //items
         public enum EquipmentsSlot {Boots, ChestP, Helmet, Trousers, Weapon, Mask};
 

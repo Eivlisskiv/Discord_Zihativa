@@ -8,7 +8,7 @@ using System;
 
 namespace AMI.Neitsillia.Items.Abilities
 {
-    class Specter
+    public class Specter
     {
         //--Statics--//
 

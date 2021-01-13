@@ -63,7 +63,7 @@ namespace AMI.Neitsillia.Commands
                 await Enter(player, areaName, Context.Channel);
                 await DUtils.DeleteContextMessageAsync(Context);
             }
-            else await DUtils.Replydb(Context, "To travel, one must have a destination. ``~Enter 'Area'`` or use the ``~tp`` interface.");
+            else await DUtils.Replydb(Context, "To travel, one must have a destination. `~Enter 'Area'` or use the `~tp` interface.");
         }
         internal static async Task Enter(Player player, string areaName, ISocketMessageChannel chan)
         {
@@ -80,7 +80,7 @@ namespace AMI.Neitsillia.Commands
             else if (player.Area.type == AreaType.Dungeon && areaName != "Floor")
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not leave this dungeon so easily, the only way is forward."));
             else if ((error = await TryEnter(player, areaName, chan)) != null)
-                DUtils.DeleteMessage(await chan.SendMessageAsync($"{player.name}, {error} {Environment.NewLine} Use ``~Travel Post`` for accessible areas."));
+                DUtils.DeleteMessage(await chan.SendMessageAsync($"{player.name}, {error} {Environment.NewLine} Use `~Travel Post` for accessible areas."));
 
             if (player.Party != null)
                 await player.Party.SyncArea(player.areaPath);

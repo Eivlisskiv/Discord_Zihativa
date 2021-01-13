@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AMI.Neitsillia.Gambling.Cards
+﻿namespace AMI.Neitsillia.Gambling.Cards
 {
-    class Card
+    public class Card
     {
         public enum  Shape { Club, Spade, Heart, Diamond }
 

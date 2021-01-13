@@ -15,7 +15,7 @@ using System.Collections.Generic;
 namespace AMI.Neitsillia.Encounters
 {
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
-    class Encounter
+    public class Encounter
     {
         [MongoDB.Bson.Serialization.Attributes.BsonId]
         public string _id;

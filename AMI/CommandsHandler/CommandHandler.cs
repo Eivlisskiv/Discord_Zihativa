@@ -176,7 +176,7 @@ namespace AMYPrototype.Commands
                 string prefix = context.Prefix;
                 await context.Channel.SendMessageAsync(
                       $"Character was not found, please load a character `{prefix}load charnamehere` from your characters list `{prefix}List Characters`" +
-                      $" OR create a new character `{prefix}new char charnamehere``");
+                      $" OR create a new character `{prefix}new char charnamehere`");
             }
             else if (exception is NeitsilliaError replyerror && replyerror.ErrorType == NeitsilliaError.NeitsilliaErrorType.ReplyError)
                 await context.Channel.SendMessageAsync(replyerror.ExtraMessage);
@@ -266,13 +266,13 @@ namespace AMYPrototype.Commands
                 case CommandError.ParseFailed:
                 case CommandError.BadArgCount:
                     {
-                        await context.Channel.SendMessageAsync($"``{result.ErrorReason}`` {Environment.NewLine}" +
+                        await context.Channel.SendMessageAsync($"`{result.ErrorReason}` {Environment.NewLine}" +
                             $"Type `{context.Prefix}chelp {method.Name}` for more details",
                             embed:new AMI.CommandsHandler.CommandInfoEmbed(method, true).Embed);
                     }
                     return true;
                 default:
-                    await context.Channel.SendMessageAsync($"Muo, something went wrong. ``{result.ErrorReason}``");
+                    await context.Channel.SendMessageAsync($"Muo, something went wrong. `{result.ErrorReason}`");
                     Log.LogS(result.ErrorReason);
                     return true;
             }

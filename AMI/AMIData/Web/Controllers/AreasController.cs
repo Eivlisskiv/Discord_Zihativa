@@ -1,10 +1,6 @@
-﻿using AMI.Methods;
-using AMI.Neitsillia.Areas.AreaPartials;
-using Microsoft.AspNetCore.Http;
+﻿using AMI.Neitsillia.Areas.AreaPartials;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -13,31 +9,34 @@ namespace AMI.AMIData.Web.Controllers
 {
     [Route("api/areas")]
     [ApiController]
-    public class AreasController : ControllerBase
+    public class AreasController : MainController<Area>
     {
-        private async Task Json(object obj)
+        internal override Area PravitizeObject(Area area)
         {
-            string json = Utils.JSON(obj);
-            Response.Headers.Add("Content-Type", "application/json");
-            await Response.WriteAsync(json);
-        }
-
-        private async Task Error(string error)
-        {
-            Response.Headers.Add("Content-Type", "application/json");
-            await Response.WriteAsync($"{{error: {error} }}");
+            //remove private data unless token is owner or admin
+            if (area.sandbox != null)
+            {
+                area.sandbox.buildingBlueprints = null;
+                area.sandbox.stock = null;
+                area.sandbox.stats = null;
+            }
+            return area;
         }
 
         // GET api/<AreasController>/5
-        [HttpGet("{name}")]
-        public async Task Get(string name)
+        [HttpGet("{address}")]
+        public async Task Get(string address)
         {
+            string id = address.Replace(';', '\\');
             Area area = null;
-            try { area = Area.LoadFromName(name); }
+            try { area = Area.LoadArea(id); }
             catch (Exception) { }
 
             if (area == null) await Error("not found");
-            else await Json(area);
+            else
+            {
+                await ToJson(area);
+            }
         }
 
         [HttpPost()]

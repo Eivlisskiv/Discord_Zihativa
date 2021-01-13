@@ -3,13 +3,12 @@ using AMI.Methods.Graphs;
 using AMI.Module;
 using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
-using Discord.WebSocket;
 using Neitsillia.Items.Item;
 using System;
 
 namespace AMI.Neitsillia.Collections
 {
-    class Tools
+    public class Tools
     {
         public string _id;
 

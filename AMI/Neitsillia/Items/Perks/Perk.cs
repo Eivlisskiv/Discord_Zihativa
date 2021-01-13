@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace AMI.Neitsillia.Items
 {
-    partial class Perk
+    public partial class Perk
     {
         #region Instance
         public static int RNG(int max) { return Program.rng.Next(max); }

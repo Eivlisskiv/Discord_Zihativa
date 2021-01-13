@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AMI.Neitsillia.Religion
 {
-    class Faith
+    public class Faith
     {
         internal static readonly Dictionary<string, (string diety, int tier)> Sigils =
         new Dictionary<string, (string, int)>()

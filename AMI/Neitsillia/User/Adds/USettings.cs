@@ -5,7 +5,7 @@ using System.IO;
 
 namespace AMI.Neitsillia.User
 {
-    class USettings
+    public class USettings
     {
         public int[] RGB = new int[3];
         public ulong userID;

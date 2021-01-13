@@ -3,7 +3,7 @@ using System;
 
 namespace AMI.Neitsillia.Collections
 {
-    class Equipment
+    public class Equipment
     {
         internal const int gearCount = 9;
         //

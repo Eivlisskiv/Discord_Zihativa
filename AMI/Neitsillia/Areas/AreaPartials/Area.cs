@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace AMI.Neitsillia.Areas.AreaPartials
 {
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
-    partial class Area
+    public partial class Area
     {
         static MongoDatabase Database => Program.data.database;
 

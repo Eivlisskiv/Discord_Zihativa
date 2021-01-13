@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData
 {
-    class DataBaseRelation<I, O>
+    public class DataBaseRelation<I, O>
     {
         public I _id;
         string TableName => typeof(O).Name;

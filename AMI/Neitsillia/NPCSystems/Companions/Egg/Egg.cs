@@ -2,9 +2,9 @@
 
 namespace AMI.Neitsillia.NPCSystems.Companions
 {
-    class Egg
+    public class Egg
     {
-        internal enum EggChallenge { Combat, Exploration, Crafting };
+        public enum EggChallenge { Combat, Exploration, Crafting };
 
         public int Tier;
         public string Name;

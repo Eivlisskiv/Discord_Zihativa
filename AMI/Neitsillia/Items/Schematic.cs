@@ -7,7 +7,7 @@ using System;
 
 namespace AMI.Neitsillia.Crafting
 {
-    class Schematic
+    public class Schematic
     {
         public string name;
         public bool exists = true;

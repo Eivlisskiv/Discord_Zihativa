@@ -6,7 +6,6 @@ using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
-using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using AMYPrototype.Commands;
@@ -17,7 +16,7 @@ using System.Collections.Generic;
 
 namespace AMI.Neitsillia.NPCSystems
 {
-    class CharacterMotherClass
+    public class CharacterMotherClass
     {
         #region Public Vars
         public long health;

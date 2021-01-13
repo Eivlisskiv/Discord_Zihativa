@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NPCSystems.Companions.Pets
 {
-    class PetList
+    public class PetList
     {
         static MongoDatabase Database => Program.data.database;
 

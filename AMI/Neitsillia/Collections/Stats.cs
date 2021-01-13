@@ -3,7 +3,7 @@
 namespace AMI.Neitsillia.Collections
 {
     [BsonIgnoreExtraElements]
-    class Stats
+    public class Stats
     {
         public const int hpPerEnd = 3;
         public const double DurabilityPerEnd = 0.01;//% decreases durability loss

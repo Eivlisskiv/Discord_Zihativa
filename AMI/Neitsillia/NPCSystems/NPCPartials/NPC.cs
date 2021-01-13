@@ -1,14 +1,9 @@
 ﻿using AMI.Methods;
 using AMI.Methods.Graphs;
-using AMI.Neitsillia.Areas;
-using AMI.Neitsillia.Areas.AreaExtentions;
 using AMI.Neitsillia.Collections;
-using AMI.Neitsillia.Combat;
-using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMYPrototype;
-using AMYPrototype.Commands;
 using Discord;
 using MongoDB.Bson.Serialization.Attributes;
 using Neitsillia.Items.Item;
@@ -17,13 +12,12 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using static AMI.Neitsillia.ReferenceData;
 
 namespace AMI.Neitsillia.NPCSystems
 {
     [BsonIgnoreExtraElements]
-    partial class NPC : CharacterMotherClass
+    public partial class NPC : CharacterMotherClass
     {
         static AMIData.MongoDatabase Database => Program.data.database;
 

@@ -110,7 +110,7 @@ namespace AMI.Neitsillia.Combat
             name = name.Trim();
             if (player.HasAbility(name, out int index))
             { results[0] = name; return results; }
-            throw NeitsilliaError.ReplyError($"{player.name} does not have ability {name}. To view character's abilities, type ``~abilities``.");
+            throw NeitsilliaError.ReplyError($"{player.name} does not have ability {name}. To view character's abilities, type `~abilities`.");
         }
 
         static string[] ParseTarget(string name, string[] results)
@@ -447,7 +447,7 @@ namespace AMI.Neitsillia.Combat
             {
                 string playerEquipmentCondition = player.equipment.VerifyCND();
                 if (playerEquipmentCondition != null && playerEquipmentCondition != "")
-                    fight.AddField("Items Broken", $"``{playerEquipmentCondition}``", true);
+                    fight.AddField("Items Broken", $"`{playerEquipmentCondition}`", true);
             }
             string abilityName = player.duel.abilityName;
             player.duel.abilityName = null;

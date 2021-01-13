@@ -2,7 +2,7 @@
 
 namespace AMI.Neitsillia.Adventures
 {
-    class AdventureQuest
+    public class AdventureQuest
     {
         public double hoursTime;
 

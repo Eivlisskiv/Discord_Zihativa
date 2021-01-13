@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace AMI.Neitsillia.Collections
 {
-    class Inventory
+    public class Inventory
     {
         public List<StackedItems> inv = new List<StackedItems>();
 

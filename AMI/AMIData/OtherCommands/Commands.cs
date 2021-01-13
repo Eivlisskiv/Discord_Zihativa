@@ -84,7 +84,22 @@ namespace AMI.AMIData.OtherCommands
 
         [Command("Support Server")][Alias("Support", "support invite")]
         public async Task Createinvite()
-        { await Context.Channel.SendMessageAsync("https://discord.gg/eGK72Aw"); }
+        {
+            var guild = Context.Client.GetGuild(201877884313403392);
+            var invs = await guild.GetInvitesAsync();
+            var botInvites = invs.Where(inv => inv.Inviter.Id == Context.Client.CurrentUser.Id);
+            if(botInvites.Any())
+            {
+                await ReplyAsync(botInvites.First().Url);
+                return;
+            }
+
+            var gs = GuildSettings.Load(guild);
+            var chan = (ITextChannel)guild.GetChannel(gs.mainChannel.id);
+            var inv = await chan.CreateInviteAsync(null);
+            await ReplyAsync(inv.Url);
+
+        }
         [Command("Roll")]
         public async Task Roll(params string[] message)
         {
@@ -273,7 +288,7 @@ namespace AMI.AMIData.OtherCommands
             content = content.Remove(0, content.IndexOf(' '));
             if (content.Trim().Length < 1)
                 await DUtils.Replydb(Context, "Your suggestion is empty, please enter your suggestion after the command:" +
-                    $" ex: ``{Context.Prefix}suggest More content pls``", lifetime: 2);
+                    $" ex: `{Context.Prefix}suggest More content pls`", lifetime: 2);
             else
             {
                 string message = "Suggestion sent" + Environment.NewLine;
@@ -302,7 +317,7 @@ namespace AMI.AMIData.OtherCommands
             content = content.Remove(0, content.IndexOf(' '));
             if (content.Trim().Length < 1)
                 await DUtils.Replydb(Context, "Your report is empty, please enter your report following the command:" +
-                    $" ex: ``{Context.Prefix}BugReport I get stuck after going in x area while being y``", lifetime: 2);
+                    $" ex: `{Context.Prefix}BugReport I get stuck after going in x area while being y`", lifetime: 2);
             else
             {
                 string message = "Report sent" + Environment.NewLine;

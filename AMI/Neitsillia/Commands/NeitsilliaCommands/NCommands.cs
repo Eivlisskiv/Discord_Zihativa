@@ -12,7 +12,6 @@ using AMI.Neitsillia.Religion;
 using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
-using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;

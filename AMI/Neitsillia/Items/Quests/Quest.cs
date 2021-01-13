@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace AMI.Neitsillia.Items.Quests
 {
-    class Quest
+    public class Quest
     {
         //Static Vars
         public enum QuestTrigger

@@ -5,15 +5,12 @@ using AMI.Module;
 using AMI.Neitsillia.Areas;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Encounters;
-using AMI.Neitsillia.Gambling.Cards;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NeitsilliaCommands;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.NPCSystems.Companions;
-using AMI.Neitsillia.NPCSystems.Companions.Pets;
-using AMI.Neitsillia.Religion;
 using AMI.Neitsillia.User.UserInterface;
 using Discord;
 using Discord.WebSocket;
@@ -29,7 +26,7 @@ using System.Threading.Tasks;
 namespace AMI.Neitsillia.User.PlayerPartials
 {
     [BsonIgnoreExtraElements]
-    partial class Player : CharacterMotherClass
+    public partial class Player : CharacterMotherClass
     {
         #region Class Variables
 

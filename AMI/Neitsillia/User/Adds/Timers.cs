@@ -3,7 +3,7 @@ using System;
 
 namespace AMI.Neitsillia.User
 {
-    class Timers
+    public class Timers
     {
         public ulong id;
         public DateTime dailyLoot;

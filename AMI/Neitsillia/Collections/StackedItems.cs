@@ -3,7 +3,7 @@ using System;
 
 namespace AMI.Neitsillia.Collections
 {
-    class StackedItems
+    public class StackedItems
     {
         public Item item;
         public int count;
