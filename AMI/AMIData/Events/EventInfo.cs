@@ -2,6 +2,7 @@
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AMI.AMIData.Events
 {
@@ -11,7 +12,7 @@ namespace AMI.AMIData.Events
         {
             var list = new List<EventInfo>()
             {
-                 HuntEvent(), 
+                 ArenaChamp(), 
             };
 
             foreach (EventInfo e in list)
@@ -31,6 +32,22 @@ namespace AMI.AMIData.Events
                 ),
 
                 eventBounty = new EventBounty("Goq", "Vhoizuku", "Cevharhu"),
+            };
+
+        public static EventInfo ArenaChamp() =>
+            new EventInfo("Arena Championship")
+            {
+                description = "Complete objectives in the arena for points to spend in the `event shop`",
+                shop = new EventShop("Arena Badges",
+                    ("Repair Kit;1", 5),
+                    ("Rune;1", 30),
+                    ("GearSet;Gladiator", 30),
+                    ("~Random", 10),
+                    ("~Random;5", 30)
+                ),
+
+                //eventBounty = new EventBounty("Goq", "Vhoizuku", "Cevharhu"),
+                rewardSources = new RewardSources[] { RewardSources.Arena },
             };
 
         public static EventInfo HalloweenEvent() =>
@@ -86,6 +103,11 @@ namespace AMI.AMIData.Events
                 shop = EventShop.HolidayPreset()
             };
 
+        public enum RewardSources
+        {
+            Arena, 
+        }
+
         [MongoDB.Bson.Serialization.Attributes.BsonId]
         public string name;
 
@@ -96,6 +118,8 @@ namespace AMI.AMIData.Events
 
         public EventBounty eventBounty;
         public EventShop shop;
+
+        public RewardSources[] rewardSources;
 
         public EventInfo(string name)
         {
@@ -136,5 +160,8 @@ namespace AMI.AMIData.Events
         {
             
         }
+
+        public bool IsRewardSource(RewardSources source)
+            => rewardSources.Contains(source);
     }
 }

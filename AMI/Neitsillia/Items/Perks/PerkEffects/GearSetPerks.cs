@@ -26,7 +26,7 @@ namespace AMI.Neitsillia.Items
             return new object[] { owner };
         }
 
-        public object[] GladiatorAdrenaline(CombatResult owner)
+        public object[] GladiatorPatientia(CombatResult owner)
         {
             int set = GearSets.GetSetPower("Gladiator", owner.character.equipment);
             double buff = (set * 0.2) * rank;
@@ -41,7 +41,7 @@ namespace AMI.Neitsillia.Items
                 rank++;
             }
 
-            owner.perkProcs.Add($"Gladiator Adrenaline: +{buff}% PHY DMG");
+            owner.perkProcs.Add($"Gladiator Patientia: +{buff}% PHY DMG");
 
             ArrayM.AddEach(owner.damageMultiplier, buff / 100.00);
 

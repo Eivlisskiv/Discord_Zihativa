@@ -13,6 +13,7 @@ namespace AMI.Neitsillia.Items
         static Dictionary<string, string[]> sets = new Dictionary<string, string[]>()
         {
             { "Trapper", SetContent("Trapper Tunic", "Trapper Leg Patches", "Trapper Cap", null, "Trapper Boots") },
+            { "Gladiator", SetContent("Lorica", null, "Galea", null, "Gladiator Sandals") },
         };
 
         public static string Drop(string name)

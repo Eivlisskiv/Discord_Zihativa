@@ -15,6 +15,7 @@ using Discord;
 using Neitsillia.Items.Item;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Combat
@@ -194,10 +195,9 @@ namespace AMI.Neitsillia.Combat
                 koinsToGain = NumbersM.CeilParse<long>(koinsToGain / (double)party.MemberCount);
                 lootDisplay += $"+{koinsToGain} Kutsyei Coins Per Party Member." + Environment.NewLine;
             }
-            else
-                lootDisplay += $"+{koinsToGain} Kutsyei Coins " + Environment.NewLine;
+            else lootDisplay += $"+{koinsToGain} Kutsyei Coins " + Environment.NewLine;
 
-            lootDisplay += EventRewards(enc, out string specialCurrencyReward);
+            lootDisplay += EventRewards(enc, out (string name, int amount) specialCurrencyReward);
 
             foreach (var cb in playerParty)
             {
@@ -207,7 +207,7 @@ namespace AMI.Neitsillia.Combat
                 if (!hasDied) cb.character.KCoins += koinsToGain;
 
                 if (cb.character is Player player)
-                    lootDisplay += await PlayerOnAllMobsDead(player, lootDisplay, specialCurrencyReward, xpToGain, kills, enc);
+                    lootDisplay += await PlayerOnAllMobsDead(player, specialCurrencyReward, xpToGain, kills, enc);
                 else if (cb.character is NPC follower)
                 {
                     lootDisplay += $" |-|{(follower.IsPet() ? follower.displayName : follower.name)} +{Utils.Display(follower.XPGain(xpToGain, follower.level))} XP {Environment.NewLine}";
@@ -276,17 +276,32 @@ namespace AMI.Neitsillia.Combat
             }
         }
 
-        string EventRewards(Encounter enc, out string reward)
+        string EventRewards(Encounter enc, out (string name, int amount) eventReward)
         {
-            reward = currentEncounter.Name == Encounter.Names.Bounty ? AMIData.Events.OngoingEvent.Ongoing.BountyReward : null;
-            return reward != null ? $"+1 {reward}" + Environment.NewLine : null;
+            int amount = 0;
+            AMIData.Events.OngoingEvent cevent = AMIData.Events.OngoingEvent.Ongoing;
+
+            if (currentEncounter.Name == Encounter.Names.Bounty)
+                amount += 1;
+
+            switch (currentArea.type)
+            {
+                case AreaType.Arena:
+                    if (cevent.eventinfo.IsRewardSource(AMIData.Events.EventInfo.RewardSources.Arena))
+                        amount++;
+                    break;
+
+            }
+
+            eventReward = amount > 0 ? (cevent.BountyReward, amount) : (null, 0);
+            return eventReward.name != null ? $"+{eventReward.amount} {eventReward.name}" + Environment.NewLine : null;
         }
 
-        async Task<string> PlayerOnAllMobsDead(Player player, string lootDisplay, string specialCurrencyReward, long xpToGain, string[] kills, Encounter enc)
+        async Task<string> PlayerOnAllMobsDead(Player player, (string name, int amount) specialCurrencyReward, long xpToGain, string[] kills, Encounter enc)
         {
             bool hasDied = player.health <= 0;
-
-            if (specialCurrencyReward != null) player.Currency.Mod(specialCurrencyReward, 1);
+            string lootDisplay = null;
+            if (specialCurrencyReward.name != null) player.Currency.Mod(specialCurrencyReward.name, specialCurrencyReward.amount);
 
             if (currentEncounter.Name == Encounter.Names.FloorJump)
                 lootDisplay += FloorJumpReward(player, currentEncounter.data);
@@ -294,7 +309,7 @@ namespace AMI.Neitsillia.Combat
             {
                 //XP
                 long xpGained = hasDied ? 0 : player.XPGain(xpToGain, player.level);
-                lootDisplay += $" |-|{player.name} +{Utils.Display(xpGained)} XP {Environment.NewLine}";
+                lootDisplay += $" |-| {player.name} +{Utils.Display(xpGained)} XP {Environment.NewLine}";
 
                 if (currentArea.type == AreaType.Nest)
                     await NestReward(player, currentArea);

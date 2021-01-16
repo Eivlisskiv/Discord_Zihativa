@@ -149,7 +149,7 @@ namespace Neitsillia.Items.Item
         public static Item LoadItem(string name, params string[] tables)
         {
             if (tables.Length < 1)
-                tables = new string[]{"Item", "Skavi", "Unique Item", "Event Item" };
+                tables = new string[]{"Item", "Skavi", "Unique Item", "Event Items" };
 
             Item i = null;
             for(int k = 0; k < tables.Length && i == null; k++)

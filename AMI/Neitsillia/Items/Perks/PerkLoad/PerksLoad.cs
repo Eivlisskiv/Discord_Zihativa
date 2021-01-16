@@ -251,7 +251,7 @@ namespace AMI.Neitsillia.Items.Perks.PerkLoad
         public static Perk Vengeful(string name) => new Perk(name)
         {
             trigger = Perk.Trigger.Turn,
-            desc = "While health is bellow 35%, gain +1% damage per percent of max health under 35%."
+            desc = "While health is bellow 35%, gain +1% damage per 1% of max health under 35%."
         };
         #endregion
 

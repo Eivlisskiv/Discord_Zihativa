@@ -76,6 +76,7 @@ namespace AMI.Neitsillia.Combat
             playerParty = new CombatResult[1] { new CombatResult(arg1, arg2, rng, this, CombatResult.Team.P) };
             mobParty = new CombatResult[1] { new CombatResult(arg3, arg4, rng, this, CombatResult.Team.M) };
         }
+
         internal Combat(Player arg1, Ability arg2, NPC arg3)//PvE
         {
             Random rng = new Random();
@@ -86,12 +87,14 @@ namespace AMI.Neitsillia.Combat
                 new CharacterMotherClass[] { arg1 }, rng, CombatResult.Team.M)
             };
         }
+
         internal Combat(NPC arg1, NPC arg3)//EvE
         {
             Random rng = new Random();
             playerParty = new CombatResult[1] { new CombatResult(arg1, NPCCombat.MobAI(arg1), rng, this, CombatResult.Team.P) };
             mobParty = new CombatResult[1] { new CombatResult(arg3, NPCCombat.MobAI(arg3), rng, this, CombatResult.Team.M) };
         }
+
         internal Combat(NPC[] mobs, params CharacterMotherClass[] players)
         {
             //
@@ -110,8 +113,6 @@ namespace AMI.Neitsillia.Combat
             for (int i = 0; i < mobs.Length; i++)
                 mobParty[i] = NPCSetUp(mobs[i], mobs, players, rng, CombatResult.Team.M);
         }
-
-
 
         CombatResult NPCSetUp(NPC self, CharacterMotherClass[] allies, CharacterMotherClass[] enemies, Random rng,
             CombatResult.Team t)
@@ -190,220 +191,5 @@ namespace AMI.Neitsillia.Combat
             { result += m.GetResultInfo(s+i) + Environment.NewLine; i++; }
             return result;
         }
-
-        /*
-        internal async Task<MsgType> FightReward(Party party, Encounter currentencounter, Area currentArea, EmbedBuilder result, MsgType msgType)
-        {
-            Player partyLeader = ((Player)playerParty[0].character);
-
-            bool endDungeon = (currentArea.type == AreaType.Dungeon || currentArea.type == AreaType.Arena) && partyLeader.areaPath.floor >= currentArea.floors;
-            bool allPlayersDead = ArePlayersDead(playerParty);
-            bool allMobsDead = IsMobDead(mobParty);
-            if (allPlayersDead)
-            {
-                NPC mob = (NPC)Utils.RandomElement(mobParty).character;
-                string lostInfo = allMobsDead ? "No one is left standing to claim victory." : "You have been defeated." + Environment.NewLine;
-
-                if (endDungeon) await Database.DeleteRecord<Area>("Dungeons", partyLeader.areaPath.path, "AreaId");
-
-                foreach (var cb in playerParty)
-                {
-                    PerkLoad.CheckPerks(cb.character, Perk.Trigger.EndFight, cb.character);
-                    if (cb.character is Player player)
-                    {
-                        if(!allMobsDead) lostInfo += CombatEndHandler.DefeatCost(player, mob, 0.5) + Environment.NewLine;
-
-                        await player.Respawn(false);
-
-                        if (endDungeon) player.areaPath = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
-                        player.SaveFileMongo();
-                    }
-                    else if (cb.character is NPC n)
-                        FollowerCheck(n, party, allPlayersDead);
-                }
-                result.AddField("Defeat", lostInfo);
-                msgType = MsgType.Main;
-                if (!allMobsDead && currentencounter.Name != Encounter.Names.Bounty && currentArea.type != AreaType.Dungeon)
-                    PopulationHandler.Add(currentArea, mob);
-            }
-            else if (allMobsDead)
-            {
-                if (endDungeon)
-                {
-                    await Database.DeleteRecord<Area>("Area", partyLeader.areaPath.path, "AreaId");
-                    await Database.DeleteRecord<Area>("Dungeons", partyLeader.areaPath.path, "AreaId");
-                }
-
-                //Get Loot into Encounter
-                Encounter enc = new Encounter("Loot", partyLeader);
-
-                (string[] kills, long koinsToGain, long xpToGain) = GetKillRewards(enc);
-
-                var invLoot = enc.loot.inv;
-
-                string lootDisplay = null;
-                if (party != null)
-                {
-                    koinsToGain = NumbersM.CeilParse<long>(koinsToGain / (party.MemberCount + 0.00));
-                    lootDisplay += $"+{koinsToGain} Kutsyei Coins Per Party Member." + Environment.NewLine;
-                }
-                else
-                    lootDisplay += $"+{koinsToGain} Kutsyei Coins " + Environment.NewLine;
-
-                string specialCurrencyReward = currentencounter.Name == Encounter.Names.Bounty ? AMIData.Events.OngoingEvent.Ongoing.BountyReward : null;
-                if (specialCurrencyReward != null) lootDisplay += $"+1 {specialCurrencyReward}" + Environment.NewLine;
-
-                foreach (var cb in playerParty)
-                {
-                    PerkLoad.CheckPerks(cb.character, Perk.Trigger.EndFight, cb.character);
-                    
-                    bool hasDied = cb.character.IsDead();
-                    if(!hasDied) cb.character.KCoins += koinsToGain;
-
-                    if (cb.character is Player player)
-                    {
-                        
-                    }
-                    else if (cb.character is NPC follower)
-                    {
-                        lootDisplay += $" |-|{(follower.IsPet() ? follower.displayName : follower.name)} +{Utils.Display(follower.XPGain(xpToGain, follower.level))} XP {Environment.NewLine}";
-
-                        //NPC looting
-                        if(follower.IsPet())
-                            follower.AddItemToInv(Item.RandomItem(follower.level, 1), follower.level);
-                        else if (enc.loot.Count > 4)
-                        {
-                            int randomLoot = Program.rng.Next(enc.loot.Count);
-                            int amount = Program.rng.Next(1, enc.loot.GetCount(randomLoot) + 1);
-                            follower.AddItemToInv(enc.loot.GetItem(randomLoot), amount, true);
-                            enc.loot.Remove(randomLoot, amount);
-                        }
-                        else follower.AddItemToInv(Item.RandomItem(follower.level));
-                        //
-                        FollowerCheck(follower, party, allPlayersDead);
-                    }
-
-                }
-
-                //Manage Encounters
-                if(party != null)  enc.Save();
-                currentencounter = null;
-
-                FinalizeResultEmbed(invLoot, result, lootDisplay);
-                msgType = MsgType.Loot;
-            }
-            else
-            {
-                //Continue combat
-                msgType = MsgType.Combat;
-                foreach (var cb in playerParty)
-                    if (cb.character is Player player)
-                        player.SaveFileMongo();
-            }
-            if (party != null)
-            {
-                if(endDungeon) party.areaKey = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
-                await party.SaveData();
-                if(currentencounter != null && !allPlayersDead)
-                    currentencounter.Save();
-            }
-            return msgType;
-        }
-
-        AreaPath ParentAreaPath(Area area, int floor = 0)
-            => new AreaPath()
-            {
-                path = area.GeneratePath(false) + area.parent,
-                name = area.parent,
-                floor = floor
-            };
-
-        internal void FollowerCheck(NPC n, Party party, bool allPlayersDead)
-        {
-            int s = n.HealthStatus(out string status);
-            /// >= 0 Is alive
-            /// -1 is Down, -2 Fainted, -3 Unconscious, -4 Dead, -5 Vaporized
-            if (s < -1 || allPlayersDead)
-            {
-                if (n.IsPet())
-                {
-                    if(party != null && s <= -4)
-                    {
-                        party.Remove(party.NPCMembers.FindIndex
-                            (x => x.origin == n.origin), null);
-                    }
-                    else
-                    {
-                        n.health = n.Health();
-                        n.stamina = n.Stamina();
-                    }
-
-                }
-                else
-                {
-                    if (party != null)
-                        party.NPCMembers.RemoveAt(party.NPCMembers.FindIndex
-                            (x => x.displayName == n.displayName));
-                    if (s > -4)
-                        n.Respawn();
-                }
-            }
-            else if (s >= -1)
-            {
-                long fullHealthCost = Verify.Max(
-                    NumbersM.NParse<long>(100 - (((n.health + 0.00) / n.Health()) * 100))
-                    , n.KCoins);
-                if (fullHealthCost > 0)
-                {
-                    n.KCoins -= fullHealthCost;
-                    n.health += NumbersM.CeilParse<long>(n.Health() * (fullHealthCost / 100.00));
-                }
-                n.stamina = n.Stamina();
-                n.SelfGear();
-            }
-        }
-
-        void FinalizeResultEmbed(List<StackedItems> invLoot, EmbedBuilder result, string lootDisplay)
-        {
-            string itemsLootDisplay = null;
-            int i = 0;
-            for (; i < 10 && i < invLoot.Count; i++)
-                if (invLoot[i] != null)
-                    itemsLootDisplay += $"{(i + 1)}| {invLoot[i]} {Environment.NewLine}";
-
-            if (i > invLoot.Count) itemsLootDisplay += $"{invLoot.Count - i} More Items..." + Environment.NewLine;
-
-            result.AddField("Victory", "You've defeated your opponent.");
-            if (lootDisplay != null)
-                result.AddField("Loot", itemsLootDisplay + lootDisplay);
-            result.WithFooter("Coins and XP are automatically collected");
-        }
-
-        (string[], long, long) GetKillRewards(Encounter enc)
-        {
-            long koinsToGain = 0;
-            long xpToGain = 0;
-            string[] kills = new string[mobParty.Length];
-            int killsIndex = 0;
-            foreach (var mobcb in mobParty)
-            {
-                NPC mob = (NPC)mobcb.character;
-                enc.AddLoot(mob.inventory);
-                if (mob.KCoins > 0)
-                    koinsToGain += mob.KCoins;
-                xpToGain += mob.XPDrop(0);
-
-                kills[killsIndex] = $"{mob.name};{mob.race};{mob.level}";
-                killsIndex++;
-            }
-
-            return (kills, koinsToGain, xpToGain);
-        }
-
-        */
-
-
-
-
     }
 }

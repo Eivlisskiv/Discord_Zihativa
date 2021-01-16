@@ -14,7 +14,7 @@ namespace AMI.Neitsillia.Items.Perks.PerkLoad
             Environment.NewLine + "Ensnare strength increases with each Bounty Hunter gear equipped.",
         };
 
-        public static Perk GladiatorAdrenaline(string name) => new Perk(name)
+        public static Perk GladiatorPatientia(string name) => new Perk(name)
         {
             trigger = Perk.Trigger.Turn,
             rank = 0,
