@@ -334,16 +334,14 @@ namespace AMI.Methods
         }
 
         internal static int[] AddEach(int[] array, int amount)
-        {
-            return Array.ConvertAll(array, i => i += amount);
-        }
+         => array.Select(i => i += amount).ToArray();
+
         internal static long[] AddEach(long[] array, long amount)
-        {
-            return Array.ConvertAll(array, i => i += amount);
-        }
-        internal static double[] AddEach(double[] array, double amount)
-        {
-            return Array.ConvertAll(array, i => i += amount);
-        }
+         => array.Select(i => i += amount).ToArray();
+        internal static double[] AddEach(double[] array, double amount) 
+            => array.Select(i => i += amount).ToArray();
+        internal static float[] AddEach(float[] array, float amount)
+            => array.Select(i => i += amount).ToArray();
+
     }
 }

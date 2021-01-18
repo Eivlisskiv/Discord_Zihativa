@@ -43,7 +43,7 @@ namespace AMI.Neitsillia.Items
 
             owner.perkProcs.Add($"Gladiator Patientia: +{buff}% PHY DMG");
 
-            ArrayM.AddEach(owner.damageMultiplier, buff / 100.00);
+            owner.damageMultiplier = ArrayM.AddEach(owner.damageMultiplier, buff / 100.00);
 
             return R(owner);
         }

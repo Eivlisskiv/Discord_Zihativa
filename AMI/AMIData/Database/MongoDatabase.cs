@@ -212,23 +212,23 @@ namespace AMI.AMIData
 
         internal R Query<T, R>(string jsonQuery, string field)
         {
-            if (BsonDocument.TryParse(jsonQuery, out BsonDocument query))
+            bool parsed = BsonDocument.TryParse(jsonQuery, out BsonDocument query);
+
+            try
             {
-                try
-                {
-                    var collection = database.GetCollection<T>(TableName<T>());
+                var collection = database.GetCollection<T>(TableName<T>());
 
-                    var project = Builders<T>.Projection.Include(field);
-                    var filter = collection.Find(query).Project<R>(project);
+                var project = Builders<T>.Projection.Include(field);
+                var filter = (parsed ? collection.Find(query) : collection.Find(jsonQuery)).Project<R>(project);
 
-                    return filter.FirstOrDefault();
-                }
-                catch (Exception e)
-                {
-                    Log.LogS(e);
-                }
+                return filter.FirstOrDefault();
             }
-            Log.LogS("Could not parse query " + jsonQuery);
+            catch (Exception e)
+            {
+                Log.LogS(e);
+            }
+
+            if (!parsed)  Log.LogS("Could not parse query " + jsonQuery);
             return default;
         }
     }

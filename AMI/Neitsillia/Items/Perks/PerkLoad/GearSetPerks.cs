@@ -22,7 +22,7 @@ namespace AMI.Neitsillia.Items.Perks.PerkLoad
             desc = "+0.2% [per set piece] physical damage per turn, " +
             "stacks up to 10% [+3% per set piece]." +
             Environment.NewLine + 
-            "+18% [per set piece] on the next turn after reaching full stack.",
+            "Additional +18% [per set piece] on the next turn after reaching full stack.",
         };
     }
 }

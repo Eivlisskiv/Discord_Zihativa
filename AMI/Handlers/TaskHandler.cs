@@ -9,16 +9,16 @@ namespace AMI.Handlers
         public static bool Active = true; 
         static Dictionary<string, TaskHandler> tasks = new Dictionary<string, TaskHandler>();
 
-        public static TaskHandler Add(string key, int delay, Func<Task> func)
+        public static TaskHandler Add(string key, int minutesdelay, Func<Task> func)
         {
             if (tasks.TryGetValue(key, out TaskHandler t))
             {
                 t.func = func;
-                t.delay = delay * 60000;
+                t.delay = minutesdelay * 60000;
             }
             else
             {
-                t = new TaskHandler(key, delay, func);
+                t = new TaskHandler(key, minutesdelay, func);
                 tasks.Add(key, t);
             }
             return t;
@@ -28,6 +28,8 @@ namespace AMI.Handlers
         {
             if (!Neitsillia.Areas.Nests.Nest.disabled)
                 Add("Nests", 15, Neitsillia.Areas.Nests.Nest.NestChecks);
+
+            Add("ArenaFights", 60 * 48, Neitsillia.Areas.Arenas.ArenaGlobalData.RefreshAllQuests);
         }
 
         public string name;

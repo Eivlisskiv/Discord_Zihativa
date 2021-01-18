@@ -263,12 +263,12 @@ namespace AMI.Neitsillia.Combat
             bool top = partyLeader.areaPath.floor >= currentArea.floors;
             if(currentArea.type == AreaType.Arena && top)
             {
-                if (currentArea.loot.Length > 0 && Program.Chance(45))
+                if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
                 {
                     int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
                     enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
                 }
-                else
+                else if (Program.Chance(currentArea.eLootRate))
                 {
                     Item reward = Item.RandomItem(currentArea.level, Rng.Next(6, 12));
                     enc.AddLoot(reward);
@@ -281,7 +281,7 @@ namespace AMI.Neitsillia.Combat
             int amount = 0;
             AMIData.Events.OngoingEvent cevent = AMIData.Events.OngoingEvent.Ongoing;
 
-            if (currentEncounter.Name == Encounter.Names.Bounty)
+            if (currentEncounter.Name == Encounter.Names.Bounty && cevent.BountyReward != null)
                 amount += 1;
 
             switch (currentArea.type)
@@ -293,8 +293,8 @@ namespace AMI.Neitsillia.Combat
 
             }
 
-            eventReward = amount > 0 ? (cevent.BountyReward, amount) : (null, 0);
-            return eventReward.name != null ? $"+{eventReward.amount} {eventReward.name}" + Environment.NewLine : null;
+            eventReward = amount > 0 ? (cevent.Currency, amount) : (null, 0);
+            return eventReward.name != null ? $"**+{eventReward.amount} {eventReward.name}**" + Environment.NewLine : null;
         }
 
         async Task<string> PlayerOnAllMobsDead(Player player, (string name, int amount) specialCurrencyReward, long xpToGain, string[] kills, Encounter enc)

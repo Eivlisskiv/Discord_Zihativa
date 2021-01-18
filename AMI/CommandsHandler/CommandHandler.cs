@@ -89,12 +89,13 @@ namespace AMYPrototype.Commands
                 running.Add(id, DateTime.UtcNow);
                 return true;
             }
-            else if (((DateTime)running[id]).AddMinutes(3) < DateTime.UtcNow)
+            else if (((DateTime)running[id]).AddMinutes(2) < DateTime.UtcNow)
             {
                 running[id] = DateTime.UtcNow;
                 return true;
             }
 
+            Log.LogS($"Waiting for command execution to end for {id}");
             return false;
         }
 
@@ -130,8 +131,6 @@ namespace AMYPrototype.Commands
 
                 if (!RunUser(s.Author.Id)) return;
 
-                context.watch = System.Diagnostics.Stopwatch.StartNew();
-
                 _ = context.BotUser;
                 _ = _command.ExecuteAsync(context, argPosition, null);
 
@@ -140,29 +139,31 @@ namespace AMYPrototype.Commands
 
         public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext ctx, IResult result)
         {
-            CustomSocketCommandContext context = (CustomSocketCommandContext)ctx;
-            if (!result.IsSuccess && command.IsSpecified)
-                await BabResult(command.Value, context, result);
-            else
+            try
             {
-                if (context.guildSettings != null)
+                CustomSocketCommandContext context = (CustomSocketCommandContext)ctx;
+                if (!result.IsSuccess && command.IsSpecified)
+                    await BabResult(command.Value, context, result);
+                else
                 {
-                    context.guildSettings.activityScore++;
-                    context.guildSettings.SaveSettings();
-                }
+                    if (context.guildSettings != null)
+                    {
+                        context.guildSettings.activityScore++;
+                        context.guildSettings.SaveSettings();
+                    }
 
-                if (Program.data != null && Program.data.activity != null)
-                {
-                    Program.data.activity.Activity(ctx.User.Id);
+                    if (Program.data != null && Program.data.activity != null)
+                    {
+                        Program.data.activity.Activity(ctx.User.Id);
+                    }
                 }
             }
-
+            catch(Exception e)
+            {
+                Log.LogS(e);
+            }
+            
             running.Remove(ctx.User.Id);
-
-            context.watch.Stop();
-            if (Program.isDev && context.watch.ElapsedMilliseconds > 500)
-                _ = UniqueChannels.Instance.SendToLog($"{context.Message.Content} {Environment.NewLine} Slow Operation {context.watch.ElapsedMilliseconds}ms");
-            else Console.WriteLine($"{context.Message.Content} => {context.watch.ElapsedMilliseconds}ms");
         }
 
         async Task BabResult(CommandInfo method, CustomSocketCommandContext context, IResult result)

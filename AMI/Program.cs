@@ -54,8 +54,6 @@ namespace AMYPrototype
         private DiscordSocketClient _client;
         private CommandHandler _handler;
 
-        Dictionary<string, Thread> threads = new Dictionary<string, Thread>();
-
         private static void Main(string[] args)
         {
             try

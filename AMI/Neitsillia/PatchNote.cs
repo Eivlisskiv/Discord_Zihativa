@@ -8,8 +8,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Ongoing Event: Bounty Hunter Festival : Added the Hunter Trap Gear Set to the event shop {Environment.NewLine}"
-                + $" {Environment.NewLine}"
+                $" New event: Arena Championship 1.0: Arena Fights reward event currency during this event. {Environment.NewLine}"
+                + $"Added Arena Quests extra drops (Gladiator Set) {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -18,14 +18,13 @@ namespace AMI.Neitsillia
             return
                 $" {Environment.NewLine}"
                 + $" {Environment.NewLine}"
-                + $" {Environment.NewLine}"
                 ;
         }
         public static string ItemsPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
+                $"Added Gladiator Gear Set {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()
@@ -44,9 +43,9 @@ namespace AMI.Neitsillia
         }
         public static string WorldPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"A new arena was built in Atsauka. Use the `service` command to use the arena once you enter it. {Environment.NewLine}"
+                $" {Environment.NewLine}"
                 + $" {Environment.NewLine}"
                 ;
         }

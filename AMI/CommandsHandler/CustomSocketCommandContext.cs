@@ -11,13 +11,11 @@ namespace AMI.Commands
 {
     public class CustomSocketCommandContext : SocketCommandContext
     {
-        internal Stopwatch watch;
-
         internal GuildSettings guildSettings;
         internal string Prefix => guildSettings?.prefix ?? "~";
 
         private BotUser _botUser;
-        internal BotUser BotUser => _botUser ?? (_botUser = BotUser.Load(User.Id));
+        internal BotUser BotUser => _botUser ??= BotUser.Load(User.Id);
 
         private Player loaded;
        
@@ -26,12 +24,12 @@ namespace AMI.Commands
         {
             get
             {
-                return loaded ?? (loaded = Player.Load(BotUser));
+                return loaded ??= Player.Load(BotUser);
             }
         }
         internal Player GetPlayer(Player.IgnoreException ie)
         {
-            return loaded ?? (loaded = Player.Load(BotUser, ie));
+            return loaded ??= Player.Load(BotUser, ie);
         }
 
         public string Content
@@ -39,7 +37,7 @@ namespace AMI.Commands
             get
             {
                 int i = Message.Content.IndexOf(' ');
-                return i > -1 ? Message.Content.Substring(i) : null;
+                return i > -1 ? Message.Content[i..] : null;
             }
         }
 

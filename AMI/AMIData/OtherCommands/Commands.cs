@@ -393,7 +393,7 @@ namespace AMI.AMIData.OtherCommands
         {
             //Quick discord
             DateTime then = DateTime.UtcNow;
-            string reply = $"Handler: {Context.watch.ElapsedMilliseconds}ms";
+            string reply = "Pong";
             var msg = await ReplyAsync(reply);
 
             reply += Environment.NewLine + "Bot/Discord: " + (DateTime.UtcNow - then).TotalMilliseconds + " ms";

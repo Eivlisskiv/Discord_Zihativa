@@ -7,6 +7,8 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.Arenas
@@ -14,6 +16,14 @@ namespace AMI.Neitsillia.Areas.Arenas
     class ArenaGlobalData
     {
         static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
+
+        public static async Task RefreshAllQuests()
+        {
+            List<ArenaGlobalData> items = await Database.LoadRecordsAsync<ArenaGlobalData>(null);
+            foreach(var i in items)
+                await i.RefreshQuests();
+        }
+
         public static async Task Delete(string id)
         => await Database.DeleteRecord<ArenaGlobalData>(null, id);
         public static async Task<ArenaGlobalData> Load(string id)
@@ -27,6 +37,8 @@ namespace AMI.Neitsillia.Areas.Arenas
 
             return v;
         }
+
+
         public string _id;
         public int level;
         public ArenaQuest[] quests;
@@ -36,7 +48,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         public async Task RefreshQuests()
         {
             quests = new ArenaQuest[5];
-            level = Database.Query<Area, int>($"{{ _id: {_id} }}", "level");
+            level = Area.LoadArea(_id).level;
             for (int i = 0; i < 5; i++)
                 quests[i] = new ArenaQuest(i < 2 ? 1 : i < 4 ? 2 : 3, level);
 
@@ -44,7 +56,8 @@ namespace AMI.Neitsillia.Areas.Arenas
         }
 
         public async Task Save()
-            => await Database.SaveRecordAsync(null, this);
+            => await Database.UpdateRecordAsync(null, 
+                AMIData.MongoDatabase.FilterEqual<ArenaGlobalData, string>("_id", _id), this);
         
         public async Task Delete() => await Delete(_id);
 
@@ -80,7 +93,10 @@ namespace AMI.Neitsillia.Areas.Arenas
             Area parent = player.Area;
             Area dungeon = new Area(AreaType.Arena, $"{parent.name} : {fight.name}", parent) {
                 floors = 0,
-                level = fight.Level(level)
+                level = fight.Level(level),
+                loot = fight.drops,
+                eLootRate = fight.dropChance,
+                mobs = new List<string>[] { fight.enemies.ToList() }
             };
 
             await player.SetArea(dungeon);

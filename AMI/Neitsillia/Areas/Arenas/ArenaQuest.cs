@@ -1,6 +1,7 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.User.UserInterface;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -12,11 +13,27 @@ namespace AMI.Neitsillia.Areas.Arenas
         static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
         static readonly string[] blacklistedRaces = { "Human", "Christmas", "Thanksgiving" };
 
+        static List<string>[][] dropsByDifficulty = new List<string>[][]
+        {
+            new List<string>[] {
+                new List<string> { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Galea" },
+            },
+            new List<string>[] {
+                new List<string> { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals",  "Galea", "Galea" },
+            },
+            new List<string>[] {
+                new List<string> { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Galea", "Lorica" },
+            },
+        };
+
         public string name;
         public int difficulty;
         public string[] enemies;
         public string description;
         public string enemiesDesc;
+
+        public int dropChance = 0;
+        public List<string>[] drops = null;
 
         public ArenaQuest(int diff, int level)
         {
@@ -43,6 +60,8 @@ namespace AMI.Neitsillia.Areas.Arenas
         private void LoadFight(int level)
         {
             (name, enemies) = RandomFight(level);
+            dropChance = 100; //difficulty * 10;
+            drops = dropsByDifficulty[difficulty - 1];
         }
 
         private (string name, string[] mobs) RandomFight(int level)

@@ -158,8 +158,7 @@ namespace AMI.Neitsillia.User.UserInterface
         internal async Task<IUserMessage> GetUiMessage()
         {
             try {
-                return message ?? 
-                    (message = (IUserMessage)await ((ISocketMessageChannel)Program.clientCopy.GetChannel(channelID)).GetMessageAsync(msgId));
+                return message ??= (IUserMessage)await ((ISocketMessageChannel)Program.clientCopy.GetChannel(channelID)).GetMessageAsync(msgId);
 
             } catch (Exception) { return null; }
         }

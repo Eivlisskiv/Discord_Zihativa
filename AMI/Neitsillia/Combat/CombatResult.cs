@@ -211,8 +211,8 @@ namespace AMI.Neitsillia.Combat
             return (hitChance >= (100 - ReferenceData.hitChance));
         }
         internal long GetTotalDamage(int i) 
-            => Math.Max(NumbersM.FloorParse<long>(Math.Abs(baseDamage[i]) 
-                * (float)damageMultiplier[i])
+            => Math.Max(NumbersM.FloorParse<long>(
+                Math.Abs(baseDamage[i]) * (float)damageMultiplier[i])
                + baseDamage[i] + bonusDamage[i], 0);
 
         internal int GetTotalResistance(int i)

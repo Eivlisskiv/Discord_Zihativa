@@ -236,5 +236,7 @@ namespace AMI.AMIData.Events
             await (eventinfo.shop?.ViewShop(player, chan, i, edit) ?? chan.SendMessageAsync("This event has no shop!", embed: EmbedInfo()));
 
         public string BountyReward => (eventinfo.shop != null && eventinfo.eventBounty != null) ? eventinfo.shop.currency : null;
+
+        public string Currency => eventinfo.shop.currency;
     }
 }
