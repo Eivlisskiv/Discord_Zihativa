@@ -19,7 +19,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public partial class Area
     {
-        static MongoDatabase Database => Program.data.database;
+        internal static MongoDatabase Database => Program.data.database;
 
         //private static Cache<string, Area> areasCache = new Cache<string, Area>();
         //private static Cache<string, Area> dungeonsCache = new Cache<string, Area>();
@@ -48,96 +48,6 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         public AreaType type;
 
         public List<Junction> junctions;
-
-        public SandBox sandbox;
-
-        #region Loading
-        public static Area Load(AreaPath path) => LoadArea(path.path, path.table);
-
-        public static Area LoadArea(string primary, string secondary = null, AreaPath.Table table = AreaPath.Table.Area)
-        {
-            Area area = null;
-            string path = null;
-            if ((area = LoadArea(primary, table)) != null)
-                return area;
-
-            else if (secondary != null)
-            {
-                Log.LogS($"Area Path: {path} was not found >> Source: {primary}");
-                return LoadArea(secondary, null);
-            }
-            Log.LogS($"Area Path: {path} was not found >> Source: {primary} | {secondary}");
-            return null;
-            //throw new Exception("Area Failed to Load. Error Logged");
-        }
-        static Area LoadArea(string areaId, AreaPath.Table table)
-        {
-            //Area area = table == AreaPath.Table.Area ? areasCache.Load(areaId) : dungeonsCache.Load(areaId);
-            //if (area != null) return area;
-            try
-            { 
-                return Database.LoadRecord(table.ToString(), MongoDatabase.FilterEqual<Area, string>("AreaId", areaId)) 
-                    ?? (table == AreaPath.Table.Dungeons ? Database.LoadRecord("Area", MongoDatabase.FilterEqual<Area, string>("AreaId", areaId)) :
-                    Database.LoadRecord("Dungeons", MongoDatabase.FilterEqual<Area, string>("AreaId", areaId)));
-
-                //(table == AreaPath.Table.Area ? areasCache : dungeonsCache).Save(areaId, area);
-
-                //return area;
-            }
-            catch (Exception e)
-            {
-                if (e is NeitsilliaError error)
-                    Log.LogS(error.ExtraMessage);
-                else
-                    _ = Handlers.UniqueChannels.Instance.SendToLog(e);
-                return null;
-            }
-        }
-
-        public static Area LoadFromName(string name)
-        {
-            List<Area> List = Database.LoadRecords("Area", MongoDatabase.FilterRegex<Area>("AreaId", name + "$"));
-
-            if (List.Count == 1) return List[0];
-
-            if (List.Count < 1) throw NeitsilliaError.ReplyError("No area found");
-            
-            else
-            {
-                string elements = null;
-                List.ForEach(a => {
-                    elements += a.AreaId + Environment.NewLine;
-                });
-                throw NeitsilliaError.ReplyError("Please precise the area id." + Environment.NewLine + elements);
-            }
-        }
-        #endregion
-
-        #region Constructors
-        /// <summary>
-        /// Use Area.LoadArea instead
-        /// </summary>
-        /// <param name="jsonOnly"></param>
-        [JsonConstructor]
-        public Area(bool jsonOnly){}
-        public Area(AreaType type, string name, Area parentArea)
-        {
-            this.name = name;
-            this.type = type;
-            realm = parentArea.realm;
-            continent = parentArea.continent;
-            kingdom = parentArea.kingdom;
-            grandparent = parentArea.parent;
-            parent = parentArea.name;
-
-            AreaId = GeneratePath(true);
-
-            level = parentArea.level;
-
-            if (type != AreaType.Dungeon && type != AreaType.Arena)
-                junctions = new List<Junction>();
-        }
-        #endregion
 
         #region Gets
         public EmbedBuilder AreaInfo(int floor, bool dispopu = false, int popuPage = 0)
@@ -320,29 +230,6 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             int min = NumbersM.NParse<int>(fl * (1 - range));
             int max = NumbersM.NParse<int>(fl * (1 + range));
             return rng.Next(min, max + 1);
-        }
-
-        internal static async Task<Area> NewStronghold(string argname, int size, Area area, Player player)
-        {
-            //public string native, faction;
-
-            //public SandBox sandbox;
-            Area stronghold = new Area(false)
-            {
-                name = argname, level = Verify.Min(player.level, area.level),
-                description = $"A Stronghold built by {player.name}",
-                ePassiveRate = 100,
-                passiveEncounter = new string[] { "Npc" },
-                realm = area.realm, continent = area.continent, kingdom = area.kingdom,
-                type = AreaType.Stronghold, junctions = new List<Junction> { new Junction(area, 0, player.areaPath.floor) },
-                sandbox = new SandBox(player.userid, size)
-            };
-            stronghold.AreaId = stronghold.GeneratePath();
-
-            area.junctions.Add(new Junction(stronghold, player.areaPath.floor, 0));
-            await area.UploadToDatabase();
-            await stronghold.UploadToDatabase();
-            return stronghold;
         }
     }
 }

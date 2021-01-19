@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.Arenas
 {
-    class Arena
+    public class Arena
     {
-        internal enum ArenaMode { Survival, };
+        public enum ArenaMode { Survival, };
         static readonly string[] ModesDesc =
         {
             "Survive never ending waves of enemies with no breaks in between each fight.",
@@ -27,8 +27,8 @@ namespace AMI.Neitsillia.Areas.Arenas
         internal static async Task Service(Player player, ISocketMessageChannel chan)
         {
             await player.NewUI("", DUtils.BuildEmbed("Arena Lobby Services",
-                $"{EUI.sideQuest} View arena quests" /*+ Environment.NewLine +
-                $"{EUI.bounties} View arena challenges"*/,
+                $"{EUI.sideQuest} View arena quests" + Environment.NewLine +
+                $"{EUI.bounties} View arena challenges",
                 null, player.userSettings.Color()).Build(), chan, MsgType.ArenaService);
         }
 
@@ -43,7 +43,7 @@ namespace AMI.Neitsillia.Areas.Arenas
             //Create Embed
             EmbedBuilder embed = DUtils.BuildEmbed(
                 "Arena", "Select Challenge", color : player.userSettings.Color(),
-                fields : DUtils.NewField($"**{(ArenaMode)i}**", ModesDesc[i])
+                fields : DUtils.NewField($"**{(ArenaMode)i}** (Level {player.Area.level}+)", ModesDesc[i])
                 );
             if (edit)
                 await player.EditUI(null, embed.Build(), chan,
@@ -82,24 +82,12 @@ namespace AMI.Neitsillia.Areas.Arenas
             Area dungeon = new Area(AreaType.Arena,
                 $"{parent.name} {(ArenaMode)mode}", parent)
             {
-                eMobRate = 100,
-                mobs = new List<string>[]
-                {
-                new List<string>{
-                    "Young Vhoizuku",
-                    "Vhoizuku",
-                    "Vhoizuku",
-                    "Vhoizuku Warrior",
-                    "Vhoizuku Warrior",
-                    "Vhoizuku Warrior",
-                    "Vhoizuku Mother",
-                }},
-
-                /*Arena = new Arena((ArenaMode)mode)
+                floors = -1,
+                arena = new Arena((ArenaMode)mode)
                 {
                     ParentID = parent.AreaId,
                     Modifiers = boolArray != null ? new ArenaModifier(boolArray) : null,
-                }*/
+                }
             };
 
             await player.SetArea(dungeon);
@@ -158,9 +146,9 @@ namespace AMI.Neitsillia.Areas.Arenas
         }
     }
     //TEST - IGNORE
-    class ArenaModifier
+    public class ArenaModifier
     {
-        internal enum ArenaModifiers { };
+        public enum ArenaModifiers { };
         internal static readonly string[] ModifiersDesc = 
         {
             "test 1",
