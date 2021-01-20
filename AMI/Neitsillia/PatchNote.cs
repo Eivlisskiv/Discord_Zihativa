@@ -9,7 +9,8 @@ namespace AMI.Neitsillia
             //return null;
             return
                 $" New event: Arena Championship 1.0: Arena Fights reward event currency during this event. {Environment.NewLine}"
-                + $"Added Arena Quests extra drops (Gladiator Set) {Environment.NewLine}"
+                + $"Added `Arena Quest` extra drops (Gladiator Set) {Environment.NewLine}"
+                + $"Added `Survival` Challenge in Arenas {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()

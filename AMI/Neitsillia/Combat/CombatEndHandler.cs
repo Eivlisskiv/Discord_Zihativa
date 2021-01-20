@@ -335,7 +335,7 @@ namespace AMI.Neitsillia.Combat
                     }
                     else if (Program.Chance(currentArea.eLootRate))
                     {
-                        Item reward = Item.RandomItem(currentArea.level, Rng.Next(6, 12));
+                        Item reward = Item.RandomGear(currentArea.level * 5);
                         enc.AddLoot(reward);
                     }
                 }

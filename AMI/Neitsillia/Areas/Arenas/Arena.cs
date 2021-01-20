@@ -118,13 +118,23 @@ namespace AMI.Neitsillia.Areas.Arenas
             {
                 if (Program.Chance(score))
                 {
-                    int t1 = ArrayM.IndexWithRates(arena.loot.Length - 1, Program.rng);
-                    int t2 = ArrayM.IndexWithRates(arena.loot[t1].Count - 1, Program.rng);
-                    //gets the item in that tier, creates a new item and adds it to the loot event collection
-                    Item item = Item.LoadItem(arena.loot[t1][t2].Trim());
-                    item.Scale(level);
+                    Item item;
+                    if (Program.Chance(10))
+                        item = Item.CreateRune(1);
+                    else if (arena.ValidTable(arena.loot))
+                    {
+                        int t1 = ArrayM.IndexWithRates(arena.loot.Length - 1, Program.rng);
+                        int t2 = ArrayM.IndexWithRates(arena.loot[t1].Count - 1, Program.rng);
+                        //gets the item in that tier, creates a new item and adds it to the loot event collection
+                        item = Item.LoadItem(arena.loot[t1][t2].Trim());
+                        item.Scale(level);
+                    }
+                    else item = Item.RandomGear(level * 5, true);
 
                     loot.Add(item, 1, -1);
+
+                    if (Program.Chance(20))
+                        loot.Add(Item.CreateRepairKit(1), 1, -1);
                 }
             }
 
@@ -165,10 +175,9 @@ namespace AMI.Neitsillia.Areas.Arenas
                 NPC m = mobs[i];
 
                 embed.AddField(
-                m.displayName + $" | m{i}",
-                "Level: " + m.level + Environment.NewLine +
-                //"Rank: " + m.Rank() + Environment.NewLine +
-                "Health: " + m.health + '/' + m.Health() + Environment.NewLine
+                    m.displayName + $" | m{i}",
+                    "Level: " + m.level + Environment.NewLine +
+                    "Health: " + m.health + '/' + m.Health() + Environment.NewLine
                 );
             }
 

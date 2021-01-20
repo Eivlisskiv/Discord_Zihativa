@@ -178,7 +178,7 @@ namespace AMI.Neitsillia.NPCSystems
                 case ReferenceData.Profession.Blacksmith:
                     {
                         Research();
-                        AddItemToInv(Item.NewTemporarySchematic(Item.RandomItem(level, rng.Next(6,12))));
+                        AddItemToInv(Item.NewTemporarySchematic(Item.RandomGear(level)));
                         AddItemToInv(Item.CreateRepairKit(1));
                     }
                 break;

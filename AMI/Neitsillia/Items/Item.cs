@@ -65,7 +65,7 @@ namespace Neitsillia.Items.Item
         public static string[] resourcerations = new string[]
             {"None", "Small Resource Ration"};
         //
-        
+
         public override string ToString()
         {
             if (CanBeEquip())
@@ -75,7 +75,7 @@ namespace Neitsillia.Items.Item
         }
         public string TypeToString()
         {
-            switch(type)
+            switch (type)
             {
                 case IType.Chestp: return "Cheat Piece";
                 default: return type.ToString();
@@ -93,7 +93,7 @@ namespace Neitsillia.Items.Item
 
         #region Loading
         [JsonConstructor]
-        public Item(bool jsonOnly){}
+        public Item(bool jsonOnly) { }
         private Item(int level, string name, IType type)
         {
             originalName = name;
@@ -108,7 +108,7 @@ namespace Neitsillia.Items.Item
 
         internal int Scale(int level)
         {
-            if (level < 1 || tier > level || level <= Math.Ceiling(tier/5.00) * 5) return 1;
+            if (level < 1 || tier > level || level <= Math.Ceiling(tier / 5.00) * 5) return 1;
             int t = tier;
             switch (type)
             {
@@ -149,13 +149,13 @@ namespace Neitsillia.Items.Item
         public static Item LoadItem(string name, params string[] tables)
         {
             if (tables.Length < 1)
-                tables = new string[]{"Item", "Skavi", "Unique Item", "Event Items" };
+                tables = new string[] { "Item", "Skavi", "Unique Item", "Event Items" };
 
             Item i = null;
-            for(int k = 0; k < tables.Length && i == null; k++)
+            for (int k = 0; k < tables.Length && i == null; k++)
                 i = Database.LoadRecord(tables[k], MongoDatabase.FilterEqual<Item, string>("_id", name));
 
-            if(i != null)
+            if (i != null)
             {
                 i.LoadPerk();
                 if (i.CanBeEquip() && i.tier < 20)
@@ -180,7 +180,7 @@ namespace Neitsillia.Items.Item
                 name = $"Schematic : {item.originalName}",
                 originalName = $"Schematic : {item.originalName}",
                 tier = item.baseTier,
-                
+
                 type = IType.Schematic,
                 schematic = item.schematic,
                 description = $"A schematic too complex to learn for {item.name}. [You must \"Use\" this item to craft it.]",
@@ -270,16 +270,16 @@ namespace Neitsillia.Items.Item
         internal void LoadPerk()
         {
             Random rng = Program.rng;
-            
+
             if (perk != null)
             {
                 if (perk.name == null || perk.name.Length < 1)
                 { perk = null; return; }
                 if (perk.name == "-Random")
                 {
-                    switch(type)
+                    switch (type)
                     {
-                        case IType.Weapon: perk = PerkLoad.RandomPerk(perk.rank, "Weapon");break;
+                        case IType.Weapon: perk = PerkLoad.RandomPerk(perk.rank, "Weapon"); break;
                         case IType.Jewelry:
                             {
                                 if (Program.rng.Next(101) <= 50)
@@ -299,7 +299,7 @@ namespace Neitsillia.Items.Item
                         case IType.Healing:
                             perk = PerkLoad.RandomPerk(perk.rank, "Status");
                             break;
-                    }  
+                    }
                 }
                 else switch (type)
                     {
@@ -317,7 +317,7 @@ namespace Neitsillia.Items.Item
                             perk = PerkLoad.Effect(perk.name, tier / 2, tier);
                             break;
                     }
-                
+
             }
         }
 
@@ -339,21 +339,21 @@ namespace Neitsillia.Items.Item
             }
             if (schematic != null && schematic.exists)
             {
-                if(schematic.name == null || schematic.name.Trim() == "")
-                schematic.name = name; issue = true;
+                if (schematic.name == null || schematic.name.Trim() == "")
+                    schematic.name = name; issue = true;
                 if (schematic.path != originalName)
                     schematic.path = originalName;
             }
             if (damage == null)
                 damage = new long[ReferenceData.DmgType.Length];
-            if(resistance == null)
+            if (resistance == null)
                 resistance = new int[ReferenceData.DmgType.Length];
             while (damage.Length < ReferenceData.DmgType.Length)
             { damage = ArrayM.AddItem(damage, 0); issue = true; }
             while (resistance.Length < ReferenceData.DmgType.Length)
             { resistance = ArrayM.AddItem(resistance, 0); issue = true; }
 
-            if(isNew)
+            if (isNew)
             {
                 CalculateStats();
                 baseTier = tier;
@@ -369,12 +369,14 @@ namespace Neitsillia.Items.Item
         }
         public async System.Threading.Tasks.Task SaveItemAsync(string table = "Item")
         {
-            if (table == "Item" && isUnique)  table = "Unique Item";
+            if (table == "Item" && isUnique) table = "Unique Item";
             await Database.UpdateRecordAsync(table, MongoDatabase.FilterEqual<Item, string>
                 ("_id", originalName), this);
             Console.WriteLine(type + " : " + name + " Verified, Updated and Registered");
         }
         //
+        public static Item RandomGear(int tier, bool jewelry = false)
+            => RandomItem(tier, Program.rng.Next(jewelry ? 5 : 6, 12));
         public static Item RandomItem(int tier, int type = -1, bool cap = true)
         {
             if (tier < 20) tier = 20;
