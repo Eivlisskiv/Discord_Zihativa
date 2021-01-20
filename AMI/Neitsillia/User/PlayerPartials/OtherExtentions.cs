@@ -15,25 +15,24 @@ namespace AMI.Neitsillia.User.PlayerPartials
         {
             get
             {
-                return (PetListKey ??
-                            (PetListKey = new DataBaseRelation<string, PetList>(_id, null))
-                       ).Data ?? (PetListKey.Data = new PetList(_id));
+                return (PetListKey ??= new DataBaseRelation<string, PetList>(_id, null)).Data 
+                    ?? (PetListKey.Data = new PetList(_id));
             }
-            set { (PetListKey ?? (PetListKey = new DataBaseRelation<string, PetList>(_id, null))).Data = value; }
+            set { (PetListKey ??= new DataBaseRelation<string, PetList>(_id, null)).Data = value; }
         }
 
         public DataBaseRelation<string, Hand> GamblingHandKey;
         internal Hand GamblingHand
         {
-            get { return (GamblingHandKey ?? (GamblingHandKey = new DataBaseRelation<string, Hand>(_id, null))).Data; }
-            set { (GamblingHandKey ?? (GamblingHandKey = new DataBaseRelation<string, Hand>(_id, null))).Data = value; }
+            get { return (GamblingHandKey ??= new DataBaseRelation<string, Hand>(_id, null)).Data; }
+            set { (GamblingHandKey ??= new DataBaseRelation<string, Hand>(_id, null)).Data = value; }
         }
 
         public DataBaseRelation<string, ProgressData> ProgressDataKey;
         internal ProgressData ProgressData
         {
-            get { return (ProgressDataKey ?? (ProgressDataKey = new DataBaseRelation<string, ProgressData>(_id, new ProgressData(_id)))).Data; }
-            set { (ProgressDataKey ?? (ProgressDataKey = new DataBaseRelation<string, ProgressData>(_id, null))).Data = value; }
+            get { return (ProgressDataKey ??= new DataBaseRelation<string, ProgressData>(_id, new ProgressData(_id))).Data; }
+            set { (ProgressDataKey ??= new DataBaseRelation<string, ProgressData>(_id, null)).Data = value; }
         }
 
         public DataBaseRelation<string, Faith> FaithKey;

@@ -1,5 +1,4 @@
 ﻿using AMI.Neitsillia.Areas.AreaPartials;
-using System.Collections.Generic;
 
 namespace AMI.Neitsillia.Areas
 {
@@ -11,8 +10,8 @@ namespace AMI.Neitsillia.Areas
             child.junctions.Add(new NeitsilliaEngine.Junction(parent, 0, 0));
             if(save)
             {
-                child.UploadToDatabase(true).Wait();
-                parent.UploadToDatabase(true).Wait();
+                child.UploadToDatabase().Wait();
+                parent.UploadToDatabase().Wait();
             }
         }
 

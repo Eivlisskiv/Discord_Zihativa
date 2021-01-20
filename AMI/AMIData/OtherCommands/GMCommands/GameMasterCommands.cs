@@ -490,7 +490,7 @@ namespace AMI.AMIData.OtherCommands
             if (HasFuel(xp, 1).Result)
             {
                 Player player = Player.Load(user.Id, Player.IgnoreException.All);
-                player.XPGain(xp);
+                player.XpGain(xp);
                 IUserMessage reply = await ReplyAsync(user.Mention + " gained " + xp + " XP points.");
                 player.ui = new UI(reply, new List<string> { EUI.xp, EUI.inv, EUI.stats });
                 player.SaveFileMongo();

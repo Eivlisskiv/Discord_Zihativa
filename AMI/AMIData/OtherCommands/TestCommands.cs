@@ -76,7 +76,7 @@ namespace AMI.AMIData.OtherCommands
             EmbedBuilder em = new EmbedBuilder();
             em.WithTitle("Next Skill Point Rewards");
             em.WithDescription(res);
-            var m = new CharacterMotherClass
+            var m = new Player
             {
                 level = level
             };
@@ -130,7 +130,7 @@ namespace AMI.AMIData.OtherCommands
         {
             Context.AdminCheck();
 
-            CharacterMotherClass character = new CharacterMotherClass();
+            Player character = new Player();
 
             for(int i = 0; i < 3; i++)
                 character.equipment.Equip(Item.RandomItem(level * 5, 5, false), i);

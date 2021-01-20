@@ -88,8 +88,8 @@ namespace AMI.Neitsillia.Areas.Nests
             if(parent.junctions.Find(x => x.filePath == nest.AreaId) == null)
                 parent.junctions.Add(new NeitsilliaEngine.Junction(nest, 0, 0));
             nest.SetRates(0, 100, 0, 0);
-            await nest.UploadToDatabase(true);
-            await parent.UploadToDatabase(true);
+            await nest.UploadToDatabase();
+            await parent.UploadToDatabase();
             return nest;
         }
 
@@ -194,7 +194,7 @@ namespace AMI.Neitsillia.Areas.Nests
             if (i != -1)
                 parent.junctions.RemoveAt(i);
 
-            await parent.UploadToDatabase(true);
+            await parent.UploadToDatabase();
             
             await Database.DeleteRecord<Area>("Area", _id);
             await Database.DeleteRecord<Nest>(null, _id);

@@ -329,23 +329,23 @@ namespace AMI.Neitsillia.User.PlayerPartials
         }
 
         #region XP and Level
-        public long XPGain(NPC mob)
+        public long XpGain(NPC mob)
         {
             long x = Convert.ToInt64(mob.XPDrop(level));
             if (x < 1) x = 1;
-            return XPGain(x);
+            return XpGain(x);
         }
-        public long XPGain(double xpgain)
+        public long XpGain(double xpgain)
         {
             long xp = NumbersM.NParse<long>(xpgain);
-            return XPGain(xp);
+            return XpGain(xp);
         }
-        public long XPGain(long xpGain, int mod)
+        public override long XpGain(long xpGain, int mod)
         {
             xpGain /= (2 + mod);
-            return XPGain(xpGain);
+            return XpGain(xpGain);
         }
-        public long XPGain(long xpGain)
+        public long XpGain(long xpGain)
         {
             double multiplier = PerkLoad.CheckPerks(this, Perk.Trigger.GainXP, ReferenceData.xprate);
             long gain = Convert.ToInt64(xpGain * multiplier);

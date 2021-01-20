@@ -1,7 +1,5 @@
 ﻿using AMI.AMIData;
 using AMI.Methods;
-using AMI.Module;
-using AMI.Neitsillia.Areas.Strongholds;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
@@ -9,7 +7,6 @@ using AMYPrototype;
 using Discord;
 using Neitsillia.Items.Item;
 using NeitsilliaEngine;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -140,7 +137,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             return false;
         }
 
-        internal async Task UploadToDatabase(bool skipChecks = false)
+        internal async Task UploadToDatabase()
         {
             await Program.data.database.UpdateRecordAsync(
                 type == AreaType.Dungeon || type == AreaType.Arena ? "Dungeons" : "Area",
@@ -163,7 +160,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             return false;
         }
 
-        bool ValidTable(IEnumerable<string>[] table)
+        internal bool ValidTable(IEnumerable<string>[] table)
         {
             return table != null && table.Length > 0;
         }

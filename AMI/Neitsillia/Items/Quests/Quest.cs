@@ -283,7 +283,7 @@ namespace AMI.Neitsillia.Items.Quests
 
             if (xpReward > 0)
             {
-                player.XPGain(xpReward);
+                player.XpGain(xpReward);
                 rewards += Utils.Display(xpReward) + " XP" + Environment.NewLine;
             }
             if (koinsReward > 0)

@@ -1,10 +1,16 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Areas.AreaPartials;
+using AMI.Neitsillia.Collections;
+using AMI.Neitsillia.Encounters;
+using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
+using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
+using MongoDB.Bson.Serialization.Attributes;
+using Neitsillia.Items.Item;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,6 +19,7 @@ namespace AMI.Neitsillia.Areas.Arenas
 {
     public class Arena
     {
+        static AMIData.MongoDatabase Database => Program.data.database;
         public enum ArenaMode { Survival, };
         static readonly string[] ModesDesc =
         {
@@ -79,15 +86,12 @@ namespace AMI.Neitsillia.Areas.Arenas
 
         internal static async Task<Area> Generate(Area parent, Player player, int mode, string[] boolArray)
         {
-            Area dungeon = new Area(AreaType.Arena,
-                $"{parent.name} {(ArenaMode)mode}", parent)
+            Area dungeon =
+            new Area(AreaType.Arena, $"{parent.name} {(ArenaMode)mode}", parent)
             {
+                eMobRate = 100,
                 floors = -1,
-                arena = new Arena((ArenaMode)mode)
-                {
-                    ParentID = parent.AreaId,
-                    Modifiers = boolArray != null ? new ArenaModifier(boolArray) : null,
-                }
+                arena = new Arena((ArenaMode)mode, boolArray),
             };
 
             await player.SetArea(dungeon);
@@ -96,96 +100,121 @@ namespace AMI.Neitsillia.Areas.Arenas
             return dungeon;
         }
 
-        //This instance for for per player/party data
-
-        public string ParentID;
         public ArenaMode gameMode;
         public ArenaModifier Modifiers;
-        
-        public Arena(ArenaMode mode)
+
+        public Arena(bool json) { }
+        public Arena(ArenaMode mode, string[] boolArray = null)
         {
             gameMode = mode;
+            Modifiers = new ArenaModifier(boolArray);
         }
 
-        internal long KutyeiCoinsReward(long score)
+        private Inventory GetLoot(Area arena, int level)
         {
-            switch(gameMode)
+            long score = Modifiers.CurrentScore;
+            Inventory loot = new Inventory();
+            for(; score > 0; score -= 100)
             {
-                case ArenaMode.Survival: return NumbersM.NParse<long>(score * Modifiers.KoinMult);
+                if (Program.Chance(score))
+                {
+                    int t1 = ArrayM.IndexWithRates(arena.loot.Length - 1, Program.rng);
+                    int t2 = ArrayM.IndexWithRates(arena.loot[t1].Count - 1, Program.rng);
+                    //gets the item in that tier, creates a new item and adds it to the loot event collection
+                    Item item = Item.LoadItem(arena.loot[t1][t2].Trim());
+                    item.Scale(level);
+
+                    loot.Add(item, 1, -1);
+                }
             }
-            return 0;
+
+            return loot;
         }
+
         internal EmbedBuilder Explore(Area area, Player player, EmbedBuilder embed)
         {
-            switch (gameMode)
+            return gameMode switch
             {
-                case ArenaMode.Survival:
-                    {
-
-                        area.LocationMob(embed, player, 0);
-
-                    }break;
-            }
-            return null;
+                ArenaMode.Survival => EncounterBadBatch(player, embed),
+                _ => embed,
+            };
         }
 
+        private EmbedBuilder EncounterBadBatch(Player player, EmbedBuilder embed)
+        {
+            int level = Math.Max(player.Area.level, 1);
+            string[] mobNames = ArenaQuest.BadBatch(level, 1).mobs;
 
-        
+            NPC[] mobs = new NPC[mobNames.Length];
+
+            for (int i = 0; i < mobNames.Length; i++)
+            {
+                NPC mob = NPC.GenerateNPC(level, mobNames[i]);
+                mob.inventory.inv.Clear();
+                mob.KCoins = 0;
+                mobs[i] = mob;
+            }
+
+            player.NewEncounter(new Encounter("Mob", player)
+            { mobs = mobs });
+
+            embed.WithDescription("You've encountered a group of creatures");
+
+            for (int i = 0; i < mobs.Length; i++)
+            {
+                NPC m = mobs[i];
+
+                embed.AddField(
+                m.displayName + $" | m{i}",
+                "Level: " + m.level + Environment.NewLine +
+                //"Rank: " + m.Rank() + Environment.NewLine +
+                "Health: " + m.health + '/' + m.Health() + Environment.NewLine
+                );
+            }
+
+            player.SaveFileMongo();
+
+            return embed;
+        }
+
+        public async Task EndChallenge(Encounter enc, Area arena)
+        {
+            //Game mode specific rewards
+            switch (gameMode)
+            {
+                default:
+                    if(arena.ValidTable(arena.loot))
+                        enc.AddLoot(GetLoot(arena, arena.level));
+                    break;
+            }
+
+            //Add user scores
+            //await TODO
+
+            //Koins rewards
+            enc.koinsToGain += NumbersM.NParse<long>(Modifiers.CurrentScore * Modifiers.koinMult);
+            enc.xpToGain += NumbersM.NParse<long>((Modifiers.CurrentScore * arena.level) * Modifiers.xPMult);
+        }
+
+        internal bool WaveProgress(int floor)
+        {
+            return Modifiers.WaveProgress(floor * gameMode switch
+            {
+                ArenaMode.Survival => 5,
+                _ => 1,
+            });
+        }
     }
     //TEST - IGNORE
     class ArenaScoreList
     {
         //same as area (ArenaLobby) id
         public string _id;
+
                //charname\userid, score
         public SortedList<string, long> PlayerScores { get; set; }
 
         public ArenaScoreList()
-        {
-
-        }
-    }
-    //TEST - IGNORE
-    public class ArenaModifier
-    {
-        public enum ArenaModifiers { };
-        internal static readonly string[] ModifiersDesc = 
-        {
-            "test 1",
-            "test 2",
-            "test 3",
-            "test 4",
-            "test 5",
-        };
-
-        //Active Arena
-        public List<ArenaModifiers> ActiveMods = new List<ArenaModifiers>();
-
-        //->//Party Stats
-        public long CurrentScore = 0;
-        public int wavesPerRounds = 5;
-        //
-        public double KoinMult = 1;
-        public double XPMult = 1;
-
-        public ArenaModifier(string[] bools)
-        {
-            for (int i = 0; i < bools.Length; i++)
-                if (bools[i] == "1")
-                {
-                    ArenaModifiers m = (ArenaModifiers)i;
-                    LoadMod(m);
-                    ActiveMods.Add(m);
-                }
-        }
-
-        void LoadMod(ArenaModifiers mod)
-        {
-            switch(mod)
-            {
-                default: //todo
-                    break;
-            }
-        }
+        { }
     }
 }

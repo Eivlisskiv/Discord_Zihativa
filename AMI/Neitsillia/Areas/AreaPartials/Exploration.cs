@@ -21,13 +21,13 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             EmbedBuilder explore = new EmbedBuilder();
             explore.WithTitle(name + " Exploration");
 
-            switch (type)
+            return type switch
             {
-                case AreaType.Dungeon: return await ExploreDungeon(player, explore);
-                //case AreaType.Arena: return Arena.Explore(this, player, explore);
-                case AreaType.Nest: return ExploreNest(player, explore);
-                default: return await ExploreRegularArea(player, explore);
-            }
+                AreaType.Dungeon => await ExploreDungeon(player, explore),
+                AreaType.Arena => ExploreArena(player, explore),
+                AreaType.Nest => ExploreNest(player, explore),
+                _ => await ExploreRegularArea(player, explore),
+            };
         }
 
         private async Task<EmbedBuilder> ExploreDungeon(Player player, EmbedBuilder explore)

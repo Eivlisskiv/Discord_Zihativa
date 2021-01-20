@@ -516,7 +516,7 @@ namespace AMI.Neitsillia.NPCSystems
             return false;
         }
         //XP
-        public long XPGain(long xpGain, int mod = 1)
+        public override long XpGain(long xpGain, int mod = 1)
         {
             if (mod < 1)
                 mod = Verify.Min(level, 1);

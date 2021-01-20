@@ -15,7 +15,6 @@ using Discord;
 using Neitsillia.Items.Item;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Combat
@@ -25,18 +24,17 @@ namespace AMI.Neitsillia.Combat
         static AMIData.MongoDatabase Database => Program.data.database;
         static Random Rng => Program.rng;
 
-        Party party;
+        readonly Party party;
         Encounter currentEncounter;
-        Area currentArea;
+        readonly Area currentArea;
 
-        Player partyLeader;
+        readonly Player partyLeader;
 
-        bool endDungeon;
-        bool allPlayersDead;
-        bool allMobsDead;
-
-        CombatResult[] playerParty;
-        CombatResult[] mobParty;
+        readonly bool endDungeon;
+        readonly bool allPlayersDead;
+        readonly bool allMobsDead;
+        readonly CombatResult[] playerParty;
+        readonly CombatResult[] mobParty;
 
         public CombatEndHandler(Combat combat, Party party, Encounter currentEncounter, 
             Area currentArea)
@@ -50,10 +48,14 @@ namespace AMI.Neitsillia.Combat
 
             partyLeader = ((Player)playerParty[0].character);
 
-            endDungeon = (currentArea.type == AreaType.Dungeon || currentArea.type == AreaType.Arena) && partyLeader.areaPath.floor >= currentArea.floors;
+            endDungeon = (currentArea.type == AreaType.Dungeon || currentArea.type == AreaType.Arena) && TopFloor;
             allPlayersDead = Combat.ArePlayersDead(playerParty);
             allMobsDead = Combat.IsMobDead(mobParty);
         }
+
+        bool TopFloor => currentArea.floors > -1 && MainAreaPath.floor >= currentArea.floors;
+
+        AreaPath MainAreaPath => party?.areaKey ?? partyLeader.areaPath;
 
         AreaPath ParentAreaPath(Area area, int floor = 0)
             => new AreaPath()
@@ -63,12 +65,12 @@ namespace AMI.Neitsillia.Combat
                 floor = floor
             };
 
-        public async Task<MsgType> Handle(EmbedBuilder result, MsgType msgType)
+        public async Task<MsgType> Handle(EmbedBuilder result)
         {
-            if (allPlayersDead)
-                msgType = await HandleAllPlayersDead(result);
-            else if (allMobsDead)
-                msgType = await HandleAllMobsDead(result);
+            MsgType msgType;
+
+            if (allPlayersDead) msgType = await HandleAllPlayersDead(result);
+            else if (allMobsDead) msgType = await HandleAllMobsDead(result);
             else
             {
                 msgType = MsgType.Combat;
@@ -92,14 +94,35 @@ namespace AMI.Neitsillia.Combat
             NPC mob = (NPC)Utils.RandomElement(mobParty).character;
             string lostInfo = allMobsDead ? "No one is left standing to claim victory." : "You have been defeated." + Environment.NewLine;
 
-            if (endDungeon) await Database.DeleteRecord<Area>("Dungeons", partyLeader.areaPath.path, "AreaId");
+            await Database.DeleteRecord<Area>("Dungeons", currentArea.AreaId, "AreaId");
 
+            MsgType msgType = MsgType.Main;
+            Encounter encounter = await ChallengeEnd();
+            if(encounter != null)
+            {
+                msgType = encounter.Name switch
+                {
+                    Encounter.Names.Loot => MsgType.Loot,
+                };
+            }
+
+            bool deathCost = msgType == MsgType.Main;
             foreach (var cb in playerParty)
             {
                 PerkLoad.CheckPerks(cb.character, Perk.Trigger.EndFight, cb.character);
+                
+                if(encounter != null ) 
+                {
+                    if (encounter.koinsToGain > 0)
+                        cb.character.KCoins += encounter.koinsToGain;
+                    if (encounter.xpToGain > 0)
+                        cb.character.XpGain(encounter.xpToGain, 1);
+                }
+
                 if (cb.character is Player player)
                 {
-                    if (!allMobsDead) lostInfo += DefeatCost(player, mob, 0.5) + Environment.NewLine;
+                    if (!allMobsDead && deathCost) 
+                        lostInfo += DefeatCost(player, mob, 0.5) + Environment.NewLine;
 
                     await player.Respawn(false);
 
@@ -109,11 +132,51 @@ namespace AMI.Neitsillia.Combat
                 else if (cb.character is NPC n)
                     FollowerCheck(n, party, allPlayersDead);
             }
+
             result.AddField("Defeat", lostInfo);
 
-            if (!allMobsDead && currentEncounter.Name != Encounter.Names.Bounty && currentArea.type != AreaType.Dungeon)
+            if (encounter != null)
+            {
+                string loot = null;
+                if(encounter.loot != null && encounter.loot.Count > 0)
+                {
+                    int c = Math.Min(encounter.loot.Count, 10);
+                    for (int i = 0; i < c; i++)
+                        loot += $"{i + 1}|" + encounter.loot[i] + Environment.NewLine;
+                    if (c < encounter.loot.Count)
+                        loot += $"And {encounter.loot.Count - c} more...";
+                }
+
+                string extraResult = (encounter.koinsToGain > 0 ? $"+{encounter.koinsToGain} Kuts" + Environment.NewLine : null)
+                    + (encounter.xpToGain > 0 ? $"+{encounter.xpToGain} XP" + Environment.NewLine : null)
+                    + loot;
+
+                result.AddField("Rewards",
+                    extraResult.Length != 0 ? extraResult : "None");
+
+                encounter.koinsToGain = 0;
+                encounter.xpToGain = 0;
+
+                if (party != null)
+                    partyLeader.NewEncounter(encounter);
+            }
+
+           if (!allMobsDead && currentEncounter.Name != Encounter.Names.Bounty 
+                && currentArea.type != AreaType.Dungeon && currentArea.type != AreaType.Arena)
                 PopulationHandler.Add(currentArea, mob);
-            return MsgType.Main;
+            return msgType;
+        }
+
+        private async Task<Encounter> ChallengeEnd()
+        {
+            Encounter enc = null;
+            if (currentArea.type == AreaType.Arena && currentArea.arena != null)
+            {
+                enc = new Encounter(Encounter.Names.Loot, partyLeader);
+                await currentArea.arena.EndChallenge(enc, currentArea);
+            }
+
+            return enc;
         }
 
         public static string DefeatCost(Player player, NPC mob, double intensity = 1)
@@ -123,7 +186,7 @@ namespace AMI.Neitsillia.Combat
             long coinsLost = Verify.Max(NumbersM.NParse<long>(((mob.Rank() + mob.level) * 2) * intensity), player.KCoins);
             player.KCoins -= coinsLost;
             //Log.CombatData(mob, player, xpDropped);
-            mob.XPGain(xpDropped);
+            mob.XpGain(xpDropped);
             return $"{player.name} lost {xpDropped} XP And {coinsLost} Kuts";
         }
 
@@ -176,8 +239,8 @@ namespace AMI.Neitsillia.Combat
         {
             if (endDungeon)
             {
-                await Database.DeleteRecord<Area>("Area", partyLeader.areaPath.path, "AreaId");
-                await Database.DeleteRecord<Area>("Dungeons", partyLeader.areaPath.path, "AreaId");
+                await Database.DeleteRecord<Area>("Area", MainAreaPath.path, "AreaId");
+                await Database.DeleteRecord<Area>("Dungeons", MainAreaPath.path, "AreaId");
             }
 
             //Get Loot into Encounter
@@ -185,7 +248,7 @@ namespace AMI.Neitsillia.Combat
 
             (string[] kills, long koinsToGain, long xpToGain) = GetKillRewards(enc);
 
-            OtherLoot(enc);
+            await OtherLoot(enc);
 
             var invLoot = enc.loot.inv;
 
@@ -210,7 +273,7 @@ namespace AMI.Neitsillia.Combat
                     lootDisplay += await PlayerOnAllMobsDead(player, specialCurrencyReward, xpToGain, kills, enc);
                 else if (cb.character is NPC follower)
                 {
-                    lootDisplay += $" |-|{(follower.IsPet() ? follower.displayName : follower.name)} +{Utils.Display(follower.XPGain(xpToGain, follower.level))} XP {Environment.NewLine}";
+                    lootDisplay += $" |-|{(follower.IsPet() ? follower.displayName : follower.name)} +{Utils.Display(follower.XpGain(xpToGain, follower.level))} XP {Environment.NewLine}";
 
                     //NPC looting
                     if (follower.IsPet())
@@ -258,22 +321,36 @@ namespace AMI.Neitsillia.Combat
             return (kills, koinsToGain, xpToGain);
         }
 
-        void OtherLoot(Encounter enc)
+        async Task OtherLoot(Encounter enc)
         {
-            bool top = partyLeader.areaPath.floor >= currentArea.floors;
-            if(currentArea.type == AreaType.Arena && top)
+            bool top = TopFloor;
+            if(currentArea.type == AreaType.Arena)
             {
-                if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
+                if (top)
                 {
-                    int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
-                    enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
+                    if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
+                    {
+                        int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
+                        enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
+                    }
+                    else if (Program.Chance(currentArea.eLootRate))
+                    {
+                        Item reward = Item.RandomItem(currentArea.level, Rng.Next(6, 12));
+                        enc.AddLoot(reward);
+                    }
                 }
-                else if (Program.Chance(currentArea.eLootRate))
-                {
-                    Item reward = Item.RandomItem(currentArea.level, Rng.Next(6, 12));
-                    enc.AddLoot(reward);
+
+                if (currentArea.arena != null) 
+                { 
+                    MainAreaPath.floor++;
+                    if(currentArea.arena.WaveProgress(MainAreaPath.floor))
+                        currentArea.level++;
+                    await currentArea.UploadToDatabase();
                 }
+                
+                
             }
+
         }
 
         string EventRewards(Encounter enc, out (string name, int amount) eventReward)
@@ -308,7 +385,7 @@ namespace AMI.Neitsillia.Combat
             else if (!hasDied)
             {
                 //XP
-                long xpGained = hasDied ? 0 : player.XPGain(xpToGain, player.level);
+                long xpGained = hasDied ? 0 : player.XpGain(xpToGain, player.level);
                 lootDisplay += $" |-| {player.name} +{Utils.Display(xpGained)} XP {Environment.NewLine}";
 
                 if (currentArea.type == AreaType.Nest)

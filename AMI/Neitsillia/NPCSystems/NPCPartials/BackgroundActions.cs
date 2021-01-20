@@ -209,7 +209,7 @@ namespace AMI.Neitsillia.NPCSystems
                         cons[rng.Next(cons.Length)]), 1 , false);
             }
             _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** lvl{level} " +
-                $"gained {XPGain(Convert.ToInt64(rng.Next(minXP, maxXP) * (xpMult + area.level + multiplier)), 0)}xp and {kutsGained} Kuts from work");
+                $"gained {XpGain(Convert.ToInt64(rng.Next(minXP, maxXP) * (xpMult + area.level + multiplier)), 0)}xp and {kutsGained} Kuts from work");
             if (profession == ReferenceData.Profession.Child && level > 13)
                 GetsAProfession((ReferenceData.Profession)rng.Next(2,8));
         }
@@ -416,7 +416,7 @@ namespace AMI.Neitsillia.NPCSystems
             StackedItems st = inventory[index];
 
             KCoins += Verify.Min(st.item.GetValue() * st.count, 1);
-            XPGain(Verify.Min(st.item.GetValue() * st.count, st.count));
+            XpGain(Verify.Min(st.item.GetValue() * st.count, st.count));
             inventory.Remove(index, st.count);
 
             return $" Got Rid of {st} gaining {(st.item.GetValue() / 2) * st.count} XP and Coins";

@@ -26,6 +26,22 @@ namespace AMI.Neitsillia.Areas.Arenas
             },
         };
 
+        public static (string name, string[] mobs) BadBatch(int level, int amount = 5)
+        {
+            string choices = Database.Query("Creature", $"{{ $and: [ " +
+                $"{{ baseLevel: {{ $lte: {level} }} }}," +
+                $"{{ race: {{ $nin: [ \"{string.Join("\", \"", blacklistedRaces)}\" ] }} }}" +
+                $" ] }}", "_id");
+            choices = choices.Replace("{ \"_id\" :", "").Replace("}", "");
+            string[] options = JsonSerializer.Deserialize<string[]>(choices);
+
+            string[] mobs = new string[amount];
+            for (int i = 0; i < mobs.Length; i++)
+                mobs[i] = Utils.RandomElement(options);
+
+            return ("Bad Batch", mobs);
+        }
+
         public string name;
         public int difficulty;
         public string[] enemies;
@@ -59,26 +75,9 @@ namespace AMI.Neitsillia.Areas.Arenas
 
         private void LoadFight(int level)
         {
-            (name, enemies) = RandomFight(level);
+            (name, enemies) = BadBatch(level);
             dropChance = 100; //difficulty * 10;
             drops = dropsByDifficulty[difficulty - 1];
         }
-
-        private (string name, string[] mobs) RandomFight(int level)
-        {
-            string choices = Database.Query("Creature", $"{{ $and: [ " +
-                $"{{ baseLevel: {{ $lte: {level} }} }}," +
-                $"{{ race: {{ $nin: [ \"{string.Join("\", \"", blacklistedRaces)}\" ] }} }}" +
-                $" ] }}", "_id");
-            choices = choices.Replace("{ \"_id\" :", "").Replace("}", "");
-            string[] options = JsonSerializer.Deserialize<string[]>(choices);
-
-            string[] mobs = new string[5];
-            for (int i = 0; i < mobs.Length; i++)
-                mobs[i] = Utils.RandomElement(options);
-
-            return ("Bad Batch", mobs);
-        }
-
     }
 }

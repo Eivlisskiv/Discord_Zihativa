@@ -325,7 +325,7 @@ namespace AMI.Neitsillia.Encounters
         public void TurnIntoLoot(Player player)
         {
             player.KCoins += koinsToGain;
-            player.XPGain(xpToGain);
+            player.XpGain(xpToGain);
             koinsToGain = 0;
             xpToGain = 0;
             Name = Names.Loot;

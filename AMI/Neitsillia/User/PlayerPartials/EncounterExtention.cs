@@ -8,12 +8,11 @@ namespace AMI.Neitsillia.User.PlayerPartials
 {
     partial class Player
     {
-        public DataBaseRelation<string, Encounter> EncounterKey
-            = new DataBaseRelation<string, Encounter>(null, null);
+        public DataBaseRelation<string, Encounter> EncounterKey;
 
         internal Encounter Encounter
         {
-            get => EncounterKey?.Data;
+            get => (EncounterKey ?? new DataBaseRelation<string, Encounter>(null, null)).Data;
             set => EncounterKey = new DataBaseRelation<string, Encounter>(value._id, value);
         }
 

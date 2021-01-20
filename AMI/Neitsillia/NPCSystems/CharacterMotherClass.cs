@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace AMI.Neitsillia.NPCSystems
 {
-    public class CharacterMotherClass
+    public abstract class CharacterMotherClass
     {
         #region Public Vars
         public long health;
@@ -335,6 +335,8 @@ namespace AMI.Neitsillia.NPCSystems
             long req = XpRequired();
             return $"**{Utils.Display(experience)}/{Utils.Display(req)}** | **{Utils.Display(req - experience)}** To next level";
         }
+
+        public abstract long XpGain(long xpGain, int mod = 1);
         #endregion
 
         public string CharacterInfo(bool getStats, bool getInv = true, bool getEq = true, bool getschems = true,

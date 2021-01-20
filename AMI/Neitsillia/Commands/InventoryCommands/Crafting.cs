@@ -65,7 +65,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
                             await DUtils.Replydb(Context, $"{player.name} is too low level to craft {itemname}. Requires level {Math.Ceiling(ret.baseTier / 5.00)}");
                         else
                         {
-                            player.XPGain(ret.tier * 10 * player.level);
+                            player.XpGain(ret.tier * 10 * player.level);
 
                             ret.EmdebInfo(crafting);
                             await DUtils.Replydb(Context, Context.User.Mention + " " + details,
@@ -117,7 +117,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             Schematic s = i.schematic;
             Inventory l = new Inventory();
 
-            player.XPGain(i.tier * player.level);
+            player.XpGain(i.tier * player.level);
 
             AddScrapLoot(l, i, count, player, r);
 
@@ -259,7 +259,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
                         }
                     }
                 }
-                player.XPGain(xp);
+                player.XpGain(xp);
                 await Neitsillia.InventoryCommands.Inventory.ViewLoot(player, Context.Channel, 0);
             }
         }
@@ -366,7 +366,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
                 PerkLoad.CheckPerks(player, Perk.Trigger.Upgrading, irec, amount, igiv.tier);
                 player.inventory.Remove(i[1], amount);
                 player.KCoins -= price;
-                player.XPGain(price * player.level);
+                player.XpGain(price * player.level);
 
                 player.EggPocketTrigger(Neitsillia.NPCSystems.Companions.Egg.EggChallenge.Crafting);
                 player.QuestTrigger(Neitsillia.Items.Quests.Quest.QuestTrigger.GearUpgrading);

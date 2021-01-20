@@ -196,7 +196,7 @@ namespace AMI.Neitsillia.Crafting
             if (skaviAmount > 0)
                 npc.RemoveInvItem(FindMaterial(npc, skaviMat, skaviAmount), skaviAmount);
             npc.AddItemToInv(Item.LoadItem(path));
-            npc.XPGain(100 * npc.level);
+            npc.XpGain(100 * npc.level);
         }
         //
         internal StackedObject<string, int> GetMaterial(int index)

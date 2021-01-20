@@ -21,7 +21,6 @@ using AMI.Neitsillia.Campaigns;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMI.Neitsillia.Areas.Arenas;
-using AMI.Neitsillia.Areas.AreaExtentions;
 using AMI.Module;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Areas.InteractiveAreas;
@@ -455,9 +454,15 @@ namespace AMI.Neitsillia.Commands
                 }
                 else
                 {
+                    if(player.Area.type == AreaType.Arena)
+                    {
+                        await chan.SendMessageAsync("You may not rest in this location type: " + player.Area.type);
+                        return;
+                    }
+
                     rest.Title = $"{player.Party?.partyName ?? player.name} Started Resting in {player.Area.name}";
                     
-                    rest.WithFooter("Attempting to use any action command with this character will result in requesting an Resting End Confirmation");
+                    rest.WithFooter("Attempting to use actions commands with this character will result in requesting to stop resting");
 
                     long? lhp = null;
                     int? lsp = null;

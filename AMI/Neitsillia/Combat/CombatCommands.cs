@@ -141,9 +141,8 @@ namespace AMI.Neitsillia.Combat
 
         [Command("Run")]
         public async Task Run()
-        {
-            await Run(Context.Player, Context.Channel, false);
-        }
+            => await Run(Context.Player, Context.Channel, false);
+
         internal static async Task Run(Player player, ISocketMessageChannel chan, bool edit)
         {
             if (!player.IsEncounter("Combat"))
@@ -152,7 +151,7 @@ namespace AMI.Neitsillia.Combat
             {
                 if(!player.IsSolo)
                 {
-                    player.duel = player.duel ?? new DuelData(null);
+                    player.duel ??= new DuelData(null);
                     await TurnCombat(player, "~Run", chan);
                     return;
                 }
@@ -170,12 +169,14 @@ namespace AMI.Neitsillia.Combat
                     fight.AddField("Escape Successful", "You ran away from combat");
                     await player.NewUI(await chan.SendMessageAsync(embed: fight.Build()),
                          MsgType.Main);
-                    player.XPGain(5);
 
                     PerkLoad.CheckPerks(player, Perk.Trigger.EndFight, player);
 
                     if (player.Area.IsDungeon && player.areaPath.floor >= player.Area.floors)
                     {
+                        if(player.Area.arena != null)
+                            await EndArenaChallenge(player, chan);
+
                         await Program.data.database.DeleteRecord<Area>("Area", player.Area.AreaId, "AreaId");
                         await player.SetArea(Area.LoadArea(player.Area.GeneratePath(false) + player.Area.parent, null), player.areaPath.floor);
                     }
@@ -184,6 +185,14 @@ namespace AMI.Neitsillia.Combat
                 else
                     await TurnCombat(player, "~Run", chan, false, edit);
             }
+        }
+
+        private static async Task EndArenaChallenge(Player player, ISocketMessageChannel chan)
+        {
+            Encounter enc = new Encounter(Encounter.Names.Loot, player);
+            await player.Area.arena.EndChallenge(enc, player.Area);
+            player.NewEncounter(enc, true);
+            await chan.SendMessageAsync(embed: enc.GetEmbed(null).Build());
         }
 
         internal static async Task AutoBrawl(Player player, ISocketMessageChannel chan)
@@ -218,7 +227,7 @@ namespace AMI.Neitsillia.Combat
                 player.duel.abilityName = abilityName;
             }
             //
-            Combat combat = null;
+            Combat combat;
             if (player.Party != null)
             {
                 CharacterMotherClass[] ps = new CharacterMotherClass[player.Party.MemberCount];
@@ -265,6 +274,10 @@ namespace AMI.Neitsillia.Combat
                             fight.AddField("Escape Successful", "You ran away from combat");
                             await chan.SendMessageAsync(embed: fight.Build());
                             await PartyEscape(player); 
+
+                            if(player.Area.arena != null)
+                                await EndArenaChallenge(player, chan);
+
                             return;
                         }
                     }
@@ -310,7 +323,7 @@ namespace AMI.Neitsillia.Combat
 
 
                 CombatEndHandler ceh = new CombatEndHandler(combat, player.Party, player.Encounter, player.Area);
-                MsgType resultType = await ceh.Handle(fight, MsgType.Combat);
+                MsgType resultType = await ceh.Handle(fight);
 
                 if (ability == null && player.ui != null &&
                     player.ui.type == MsgType.Combat && player.ui.data != null)

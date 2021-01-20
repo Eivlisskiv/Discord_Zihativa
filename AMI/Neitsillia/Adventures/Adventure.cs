@@ -184,7 +184,7 @@ namespace AMI.Neitsillia.Adventures
                 await chan.SendMessageAsync($"{player.name}'s Adventure ended. Experience points and Coins were automatically collected");
 
                 player.KCoins += coins;
-                player.XPGain(xp);
+                player.XpGain(xp);
 
                 if (loot > 0)
                 {

@@ -3,6 +3,7 @@ using AMI.Neitsillia.Areas.Arenas;
 using AMI.Neitsillia.Areas.InteractiveAreas;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NeitsilliaCommands;
+using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
 using System;
@@ -169,7 +170,10 @@ namespace AMI.Neitsillia.User.UserInterface
                         else
                         {
                             await Arena.Generate(player.Area, player, page, null);
-                            await msg.Channel.SendMessageAsync(embed: player.Area.AreaInfo(player.areaPath.floor).Build());
+                            await msg.Channel.SendMessageAsync(embed: DUtils.BuildEmbed($"Entered {player.Area.name}", 
+                                "Complete your challenge to gain rewards." + Environment.NewLine +
+                                "**Warning:** Running away, dying or leaving the area will end the challenge" + Environment.NewLine +
+                                "Use the `Explore` command to continue", null, player.userSettings.Color()).Build());
                         }
                     }
                     break;

@@ -1,13 +1,21 @@
 ﻿using AMI.Neitsillia.Areas.Arenas;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AMI.Neitsillia.User.PlayerPartials;
+using Discord;
 
 namespace AMI.Neitsillia.Areas.AreaPartials
 {
     public partial class Area
     {
         public Arena arena;
+
+        public EmbedBuilder ExploreArena(Player player, EmbedBuilder embed)
+        {
+            if(arena != null)
+            {
+                return arena.Explore(this, player, embed);
+            }
+
+            return embed;
+        }
     }
 }
