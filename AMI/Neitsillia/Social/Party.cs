@@ -113,6 +113,10 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 throw Module.NeitsilliaError.ReplyError("Player already has a character in this party");
             members.Add(new PartyMember(player.userid, player.name));
             player.PartyKey = new AMIData.DataBaseRelation<string, Party>(_id, this);
+            player.EncounterKey = new AMIData.DataBaseRelation<string, Encounters.Encounter>(EncounterKey, null);
+            player.AreaInfo = areaKey;
+            player.SaveFileMongo();
+
             await SaveData();
         }
         internal async Task Remove(Player player)
