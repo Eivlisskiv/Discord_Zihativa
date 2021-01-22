@@ -99,7 +99,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             else if (index >= player.inventory.Count || index < 0)
                 await DUtils.Replydb(Context, "Invalid Item");
             else if (player.inventory.GetItem(index) is Item item &&
-                (item.schematic == null || !item.schematic.exists || item.type == Item.IType.Schematic))
+                (item.isUnique || item.schematic == null || !item.schematic.exists || item.type == Item.IType.Schematic))
                 await DUtils.Replydb(Context, "Item can not be dismantled");
             else
             {
@@ -114,7 +114,6 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
         async Task DismantlingLoot(Player player, Item i, int count)
         {
             Random r = Program.rng;
-            Schematic s = i.schematic;
             Inventory l = new Inventory();
 
             player.XpGain(i.tier * player.level);
@@ -128,9 +127,9 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             await MoreDismantlingMethod(player, l, canCollect);
             bool schemGained = await CheckSchemGain(player, i, r, Verify.Min(count / 75.001, 1));
 
-            player.QuestTrigger(Neitsillia.Items.Quests.Quest.QuestTrigger.Scrapping, $"{i.name};{count};{schemGained}");
+            player.QuestTrigger(Items.Quests.Quest.QuestTrigger.Scrapping, $"{i.name};{count};{schemGained}");
         }
-        void AddScrapLoot(Neitsillia.Collections.Inventory l, Item i, int count, Player player, Random r)
+        void AddScrapLoot(Inventory l, Item i, int count, Player player, Random r)
         {
             double cnd = 50;
             if (i.CanBeEquip())

@@ -12,6 +12,8 @@ namespace AMI.AMIData.HelpPages
 
         public Embed H_crafting => Embed(Crafting, Inventory_Icons);
 
+        public Embed H_schematic => Embed(PermaSchematics, TempoSchematics);
+
         EmbedFieldBuilder Inventory => DUtils.NewField("Inventory",
             $"`{prefix}inv` **open and view your inventory**" + Environment.NewLine
             + $"`{prefix}sort inv` **Sort your inventory**" + Environment.NewLine
@@ -36,10 +38,18 @@ namespace AMI.AMIData.HelpPages
              + $"`{prefix}use` **Use a temporary schematic from your inventory to craft from inventory slot**" + Environment.NewLine
         );
 
-        EmbedFieldBuilder Schematics => DUtils.NewField("Schematics",
-            "There are two types of schematics:" + Environment.NewLine
-            + $"Learned Schematics: These are permanent and unlimited. They are also needed to upgrade the item or repair without repair kits. Located in `{prefix}schems`" + Environment.NewLine
-            + $"One time Schematics: These are located in your `{prefix}inventory` and can only be used once using `{prefix}use` command" + Environment.NewLine
+        EmbedFieldBuilder PermaSchematics => DUtils.NewField("Permanent Schematics",
+            $"Your character's Permanent Schematics are located in `{prefix}schems`" + Environment.NewLine
+            + $"**-** They are permanent and may not be dropped or removed." + Environment.NewLine
+            + $"**-** Can be used unlimited times." + Environment.NewLine
+            + $"**-** Required to upgrade the item." + Environment.NewLine
+            + $"**-** Exclusively obtained from scrapping." + Environment.NewLine
+            );
+        EmbedFieldBuilder TempoSchematics => DUtils.NewField("Consumable Schematics",
+            $"These are items stored in `{prefix}inv`" + Environment.NewLine
+            + $"**-** They can only be used once using `{prefix}use`." + Environment.NewLine
+            + $"**-** Some rare items may only be obtained from crafting from these kind of schematics." + Environment.NewLine
+            + $"**-** Various drop locations." + Environment.NewLine
             );
     }
 }

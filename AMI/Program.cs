@@ -2,12 +2,10 @@
 using System.Threading.Tasks;
 using AMYPrototype.Commands;
 using AMI.Methods;
-using System.Threading;
 using Discord.WebSocket;
 using Discord;
 using AMI.AMIData.Servers;
 using AMI.AMIData;
-using System.Collections.Generic;
 using AMI.Handlers;
 using AMI.AMIData.Webhooks;
 

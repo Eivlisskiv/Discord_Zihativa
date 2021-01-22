@@ -162,6 +162,6 @@ namespace AMI.AMIData.Events
         }
 
         public bool IsRewardSource(RewardSources source)
-            => rewardSources.Contains(source);
+            => rewardSources != null && rewardSources.Contains(source);
     }
 }

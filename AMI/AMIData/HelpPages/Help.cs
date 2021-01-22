@@ -50,7 +50,7 @@ namespace AMI.AMIData.HelpPages
 
         Embed Embed(string message, params EmbedFieldBuilder[] fields) => DUtils.BuildEmbed("Help",
             message
-            + Environment.NewLine + $"For a list of all commands, use the `{prefix}module` command."
+            + Environment.NewLine + $"Check out the website: https://zihativa.tk"
             + Environment.NewLine + $"For details on a specific command, use `{prefix}chelp {{command name}}`."
             + Environment.NewLine + $"Get an invite to the support server with the `{prefix}support` command",
             null, Color.DarkRed, fields

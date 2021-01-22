@@ -123,11 +123,11 @@ namespace AMI.Neitsillia.InventoryCommands
             else temp = dailyressource.ToString();
             itemsLoot += temp + Environment.NewLine;
             //
-            int tier = Program.RandomInterval(player.level, 0.15);
+            int tier = Math.Max(Program.RandomInterval(player.level, 0.15), 2);
             itemsLoot += GetDailyGear(player, tier * 5) + Environment.NewLine;
 
             if(player.level < 9)
-                itemsLoot += GetDailyGear(player, 20, (int)Item.IType.Weapon) + Environment.NewLine;
+                itemsLoot += GetDailyGear(player, 10, (int)Item.IType.Weapon) + Environment.NewLine;
 
             EmbedBuilder loot = new EmbedBuilder();
             //

@@ -153,7 +153,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         private EmbedBuilder EncounterBadBatch(Player player, EmbedBuilder embed)
         {
             int level = Math.Max(player.Area.level, 1);
-            string[] mobNames = ArenaQuest.BadBatch(level, 1).mobs;
+            string[] mobNames = ArenaQuest.BadBatch(level, player.IsSolo ? 2 : (player.Party.MemberCount + 1)).mobs;
 
             NPC[] mobs = new NPC[mobNames.Length];
 

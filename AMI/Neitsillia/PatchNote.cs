@@ -8,9 +8,9 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $" New event: Arena Championship 1.0: Arena Fights reward event currency during this event. {Environment.NewLine}"
-                + $"Added `Arena Quest` extra drops (Gladiator Set) {Environment.NewLine}"
-                + $"Added `Survival` Challenge in Arenas {Environment.NewLine}"
+                $"Fixed daily rewards being too high tier for level < 5 {Environment.NewLine}"
+                + $" Added `help schematic` to inform people of the (2) different schems types {Environment.NewLine}"
+                + $" Fixed parties failing to save due to the wrong _id being used {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -25,7 +25,7 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Added Gladiator Gear Set {Environment.NewLine}"
+                $"Fixed Unique items being scrappable {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()

@@ -379,7 +379,7 @@ namespace Neitsillia.Items.Item
             => RandomItem(tier, Program.rng.Next(jewelry ? 5 : 6, 12));
         public static Item RandomItem(int tier, int type = -1, bool cap = true)
         {
-            if (tier < 20) tier = 20;
+            if (tier < 10) tier = 10;
             else if (cap) tier = Math.Min(tier, 38 * 5);
 
             if (type < 0) type = Utils.RandomElement(0, 1, 2, 5, 6, 7, 8, 9, 10, 11);
