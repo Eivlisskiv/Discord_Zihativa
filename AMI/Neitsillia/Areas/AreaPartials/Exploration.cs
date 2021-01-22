@@ -32,7 +32,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
         private async Task<EmbedBuilder> ExploreDungeon(Player player, EmbedBuilder explore)
         {
-            int.TryParse((player.Party != null ? player.Party.areaKey : player.areaPath).data, out int i);
+            int.TryParse((player.Party != null ? player.Party.areaKey : player.AreaInfo).data, out int i);
             if (Program.Chance(i * 13))
             {
                 player.NewEncounter(new Encounter(Encounter.Names.Floor, player));
@@ -89,9 +89,9 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         {
             int x = Program.rng.Next(eLootRate + eMobRate + ePassiveRate + 1);
 
-            int.TryParse((player.Party != null ? player.Party.areaKey : player.areaPath).data, out int floorChances);
+            int.TryParse((player.Party != null ? player.Party.areaKey : player.AreaInfo).data, out int floorChances);
 
-            if (player.areaPath.floor < floors && (floorChances * 5) + 10 >= Program.rng.Next(101))
+            if (player.AreaInfo.floor < floors && (floorChances * 5) + 10 >= Program.rng.Next(101))
             {
                 player.NewEncounter(new Encounter(Encounter.Names.Floor, player));
                 explore = player.Encounter.GetEmbed(explore);
@@ -113,7 +113,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             }
             catch (Exception e)
             {
-                _ = Handlers.UniqueChannels.Instance.SendToLog(e, $"{player.userid} Exploring floor {player.areaPath.floor} of {player.Area.name}", null);
+                _ = Handlers.UniqueChannels.Instance.SendToLog(e, $"{player.userid} Exploring floor {player.AreaInfo.floor} of {player.Area.name}", null);
 
                 if (eQuestRate > 0 && player.quests.Count < 15)
                 {
@@ -162,7 +162,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             //Get Floor Effect
             var looTable = loot; //ArrayM.FloorEffect(loot, floor, floors);
             //Get the level to scale gear to
-            int level = GetAreaFloorLevel(rng, player.areaPath.floor);
+            int level = GetAreaFloorLevel(rng, player.AreaInfo.floor);
             //Roll through loot table
             for (int i = 0; i < lootCount; i++)
             {
@@ -243,7 +243,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 mob = new NPC[mobCount];
 
                 for (int i = 0; i < mob.Length; i++)
-                    mob[i] = GetAMob(rng, player.areaPath.floor);
+                    mob[i] = GetAMob(rng, player.AreaInfo.floor);
                 player.NewEncounter(new Encounter("Mob", player)
                 { mobs = mob });
             }

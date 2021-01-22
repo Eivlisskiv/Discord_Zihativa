@@ -112,7 +112,7 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case EUI.sideQuest:
-                    var data = await ArenaGlobalData.Load(player.areaPath.path);
+                    var data = await ArenaGlobalData.Load(player.AreaInfo.path);
                     await data.DiscordUI(player, reaction.Channel);
                     break;
 
@@ -125,7 +125,7 @@ namespace AMI.Neitsillia.User.UserInterface
         public async Task ArenaFights(SocketReaction reaction, IUserMessage msg)
         {
             string e = reaction.Emote.ToString();
-            var data = await ArenaGlobalData.Load(player.areaPath.path);
+            var data = await ArenaGlobalData.Load(player.AreaInfo.path);
             //is not a number, is paying
             switch (e)
             {
@@ -229,7 +229,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     {
                         string[] boolArray = args[2].Split(',');
                         await Arena.Generate(player.Area, player, page, boolArray);
-                        await msg.Channel.SendMessageAsync(embed: player.Area.AreaInfo(player.areaPath.floor).Build());
+                        await msg.Channel.SendMessageAsync(embed: player.Area.AreaInfo(player.AreaInfo.floor).Build());
                     }
                     break;
             }

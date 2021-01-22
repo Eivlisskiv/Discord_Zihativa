@@ -49,8 +49,8 @@ namespace AMI.Module
         {
             return DUtils.BuildEmbed(player.name,
                 (OngoingEvent.Ongoing != null ? $"{EUI.eventQuest}**Event**{EUI.eventQuest}: __{OngoingEvent.Ongoing.name}__ {Environment.NewLine}" : null)
-                + $"Location: {player.areaPath.name} {Environment.NewLine}"
-                + (player.areaPath.floor > 0 ? $"Floor: {player.areaPath.floor} {Environment.NewLine}" : null)
+                + $"Location: {player.AreaInfo.name} {Environment.NewLine}"
+                + (player.AreaInfo.floor > 0 ? $"Floor: {player.AreaInfo.floor} {Environment.NewLine}" : null)
                 + (player.Encounter != null ? $"Encounter: {player.Encounter.Name} {Environment.NewLine}" : null)
                 ,null, player.userSettings.Color());
         }
@@ -582,7 +582,7 @@ namespace AMI.Module
                 }
             }
             //Area
-            if (player.areaPath == null)
+            if (player.AreaInfo == null)
                 await player.SetArea(Area.LoadFromName("Atsauka")); errorsFixed++; message += "You were brought back to Atsauka | ";
             //End Area
             player.SaveFileMongo();

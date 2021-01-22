@@ -9,8 +9,9 @@ namespace AMI.Neitsillia
             //return null;
             return
                 $"Fixed daily rewards being too high tier for level < 5 {Environment.NewLine}"
-                + $" Added `help schematic` to inform people of the (2) different schems types {Environment.NewLine}"
-                + $" Fixed parties failing to save due to the wrong _id being used {Environment.NewLine}"
+                + $"Added `help schematic` to inform people of the (2) different schems types {Environment.NewLine}"
+                + $"Fixed parties failing to save due to the wrong _id being used {Environment.NewLine}"
+                + $"Fixed party data not properly being shared {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()

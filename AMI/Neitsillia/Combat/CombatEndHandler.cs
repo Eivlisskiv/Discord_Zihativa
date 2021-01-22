@@ -55,7 +55,7 @@ namespace AMI.Neitsillia.Combat
 
         bool TopFloor => currentArea.floors > -1 && MainAreaPath.floor >= currentArea.floors;
 
-        AreaPath MainAreaPath => party?.areaKey ?? partyLeader.areaPath;
+        AreaPath MainAreaPath => party?.areaKey ?? partyLeader.AreaInfo;
 
         AreaPath ParentAreaPath(Area area, int floor = 0)
             => new AreaPath()
@@ -81,7 +81,7 @@ namespace AMI.Neitsillia.Combat
 
             if (party != null)
             {
-                if (endDungeon) party.areaKey = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
+                if (endDungeon) party.areaKey = ParentAreaPath(currentArea, partyLeader.AreaInfo.floor);
                 await party.SaveData();
                 if (currentEncounter != null && !allPlayersDead)
                     currentEncounter.Save();
@@ -126,7 +126,7 @@ namespace AMI.Neitsillia.Combat
 
                     await player.Respawn(false);
 
-                    if (endDungeon) player.areaPath = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
+                    if (endDungeon) player.AreaInfo = ParentAreaPath(currentArea, partyLeader.AreaInfo.floor);
                     player.SaveFileMongo();
                 }
                 else if (cb.character is NPC n)
@@ -409,7 +409,7 @@ namespace AMI.Neitsillia.Combat
 
                 if (endDungeon)//Complete dungeon
                 {
-                    player.areaPath = ParentAreaPath(currentArea, partyLeader.areaPath.floor);
+                    player.AreaInfo = ParentAreaPath(currentArea, partyLeader.AreaInfo.floor);
                     player.Quest_Trigger(Items.Quests.Quest.QuestTrigger.ClearDungeon);
                 }
                 //Give the loot encounter
@@ -423,10 +423,10 @@ namespace AMI.Neitsillia.Combat
         string FloorJumpReward(Player player, string floor)
         {
             int f = int.Parse(floor);
-            player.areaPath.floor += f;
+            player.AreaInfo.floor += f;
 
             player.Quest_Trigger(Items.Quests.Quest.QuestTrigger.EnterFloor,
-            $"{player.areaPath.path};{player.areaPath.floor}");
+            $"{player.AreaInfo.path};{player.AreaInfo.floor}");
             player.EggPocket_Trigger(NPCSystems.Companions.Egg.EggChallenge.Exploration);
 
             return $"{player.name} has advanced {f} floors." + Environment.NewLine;

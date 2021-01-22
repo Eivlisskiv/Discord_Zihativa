@@ -103,7 +103,7 @@ namespace AMI.Neitsillia.Encounters
             {
                 case Names.Floor:
                     {
-                        if (player.areaPath.floor < player.Area.floors)
+                        if (player.AreaInfo.floor < player.Area.floors)
                         {
                             encounterEvent = "You've discovered a pathway to a new floor of this area";
                             footerInfo = $"'~Enter Floor' OR {EUI.enterFloor} to proceed to the next floor";

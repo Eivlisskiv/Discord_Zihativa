@@ -228,10 +228,10 @@ namespace AMI.Neitsillia.User.PlayerPartials
             level = -1;
             name = playerName;
             health = 5;
-            areaPath = new AreaPath()
+            AreaInfo = new AreaPath()
             { name = "Moceoy's Basement", path = "Neitsillia\\Casdam Ilse\\Central Casdam\\Moceoy's Basement\\Moceoy's Basement" };
 
-            Area = Areas.AreaPartials.Area.Load(areaPath);
+            Area = Areas.AreaPartials.Area.Load(AreaInfo);
 
             equipment.weapon = Item.LoadItem("Wooden Spear");
 
@@ -266,8 +266,9 @@ namespace AMI.Neitsillia.User.PlayerPartials
         {
             if (Encounter != null && saveEncounter)
             {
-                EncounterKey._id = Encounter._id;
-                EncounterKey.Save();
+                if(EncounterKey?._id != Encounter._id)
+                    EncounterKey = new DataBaseRelation<string, Encounter>(Encounter._id, Encounter);
+                else EncounterKey?.Save();
             }
 
             ToolsKey?.Save();
@@ -290,10 +291,10 @@ namespace AMI.Neitsillia.User.PlayerPartials
                 Party.RemoveAllPets(this);
                 if (IsSolo)
                 {
-                    if(areaPath.table == AreaPath.Table.Dungeons)
+                    if(AreaInfo.table == AreaPath.Table.Dungeons)
                     {
-                        await AMYPrototype.Program.data.database.DeleteRecord<Areas.AreaPartials.Area>("Dungeons", 
-                            areaPath.path, "AreaId");
+                        await AMYPrototype.Program.data.database.DeleteRecord<Areas.AreaPartials.Area>("Dungeons",
+                            AreaInfo.path, "AreaId");
                     }
 
                     for(int i = 0; i < Party.NPCMembers.Count; i++)

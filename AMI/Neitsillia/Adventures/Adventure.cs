@@ -121,7 +121,7 @@ namespace AMI.Neitsillia.Adventures
         EmbedBuilder ToEmbed((int nloot, long nxp, long koins)? looted, bool addLooted = false)
         {
             string activity = activityStream.Count > 0 ? string.Join(Environment.NewLine, activityStream) : $"...";
-            string title = quest?.ToString() ?? $"{player.name} Free Roaming in {player.areaPath.name}";
+            string title = quest?.ToString() ?? $"{player.name} Free Roaming in {player.AreaInfo.name}";
             EmbedBuilder embed =  DUtils.BuildEmbed(title,
                 $"{EUI.health} {Utils.Display(player.health)}/{Utils.Display(player.Health())} | " + 
                 $"{EUI.stamina} {Utils.Display(player.stamina)}/{Utils.Display(player.Stamina())}" + Environment.NewLine    

@@ -82,7 +82,7 @@ namespace AMI.Neitsillia.Commands
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"{player.name}, {error} {Environment.NewLine} Use `~Travel Post` for accessible areas."));
 
             if (player.Party != null)
-                await player.Party.SyncArea(player.areaPath);
+                await player.Party.SyncArea(player.AreaInfo);
         }
         static async Task<string> TryEnter(Player player, string areaName, ISocketMessageChannel chan)
         {
@@ -140,11 +140,11 @@ namespace AMI.Neitsillia.Commands
             player.EggPocketTrigger(NPCSystems.Companions.Egg.EggChallenge.Exploration);
 
             if (AMIData.Events.OngoingEvent.Ongoing != null)
-                AMIData.Events.OngoingEvent.Ongoing.EventBounty(player.Area, player.areaPath.floor);
+                AMIData.Events.OngoingEvent.Ongoing.EventBounty(player.Area, player.AreaInfo.floor);
 
             if (player.Area.type == AreaType.Dungeon && player.AreaInfo.floor >= player.Area.floors)
             {
-                player.areaPath.floor++;
+                player.AreaInfo.floor++;
                 NPCSystems.NPC mob = Dungeons.GetBoss(player.Area);
                 player.NewEncounter(new Encounter("Mob", player)
                 { mobs = new NPCSystems.NPC[] { mob } });
@@ -161,13 +161,13 @@ namespace AMI.Neitsillia.Commands
             else
             {
                 int floors = Math.Min(player.level < player.Area.level ? 1 : Math.Min((player.level - player.Area.level) / 5, 6), player.level - player.AreaInfo.floor);
-                player.areaPath.floor += floors;
-                result = player.Area.AreaInfo(player.areaPath.floor).WithColor(player.userSettings.Color());
+                player.AreaInfo.floor += floors;
+                result = player.Area.AreaInfo(player.AreaInfo.floor).WithColor(player.userSettings.Color());
                 message = $"You've advanced {floors} floors " + player.Area.name;
             }
 
             player.QuestTrigger(Quest.QuestTrigger.EnterFloor,
-                $"{player.areaPath.path};{player.areaPath.floor}");
+                $"{player.AreaInfo.path};{player.AreaInfo.floor}");
 
             await player.NewUI(await chan.SendMessageAsync(message,
                 embed: result.Build()), uiType);
@@ -177,25 +177,25 @@ namespace AMI.Neitsillia.Commands
             junction.PassJunction(player);
 
             if (AMIData.Events.OngoingEvent.Ongoing != null)
-                AMIData.Events.OngoingEvent.Ongoing.EventBounty(player.Area, player.areaPath.floor);
+                AMIData.Events.OngoingEvent.Ongoing.EventBounty(player.Area, player.AreaInfo.floor);
 
-            player.QuestTrigger(Neitsillia.Items.Quests.Quest.QuestTrigger.Enter, player.areaPath.path);
+            player.QuestTrigger(Neitsillia.Items.Quests.Quest.QuestTrigger.Enter, player.AreaInfo.path);
 
-            EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.areaPath.floor));
+            EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.AreaInfo.floor));
             await player.NewUI(await chan.SendMessageAsync("You've entered " + player.Area.name, embed: areaInfo.Build())
             , MsgType.Main);
         }
         internal static async Task EnterDungeon(Player player, ISocketMessageChannel chan)
         {
             player.EndEncounter();
-            Area dungeon = Dungeons.Generate(player.areaPath.floor, player.Area);
-            await player.SetArea(dungeon, player.areaPath.floor);
+            Area dungeon = Dungeons.Generate(player.AreaInfo.floor, player.Area);
+            await player.SetArea(dungeon, player.AreaInfo.floor);
 
             player.QuestTrigger(Quest.QuestTrigger.Enter, "Dungeon");
 
             player.EggPocketTrigger(Neitsillia.NPCSystems.Companions.Egg.EggChallenge.Exploration);
 
-            EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.areaPath.floor));
+            EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.AreaInfo.floor));
             await player.NewUI(await chan.SendMessageAsync("You've entered " + player.Area.name,
             embed: areaInfo.Build()), MsgType.Main);
         }
@@ -226,7 +226,7 @@ namespace AMI.Neitsillia.Commands
                 for (int i = page * 5; i < pArea.junctions.Count && i < (page + 1) * 5; i++)
                 {
                     if (pArea.junctions[i] != null &&
-                            player.areaPath.floor >= pArea.junctions[i].floorRequirement)
+                            player.AreaInfo.floor >= pArea.junctions[i].floorRequirement)
                     {
                         juncList += $"{EUI.GetNum(n)} {pArea.junctions[i]} {Environment.NewLine}";
                         juncIds.Add(pArea.junctions[i].destination);
@@ -273,7 +273,7 @@ namespace AMI.Neitsillia.Commands
                     }
                     catch (Exception exploring)
                     {
-                        await Handlers.UniqueChannels.Instance.SendToLog(exploring, $"{player.userid} Exploring floor {player.areaPath.floor} of {player.Area.name}", chan);
+                        await Handlers.UniqueChannels.Instance.SendToLog(exploring, $"{player.userid} Exploring floor {player.AreaInfo.floor} of {player.Area.name}", chan);
                         throw NeitsilliaError.ReplyError("Apologies, but we've encountered an error. It has been logged and sent to the support channel.");
                     }
 
@@ -319,12 +319,12 @@ namespace AMI.Neitsillia.Commands
         public async Task JumpFloor(int floors)
         {
             Player player = Context.Player;
-            floors = Verify.Max(floors, player.Area.floors - player.areaPath.floor);
+            floors = Verify.Max(floors, player.Area.floors - player.AreaInfo.floor);
             if (player.Area.type == AreaType.Dungeon || player.Area.type == AreaType.Arena)
                 await ReplyAsync($"You may not jump floors in this {player.Area.type}. ");
             else if (!player.userTimers.CanFloorJump())
                 await ReplyAsync($"This action is currently on cooldown. {Timers.CoolDownToString(player.userTimers.floorJumpCooldown)} until cooldown end. ");
-            else if (player.areaPath.floor >= player.Area.floors)
+            else if (player.AreaInfo.floor >= player.Area.floors)
                 await ReplyAsync($"{player.name} has already reached the maximum floor.");
             else if (player.Party != null && player.Party.GetLeaderID() != player.userid)
                 await ReplyAsync($"Only the leader may lead the party.");
@@ -566,7 +566,7 @@ namespace AMI.Neitsillia.Commands
         public async Task Area_Info()
         {
             Player player = Player.Load(Context.User.Id, Player.IgnoreException.Resting);
-            await ReplyAsync(embed: player.Area.AreaInfo(player.areaPath.floor).Build());
+            await ReplyAsync(embed: player.Area.AreaInfo(player.AreaInfo.floor).Build());
         }
 
         [Command("NestInfo")][Alias("nesti")]
@@ -610,7 +610,7 @@ namespace AMI.Neitsillia.Commands
                     await DUtils.Replydb(Context, $"{player.name} is missing {cost - player.KCoins} Kutsyei Coins for this transaction.");
                 else
                     await player.NewUI(await ReplyAsync($"Please confirm the construction of size {size} Stronghold " +
-                        $"{strongholdName} conjuncted with floor {player.areaPath.floor} of {player.Area.name} for the " +
+                        $"{strongholdName} conjuncted with floor {player.AreaInfo.floor} of {player.Area.name} for the " +
                         $"cost of {cost} Kutsyei Coins.")
                         , MsgType.NewStronghold, $"{strongholdName}&{size}");
             }

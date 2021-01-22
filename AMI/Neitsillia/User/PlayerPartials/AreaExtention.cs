@@ -12,7 +12,16 @@ namespace AMI.Neitsillia.User.PlayerPartials
         public string respawnArea;
 
         public AreaPath areaPath;
-        internal AreaPath AreaInfo => Party?.areaKey ?? areaPath;
+        internal AreaPath AreaInfo 
+        {
+            get => Party?.areaKey ?? areaPath;
+            set
+            {
+                areaPath = value;
+                if (Party != null)
+                    _ = Party.SyncArea(value);
+            }
+        }
 
         private Area _area;
         internal Area Area
@@ -43,7 +52,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
                 case AreaType.Nest:
                     {
                         pathDestination.data = "Nest";
-                        pathDestination.floor = areaPath.floor;
+                        pathDestination.floor = AreaInfo.floor;
 
                         //pathDestination.table = AreaPath.Table.Nest;
                     }
@@ -58,18 +67,17 @@ namespace AMI.Neitsillia.User.PlayerPartials
                     pathDestination.table = AreaPath.Table.Area; break;
             }
             //Current Area is a nest, when leaving the nest, return to old floor
-            if (Area.type == AreaType.Nest) pathDestination.floor = areaPath.floor;
+            if (Area.type == AreaType.Nest) pathDestination.floor = AreaInfo.floor;
 
-            this.areaPath = pathDestination;
-            this.Area = argArea;
-            Party?.SyncArea(areaPath);
+            AreaInfo = pathDestination;
+            Area = argArea;
         }
 
         public Area LoadAreaPath()
         {
-            if (areaPath == null)
+            if (AreaInfo == null)
             {
-                areaPath = new AreaPath()
+                AreaInfo = new AreaPath()
                 {
                     name = respawnArea?.Split('\\')[4] ?? "Atsauka",
                     path = respawnArea ?? "Neitsillia\\Casdam Ilse\\Central Casdam\\Atsauka\\Atsauka",
@@ -77,21 +85,21 @@ namespace AMI.Neitsillia.User.PlayerPartials
                 };
             }
 
-            Area = Area.Load(areaPath);
+            Area = Area.Load(AreaInfo);
 
             //Area.FloorEffects(areaPath.floor);
             if (_area == null)
             {
-                if (areaPath.data == "Nest")
+                if (AreaInfo.data == "Nest")
                 {
-                    string[] data = areaPath.path.Split('\\');
-                    areaPath = new AreaPath()
+                    string[] data = AreaInfo.path.Split('\\');
+                    AreaInfo = new AreaPath()
                     {
                         name = data[3],
                         path = $"{data[0]}\\{data[1]}\\{data[2]}\\{data[3]}\\{data[3]}",
                         floor = 0
                     };
-                    Area = Area.Load(areaPath);
+                    Area = Area.Load(AreaInfo);
                     if (Area != null)
                     {
                         _ = SetArea(Area);
@@ -99,17 +107,17 @@ namespace AMI.Neitsillia.User.PlayerPartials
                     }
                 }
 
-                areaPath = new AreaPath()
+                AreaInfo = new AreaPath()
                 {
                     name = respawnArea?.Split('\\')[4] ?? "Atsauka",
                     path = respawnArea ?? "Neitsillia\\Casdam Ilse\\Central Casdam\\Atsauka\\Atsauka",
                     floor = 0
                 };
 
-                Area = Area.Load(areaPath);
+                Area = Area.Load(AreaInfo);
                 if (_area == null)
                 {
-                    areaPath = new AreaPath()
+                    AreaInfo = new AreaPath()
                     {
                         name = "Atsauka",
                         path = "Neitsillia\\Casdam Ilse\\Central Casdam\\Atsauka\\Atsauka",
@@ -117,11 +125,11 @@ namespace AMI.Neitsillia.User.PlayerPartials
                     };
                 }
 
-                Log.LogS($"{Environment.NewLine}{Environment.NewLine} {userid}\\{name} is being sent back to {areaPath.name} " +
-                    $"after failing to load Floor {areaPath.floor} of {areaPath.name} -> {areaPath.path} {Environment.NewLine}");
-                SetArea(Area.Load(areaPath)).Wait();
+                Log.LogS($"{Environment.NewLine}{Environment.NewLine} {userid}\\{name} is being sent back to {AreaInfo.name} " +
+                    $"after failing to load Floor {AreaInfo.floor} of {AreaInfo.name} -> {AreaInfo.path} {Environment.NewLine}");
+                SetArea(Area.Load(AreaInfo)).Wait();
                 AMYPrototype.Program.clientCopy.GetUser(userid).SendMessageAsync(
-                    $"Your character {name} was sent back to {areaPath.name} due to error while loading Area. " +
+                    $"Your character {name} was sent back to {AreaInfo.name} due to error while loading Area. " +
                     $"If this error persists or progression was lost, please contact an administrator.").Wait();
                 SaveFileMongo();
             }
@@ -131,7 +139,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
         internal async Task AreaData(string s)
         {
             if (Party == null)
-                areaPath.data = s;
+                AreaInfo.data = s;
             else
             {
                 Party.areaKey.data = s;

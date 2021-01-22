@@ -24,12 +24,12 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 continent = area.continent,
                 kingdom = area.kingdom,
                 type = AreaType.Stronghold,
-                junctions = new List<Junction> { new Junction(area, 0, player.areaPath.floor) },
+                junctions = new List<Junction> { new Junction(area, 0, player.AreaInfo.floor) },
                 sandbox = new SandBox(player.userid, size)
             };
             stronghold.AreaId = stronghold.GeneratePath();
 
-            area.junctions.Add(new Junction(stronghold, player.areaPath.floor, 0));
+            area.junctions.Add(new Junction(stronghold, player.AreaInfo.floor, 0));
             await area.UploadToDatabase();
             await stronghold.UploadToDatabase();
             return stronghold;

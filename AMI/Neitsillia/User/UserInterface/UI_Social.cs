@@ -13,8 +13,8 @@ namespace AMI.Neitsillia.User.UserInterface
             if (await player.LoadCheck(true, reaction.Channel, Player.IgnoreException.None))
             {
                 Player inviter = Player.Load(data, Player.IgnoreException.None);
-                if (inviter.areaPath.path == player.areaPath.path &&
-                    inviter.areaPath.floor == player.areaPath.floor)
+                if (inviter.AreaInfo.path == player.AreaInfo.path &&
+                    inviter.AreaInfo.floor == player.AreaInfo.floor)
                 {
                     await inviter.Party.Add(player);
                     player.PartyKey = new AMIData.DataBaseRelation<string, NeitsilliaCommands.Party>
@@ -22,7 +22,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     player.SaveFileMongo();
                     await EditMessage(embed: player.Party.EmbedInfo());
                 }
-                else await EditMessage($"{player.name} must be in the same area to join. Floor {player.areaPath.floor} of {inviter.Area.name} {inviter.Area.parent}.");
+                else await EditMessage($"{player.name} must be in the same area to join. Floor {player.AreaInfo.floor} of {inviter.Area.name} {inviter.Area.parent}.");
             }
         }
     }

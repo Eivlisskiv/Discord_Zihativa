@@ -179,7 +179,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 }
                 else if (x <= eMobRate + eLootRate)
                 {
-                    NPC mob = GetAMob(rng, player.areaPath.floor);
+                    NPC mob = GetAMob(rng, player.AreaInfo.floor);
                     double playerPower = player.PowerLevel();
                     double mobPower = mob.PowerLevel();
                     double mod = playerPower - mobPower;

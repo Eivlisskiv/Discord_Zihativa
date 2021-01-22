@@ -12,7 +12,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
 
         internal Encounter Encounter
         {
-            get => (EncounterKey ?? new DataBaseRelation<string, Encounter>(null, null)).Data;
+            get => (EncounterKey ?? new DataBaseRelation<string, Encounter>(Party?.EncounterKey, null)).Data;
             set => EncounterKey = new DataBaseRelation<string, Encounter>(value._id, value);
         }
 

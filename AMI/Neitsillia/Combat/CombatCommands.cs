@@ -1,6 +1,5 @@
 ﻿using AMI.Methods;
 using AMI.Module;
-using AMI.Neitsillia.Areas;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items;
@@ -172,13 +171,13 @@ namespace AMI.Neitsillia.Combat
 
                     PerkLoad.CheckPerks(player, Perk.Trigger.EndFight, player);
 
-                    if (player.Area.IsDungeon && player.areaPath.floor >= player.Area.floors)
+                    if (player.Area.IsDungeon && player.AreaInfo.floor >= player.Area.floors)
                     {
                         if(player.Area.arena != null)
                             await EndArenaChallenge(player, chan);
 
                         await Program.data.database.DeleteRecord<Area>("Area", player.Area.AreaId, "AreaId");
-                        await player.SetArea(Area.LoadArea(player.Area.GeneratePath(false) + player.Area.parent, null), player.areaPath.floor);
+                        await player.SetArea(Area.LoadArea(player.Area.GeneratePath(false) + player.Area.parent, null), player.AreaInfo.floor);
                     }
                     player.SaveFileMongo();
                 }
@@ -385,7 +384,7 @@ namespace AMI.Neitsillia.Combat
                     await DUtils.Replydb(Context, $"{player.name} may not start a duel while in combat");
                 else if (player.Party != null)
                     await DUtils.Replydb(Context, $"{player.name} may not start a duel while in a party");
-                else if (player.areaPath.path != enemy.areaPath.path)
+                else if (player.AreaInfo.path != enemy.AreaInfo.path)
                     await DUtils.Replydb(Context, $"{player.name} may only duel players in the same area.");
                 else if (enemy.IsEncounter("Combat"))
                     await DUtils.Replydb(Context, $"{enemy.name} may not accept a duel while in combat");

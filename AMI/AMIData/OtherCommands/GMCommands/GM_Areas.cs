@@ -24,7 +24,7 @@ namespace AMI.AMIData.OtherCommands
                 player.EndEncounter();
                 await player.SetArea(area);
                 player.SaveFileMongo();
-                EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.areaPath.floor));
+                EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.AreaInfo.floor));
                 await player.NewUI(await Context.Channel.SendMessageAsync("You've entered " + player.Area.name, embed: areaInfo.Build())
                 , MsgType.Main);
             }
@@ -38,12 +38,12 @@ namespace AMI.AMIData.OtherCommands
                 Player player = Player.Load(user.Id);
                 Area dungeon = null;
                 if (args.Length > 0)
-                    dungeon = Dungeons.ManualDungeon(StringM.UpperAt(ArrayM.ToString(args)), player.areaPath.floor, player.Area);
-                else dungeon = Dungeons.Generate(player.areaPath.floor, player.Area);
+                    dungeon = Dungeons.ManualDungeon(StringM.UpperAt(ArrayM.ToString(args)), player.AreaInfo.floor, player.Area);
+                else dungeon = Dungeons.Generate(player.AreaInfo.floor, player.Area);
                 if (dungeon != null)
                 {
                     await player.SetArea(dungeon);
-                    await player.NewUI(await ReplyAsync(embed: dungeon.AreaInfo(player.areaPath.floor).Build()), MsgType.Main);
+                    await player.NewUI(await ReplyAsync(embed: dungeon.AreaInfo(player.AreaInfo.floor).Build()), MsgType.Main);
                 }
                 else await ReplyAsync("Dungeon not Found");
             }
