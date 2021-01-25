@@ -275,24 +275,30 @@ namespace AMI.Module
 
         #region Collections
         [Command("Inventory"), Alias("Inv"), Summary("Displays the inventory page `display page` with the filter (item type).")]
-        public async Task DisplayInventory(int displayPage = 1, string filter = "none")
+        public async Task DisplayInventory(
+            [Summary("Page number")]
+            int displayPage = 1,
+            [Summary("Items filter to display: " +
+            "[ materials, healing, usable, gear, consumable ] or any specific item type")]
+            string filter = "all")
         {
             Player player = Player.Load(Context.User.Id, Player.IgnoreException.Resting);
 
             await DisplayInventory(player, Context.Channel, displayPage-1, filter);
         }
-        internal static async Task DisplayInventory(Player player, IMessageChannel chan, int displayPage, string filter = "none", bool isEdit = false)
+        internal static async Task DisplayInventory(Player player, IMessageChannel chan, int displayPage, string filter = "all", bool isEdit = false)
         {
             if (player.inventory.inv.Count > 0)
             {
                 EmbedBuilder inventory = player.UserEmbedColor(
                     player.inventory.ToEmbed(ref displayPage, ref filter,
-                    $"{player.name}'s Inventory", player.InventorySize(),player.equipment));
-                //
+                    $"{player.name}'s Inventory", player.InventorySize(), player.equipment));
+
+                string data = $"{displayPage};{filter}";
                 if (isEdit)
-                    await player.EditUI(null, inventory.Build(), chan, MsgType.Inventory, displayPage.ToString());
+                    await player.EditUI(null, inventory.Build(), chan, MsgType.Inventory, data);
                 else
-                    await player.NewUI(await chan.SendMessageAsync(embed: inventory.Build()), MsgType.Inventory, displayPage.ToString());
+                    await player.NewUI(await chan.SendMessageAsync(embed: inventory.Build()), MsgType.Inventory, data);
             }
             else
                 await chan.SendMessageAsync("Inventory Empty");

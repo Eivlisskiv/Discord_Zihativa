@@ -290,7 +290,7 @@ namespace AMI.Neitsillia.NPCSystems
                 case Item.IType.Weapon: return hasweapon;
                 case Item.IType.Helmet: return hashelmet;
                 case Item.IType.Mask: return hasmask;
-                case Item.IType.Chestp: return haschestp;
+                case Item.IType.Chest: return haschestp;
                 case Item.IType.Jewelry: return true;
                 case Item.IType.Trousers: return hastrousers;
                 case Item.IType.Boots: return hasboots;

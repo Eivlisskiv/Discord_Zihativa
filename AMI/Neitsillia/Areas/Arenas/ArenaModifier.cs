@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using static AMI.Neitsillia.Areas.Arenas.Arena;
 
 namespace AMI.Neitsillia.Areas.Arenas
 {
-    //TEST - IGNORE
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class ArenaModifier
     {
         public enum ArenaModifiers { };
@@ -24,11 +25,12 @@ namespace AMI.Neitsillia.Areas.Arenas
         //
         public int wavesPerRounds = 5;
         public double koinMult = 1;
-        public double xPMult = 1;
+        public double xpMult = 1;
         public double lootMult;
 
-        public ArenaModifier(string[] bools)
+        public ArenaModifier(ArenaMode mode, string[] bools)
         {
+            if (mode == ArenaMode.Survival) xpMult  = 5;
             if(bools != null)
             for (int i = 0; i < bools.Length; i++)
                 if (bools[i] == "1")

@@ -92,7 +92,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 string[] d = winner.Split('\\');
                 await GameMasterCommands.ReportActivityToServers(
                 $"<@{d[0]}> 's {d[1]} Won the {TotalValue}~~K~~ Lottery!", null);
-                await AMYPrototype.Program.clientCopy.GetUser(ulong.Parse(d[0])).SendMessageAsync(
+                await Handlers.DiscordBotHandler.Client.GetUser(ulong.Parse(d[0])).SendMessageAsync(
                     $"Your character {d[1]} has won the {TotalValue}~~K~~ Lottery!");
 
             }

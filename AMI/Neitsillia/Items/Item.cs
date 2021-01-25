@@ -54,7 +54,7 @@ namespace Neitsillia.Items.Item
             Material,//0
             Healing, Consumable, //1,2
             Usable, Mysterybox, //3,4
-            Jewelry, Helmet, Trousers, Mask, Chestp, Boots, //5-10
+            Jewelry, Helmet, Trousers, Mask, Chest, Boots, //5-10
             Weapon, //11
             notfound, //12
             Schematic, BuildingBlueprint, //13, 14
@@ -77,7 +77,7 @@ namespace Neitsillia.Items.Item
         {
             switch (type)
             {
-                case IType.Chestp: return "Cheat Piece";
+                case IType.Chest: return "Cheat Piece";
                 default: return type.ToString();
             }
         }
@@ -125,7 +125,7 @@ namespace Neitsillia.Items.Item
                     break;
 
                 case IType.Boots:
-                case IType.Chestp:
+                case IType.Chest:
                 case IType.Helmet:
                 case IType.Jewelry:
                 case IType.Mask:
@@ -290,7 +290,7 @@ namespace Neitsillia.Items.Item
                             break;
                         case IType.Helmet:
                         case IType.Boots:
-                        case IType.Chestp:
+                        case IType.Chest:
                         case IType.Mask:
                         case IType.Trousers:
                             perk = PerkLoad.RandomPerk(perk.rank, "Armor");
@@ -307,7 +307,7 @@ namespace Neitsillia.Items.Item
                         case IType.Jewelry:
                         case IType.Helmet:
                         case IType.Boots:
-                        case IType.Chestp:
+                        case IType.Chest:
                         case IType.Mask:
                         case IType.Trousers:
                             perk = PerkLoad.Load(perk.name);
@@ -783,7 +783,7 @@ namespace Neitsillia.Items.Item
                             return Rename(newname + " Mask");
                         }
                         
-                    case IType.Chestp:
+                    case IType.Chest:
                         {
                             if( x >= 50)
                             return Rename(newname + " Plates");

@@ -19,11 +19,11 @@ namespace AMI.Neitsillia.Areas.Nests
 {
     class Nest
     {
-        public const bool disabled = true;
+        public const bool DISABLED = false;
 
         static MongoDatabase Database => Program.data.database;
 
-        static Dictionary<string, Nest> Nests = new Dictionary<string, Nest>();
+        static readonly Dictionary<string, Nest> Nests = new Dictionary<string, Nest>();
 
         static DateTime lastSpawn = DateTime.UtcNow;
         const int MaxHours = 10;
@@ -99,7 +99,7 @@ namespace AMI.Neitsillia.Areas.Nests
             for (int i = 0; i < Nests.Count; i++)
             {
                 KeyValuePair<string, Nest> entry = Nests.ElementAt(i);
-                if (!await entry.Value.VerifyNest())
+                if (await entry.Value.VerifyNest())
                 {
                     entry.Value.Save();
                     i++;
@@ -113,7 +113,7 @@ namespace AMI.Neitsillia.Areas.Nests
             for (int i = 0; i < nests.Count; i++)
             {
                 var n = nests[i];
-                if (!await n.VerifyNest() &&
+                if (await n.VerifyNest() &&
                     n.key != null && GetNest(n.key) == null)
                 { 
                     Nests.Add(n.key, n);
@@ -131,7 +131,7 @@ namespace AMI.Neitsillia.Areas.Nests
 
         internal static async Task VerifyNests()
         {
-            for (int i = 0; i < Nests.Count; i++)
+            for (int i = 0; i < Nests.Count; )
             {
                 KeyValuePair<string, Nest> entry = Nests.ElementAt(i);
                 if (await entry.Value.VerifyNest()) i++;
@@ -273,7 +273,7 @@ namespace AMI.Neitsillia.Areas.Nests
 
                 Console.WriteLine("embed built");
 
-                if(!disabled)
+                if(!DISABLED)
                     await GameMasterCommands.SendToSubscribed("Nest Notification", embed.Build());
                 await Delete();
 
@@ -287,7 +287,7 @@ namespace AMI.Neitsillia.Areas.Nests
                             ,DUtils.NewField("Top Hunters", GetTop(5))
                             );
 
-                if (!disabled)
+                if (!DISABLED)
                     await GameMasterCommands.SendToSubscribed("Nest Notification", embed.Build());
 
                 await Delete();

@@ -1,18 +1,15 @@
-﻿using AMI.AMIData.Webhooks;
-using AMI.Methods;
-using AMYPrototype;
+﻿using AMI.Methods;
 using Discord.WebSocket;
 using DiscordBotsList.Api;
 using DiscordBotsList.Api.Objects;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace AMI.AMIData
 {
-    class DiscordBotList_Top
+    public class DiscordBotList_Top
     {
 
         public AuthDiscordBotListApi DblApiAuth;

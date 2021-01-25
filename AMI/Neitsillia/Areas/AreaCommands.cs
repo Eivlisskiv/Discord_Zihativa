@@ -68,7 +68,6 @@ namespace AMI.Neitsillia.Commands
         {
             string error = "You may not access that area from your current location or the area entered does not exist.";
             //
-            Junction found = null;
             //Player is in combat
             if (player.IsEncounter("Combat"))
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not enter another area while in combat"));
@@ -160,7 +159,9 @@ namespace AMI.Neitsillia.Commands
             }
             else
             {
-                int floors = Math.Min(player.level < player.Area.level ? 1 : Math.Min((player.level - player.Area.level) / 5, 6), player.level - player.AreaInfo.floor);
+                // Calc the amount of floors to go:
+                //           (if lower than area level, only ever 1 [else] difference of player's level and area's lvl capped at 6) capped at available floors
+                int floors = Math.Min(player.level < player.Area.level ? 1 : Math.Min((player.level - player.Area.level) / 5, 6), player.Area.floors - player.AreaInfo.floor);
                 player.AreaInfo.floor += floors;
                 result = player.Area.AreaInfo(player.AreaInfo.floor).WithColor(player.userSettings.Color());
                 message = $"You've advanced {floors} floors " + player.Area.name;

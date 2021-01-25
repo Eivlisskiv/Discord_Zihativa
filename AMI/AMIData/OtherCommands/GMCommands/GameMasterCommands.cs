@@ -127,35 +127,6 @@ namespace AMI.AMIData.OtherCommands
         #region Commands
 
         #region Get Info
-        [Command("Full Sheet")]
-        [Alias("Full Stats", "fstats", "fs")]
-        public async Task Full_Sheet(string arg = null)
-        {
-            if (arg == null || await IsGMLevel(1))
-            {
-                Player player = null;
-                if (arg != null)
-                {
-                    player = Player.Load(arg);
-                    if (player != null) { }
-                    else if (ulong.TryParse(arg, out ulong id))
-                        player = Player.Load(id);
-                    else if (ulong.TryParse(arg.Substring(2).Trim('>'), out id))
-                        player = Player.Load(id);
-                }
-                if (player == null)
-                    player = Player.Load(Context.User.Id, Player.IgnoreException.All); ;
-                string path = $"Temp/{player.userid}-{player.name} Full Stats.txt";
-                StreamWriter stats = new StreamWriter(path);
-                //
-                stats.WriteLine(player.FullInfo());
-                //
-                stats.Close();
-                await Context.Channel.SendFileAsync(path);
-                File.Delete(path);
-                await Context.Message.DeleteAsync();
-            }
-        }
         [Command("Mod GM")]
         public async Task ModGM(IUser user, int level)
         {
@@ -807,7 +778,7 @@ namespace AMI.AMIData.OtherCommands
         public async Task SendMessage(ulong guildID, ulong channelID, string message)
         {
             if (IsGMLevel(4).Result)
-                await Program.clientCopy.GetGuild(guildID).GetTextChannel(channelID).SendMessageAsync(message);
+                await Handlers.DiscordBotHandler.Client.GetGuild(guildID).GetTextChannel(channelID).SendMessageAsync(message);
             await DUtils.DeleteContextMessageAsync(Context);
         }
         [Command("Notify", true)]

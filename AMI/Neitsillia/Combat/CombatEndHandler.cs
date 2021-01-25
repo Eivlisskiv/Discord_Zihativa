@@ -103,6 +103,7 @@ namespace AMI.Neitsillia.Combat
                 msgType = encounter.Name switch
                 {
                     Encounter.Names.Loot => MsgType.Loot,
+                    _ => msgType,
                 };
             }
 
@@ -248,17 +249,11 @@ namespace AMI.Neitsillia.Combat
 
             (string[] kills, long koinsToGain, long xpToGain) = GetKillRewards(enc);
 
-            await OtherLoot(enc);
+            xpToGain = await OtherLoot(enc, xpToGain);
 
             var invLoot = enc.loot.inv;
 
-            string lootDisplay = null;
-            if (party != null)
-            {
-                koinsToGain = NumbersM.CeilParse<long>(koinsToGain / (double)party.MemberCount);
-                lootDisplay += $"+{koinsToGain} Kutsyei Coins Per Party Member." + Environment.NewLine;
-            }
-            else lootDisplay += $"+{koinsToGain} Kutsyei Coins " + Environment.NewLine;
+            string lootDisplay = DistributeCoins(ref koinsToGain);
 
             lootDisplay += EventRewards(enc, out (string name, int amount) specialCurrencyReward);
 
@@ -312,7 +307,7 @@ namespace AMI.Neitsillia.Combat
                 enc.AddLoot(mob.inventory);
                 if (mob.KCoins > 0)
                     koinsToGain += mob.KCoins;
-                xpToGain += mob.XPDrop(0);
+                xpToGain += mob.XPDrop(currentArea.type == AreaType.Nest ? 3 : 0);
 
                 kills[killsIndex] = $"{mob.name};{mob.race};{mob.level}";
                 killsIndex++;
@@ -321,15 +316,18 @@ namespace AMI.Neitsillia.Combat
             return (kills, koinsToGain, xpToGain);
         }
 
-        async Task OtherLoot(Encounter enc)
+        async Task<long> OtherLoot(Encounter enc, long xpGain)
         {
             bool top = TopFloor;
             if(currentArea.type == AreaType.Arena)
             {
+                Log.LogS("In Arena");
                 if (top)
                 {
+                    Log.LogS("In top floor Arena");
                     if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
                     {
+                        Log.LogS("Arena loot");
                         int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
                         enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
                     }
@@ -345,12 +343,27 @@ namespace AMI.Neitsillia.Combat
                     MainAreaPath.floor++;
                     if(currentArea.arena.WaveProgress(MainAreaPath.floor))
                         currentArea.level++;
+
+                    xpGain = NumbersM.CeilParse<long>(xpGain * (float)(currentArea.arena.Modifiers?.xpMult ?? 1));
+
                     await currentArea.UploadToDatabase();
                 }
-                
-                
             }
 
+            return xpGain;
+        }
+
+        private string DistributeCoins(ref long kuts)
+        {
+            if (kuts == 0) return null;
+
+            if (party != null)
+            {
+                kuts = NumbersM.CeilParse<long>(kuts / (double)party.MemberCount);
+                return $"+{kuts} Kutsyei Coins Per Party Member." + Environment.NewLine;
+            }
+
+            return $"+{kuts} Kutsyei Coins " + Environment.NewLine;
         }
 
         string EventRewards(Encounter enc, out (string name, int amount) eventReward)

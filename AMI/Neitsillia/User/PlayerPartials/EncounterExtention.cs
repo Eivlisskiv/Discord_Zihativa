@@ -66,18 +66,14 @@ namespace AMI.Neitsillia.User.PlayerPartials
         {
             if (Encounter == null)
                 return false;
-            switch (type.ToLower())
+            return (type.ToLower()) switch
             {
-                case "combat":
-                    return Encounter.IsCombatEncounter();
-                case "passive":
-                    return Encounter.IsPassiveEncounter();
-                case "npc":
-                    return Encounter.IsNPC();
-                case "partyshared":
-                    return Encounter.IsCombatEncounter() || Encounter.Name == Encounter.Names.Puzzle || Encounter.IsNPC();
-            }
-            return false;
+                "combat" => Encounter.IsCombatEncounter(),
+                "passive" => Encounter.IsPassiveEncounter(),
+                "npc" => Encounter.IsNPC(),
+                "partyshared" => Encounter.IsCombatEncounter() || Encounter.Name == Encounter.Names.Puzzle || Encounter.IsNPC(),
+                _ => false,
+            };
         }
         public bool IsEncounter(params Encounter.Names[] names)
         {

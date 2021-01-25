@@ -1,5 +1,6 @@
 ﻿using AMI.Methods;
 using MongoDB.Driver;
+using System;
 using System.Threading.Tasks;
 
 namespace AMI.AMIData
@@ -80,7 +81,10 @@ namespace AMI.AMIData
 
             await AMYPrototype.Program.data.database.DeleteRecord<O, I>
                 (TableName, _id);
-
+            if (data != null)
+            {
+                try { Utils.SetVar(data, "_id", nId); } catch (Exception) { }
+            }
             _id = nId;
 
             await SaveAsync();

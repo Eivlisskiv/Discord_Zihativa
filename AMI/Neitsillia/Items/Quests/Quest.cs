@@ -294,17 +294,16 @@ namespace AMI.Neitsillia.Items.Quests
 
             if (itemReward != null)
             {
-                Item item = null;
                 string[] data = itemReward.item.Split(';');
                 int tier = 0;
                 if (data.Length > 1) int.TryParse(data[1], out tier);
-                switch(data[0])
+                Item item = (data[0]) switch
                 {
-                    case "-Repair Kit": item = Item.CreateRepairKit(tier); break;
-                    case "-Rune": item = Item.CreateRepairKit(tier); break;
-                    case "-Random": item = Item.RandomItem(tier); break;
-                    default: item = Item.LoadItem(itemReward.item); break;
-                }
+                    "-Repair Kit" => Item.CreateRepairKit(tier),
+                    "-Rune" => Item.CreateRepairKit(tier),
+                    "-Random" => Item.RandomItem(tier),
+                    _ => Item.LoadItem(itemReward.item),
+                };
                 player.inventory.Add(item, itemReward.count, -1);
                 rewards += $"{itemReward.count}x {item.name}" + Environment.NewLine;
             }

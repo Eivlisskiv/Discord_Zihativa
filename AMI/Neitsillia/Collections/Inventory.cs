@@ -10,19 +10,18 @@ namespace AMI.Neitsillia.Collections
 {
     public class Inventory
     {
+        const int ITEM_PER_PAGE = 15;
+
         public List<StackedItems> inv = new List<StackedItems>();
 
         public int Count { get => inv.Count; }
 
         internal StackedItems this[int index] => inv[index];
 
-
         public Inventory() { }
 
         public Inventory(params StackedItems[] items)
-        {
-            inv.AddRange(items);
-        }
+            => inv.AddRange(items);
 
         public bool Add(Inventory i, int size)
         {
@@ -141,32 +140,19 @@ namespace AMI.Neitsillia.Collections
                 return true;
             return false;
         }
-        public bool CanContain(StackedItems t, int size)
-        {
-            return CanContain(t.item, t.count, size);
-        }
+        public bool CanContain(StackedItems t, int size) => CanContain(t.item, t.count, size);
 
-        public int FindIndex(string matName)
-        {
-            return inv.FindIndex(StackedItems.FindWithName(matName));
-        }
-        public int FindIndex(Item.IType type)
-        {
-            return inv.FindIndex(StackedItems.FindWithType(type));
-        }
+        public int FindIndex(string matName) 
+            => inv.FindIndex(StackedItems.FindWithName(matName));
+        public int FindIndex(Item.IType type) 
+            => inv.FindIndex(StackedItems.FindWithType(type));
         public int FindIndex(Item item)
-        {
-            return inv.FindIndex(StackedItems.FindWithName(item));
-        }
+            => inv.FindIndex(StackedItems.FindWithName(item));
         public int FindIndex(int rank)
-        {
-            return inv.FindIndex(StackedItems.FindWithRank(rank));
-        }
+            => inv.FindIndex(StackedItems.FindWithRank(rank));
 
-        public IEnumerator GetEnumerator()
-        {
-            return inv.GetEnumerator();
-        }
+        public IEnumerator GetEnumerator() 
+            => inv.GetEnumerator();
 
         internal EmbedBuilder ToEmbed(ref int page, string inventoryName = "Inventory", int size = -1, Equipment comparison = null)
         {
@@ -175,44 +161,53 @@ namespace AMI.Neitsillia.Collections
         }
         internal EmbedBuilder ToEmbed(ref int page, ref string filter, string inventoryName = "Inventory", int size = -1, Equipment comparison = null)
         {
-            const int itemPerPage = 15;
-            int maxpage = Convert.ToInt32(Math.Ceiling((double)Count / itemPerPage));
+            
+            int maxpage = Convert.ToInt32(Math.Ceiling((double)Count / ITEM_PER_PAGE));
             page = Verify.MinMax(page, maxpage - 1, 0);
             EmbedBuilder inventory = new EmbedBuilder();
             
             string itemList = null;
+            filter = filter.ToLower();
             Func<Item, string, bool> filterFcuntion = GetFilter(ref filter);
-            inventory.WithTitle(inventoryName + (filter == "none" ? null : $" ({filter})"));
+            inventory.WithTitle(inventoryName + (filter == "all" ? null : $" ({filter})"));
 
             if (Count > 0)
             {
-                int max = (itemPerPage * (page + 1));
-                for (int p = (itemPerPage * page); p < max
-                      && p < Count; p++)
+                for (int p = (ITEM_PER_PAGE * page), added = 0; 
+                    added < ITEM_PER_PAGE && p < Count; p++)
                 {
-                    if (inv[p] == null)
-                        Remove(p, 1);
-                    else if (filterFcuntion == null || filterFcuntion(inv[p].item, filter))
-                        itemList += $"{p + 1}| `{inv[p]}` " 
-                            + (comparison != null ? inv[p].item.CompareTo(comparison) : null) 
+                    if (inv[p] == null) Remove(p, 1);
+                    if (filterFcuntion == null || filterFcuntion(inv[p].item, filter))
+                    {
+                        itemList += $"{p + 1}| `{inv[p]}` "
+                            + (comparison != null ? inv[p].item.CompareTo(comparison) : null)
                             + EUI.ItemType(inv[p].item.type)
-                            + (p < max && p < Count ? Environment.NewLine : null);
+                            + (added < ITEM_PER_PAGE && p < Count ? Environment.NewLine : null);
+                        added++;
 
+                        if(itemList.Length > 900)
+                        {
+                            inventory.AddField("Items", itemList ?? "Empty", false);
+                            itemList = null;
+                        }
+                    }
                 }
-                
             }
 
-            inventory.AddField("Items", itemList ?? "Empty", true);
+            bool firstField = inventory.Fields.Count == 0;
+            if(firstField || itemList != null)
+                inventory.AddField(firstField ? "Items" : "...", itemList ?? "Empty", true);
 
             if (size == -1) size = Count;
             inventory.WithFooter($"{inventoryName} Capacity: {Count}/{size} | " +
                 $"Page {(page + 1)}/{maxpage}");
+
             return inventory;
         }
 
         Func<Item, string, bool> GetFilter(ref string filter)
         {
-            switch(filter.ToLower())
+            switch(filter)
             {
                 case "mat":
                 case "mats":
@@ -222,29 +217,45 @@ namespace AMI.Neitsillia.Collections
                     filter = "healing";
                     return TypeFilter;
 
+                case "consumable":
+                    return ConsumableFilter;
+
+                case "essense":
+                    filter = "essensevial";
+                    return TypeFilter;
+
                 case "material":
                 case "healing":
-                case "consumable":
                 case "usable":
-                case "mysterybox":
-                case "mystery box":
                 case "jewelry":
                 case "helmet":
                 case "trousers":
                 case "mask":
-                case "chestp":
+                case "chest":
                 case "boots":
                 case "weapon":
+                case "schematic":
+                case "repairkit": 
+                case "rune":
+                case "essensevial":
+                    return TypeFilter;
+
+                case "mysterybox":
+                case "mystery box":
+                    filter = "mysterybox";
+                    return TypeFilter;
+
                 case "bchematic":
                 case "buildingblueprint":
                 case "building blueprint":
+                    filter = "buildingblueprint";
                     return TypeFilter;
 
                 case "gear":
                 case "equipment":
                     return IsGear;
                 default:
-                    filter = "none";
+                    filter = "all";
                     return null;
             }
         }
@@ -263,13 +274,12 @@ namespace AMI.Neitsillia.Collections
         }
 
         bool TypeFilter(Item i, string type)
-        {
-            return i.type.ToString().ToLower().Equals(type.ToLower());
-        }
+         => i.type.ToString().ToLower().Equals(type.ToLower());
+
+        bool ConsumableFilter(Item i, string type)
+         => i.type == Item.IType.Healing || i.type == Item.IType.Consumable;
 
         bool IsGear(Item i, string t)
-        {
-            return i.CanBeEquip();
-        }
+            => i.CanBeEquip();
     }
 }

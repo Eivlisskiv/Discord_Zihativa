@@ -190,7 +190,7 @@ namespace AMI.AMIData.OtherCommands
         }
         //[Command("user info")]
         public async Task UserInfoAsync(ulong id)
-            => await UserInfoAsync(Program.clientCopy.GetUser(id));
+            => await UserInfoAsync(Handlers.DiscordBotHandler.Client.GetUser(id));
         [Command("user info")]
         public async Task UserInfoAsync(IUser user = null)
         {
@@ -234,6 +234,7 @@ namespace AMI.AMIData.OtherCommands
             }
             await DUtils.Replydb(Context, embed: em.Build());
         }
+        
         [Command("server info")]
         public async Task ServerInfo(ulong? id = null)
         {
@@ -250,7 +251,7 @@ namespace AMI.AMIData.OtherCommands
                 if (gs?.Guild == null)
                 {
                     //Bot is not in that server, delete from database.
-                    await Program.data.database.database.GetCollection<GuildSettings>("Guilds").DeleteOneAsync($"{{_id:{gs.guildID}}}");
+                    await Program.data.database.database.GetCollection<GuildSettings>("Guilds").DeleteOneAsync($"{{_id:{id}}}");
                     await ReplyAsync("Guild not found");
                 }
                 else await ReplyAsync(embed: gs.GetInfo().Build());
@@ -343,7 +344,7 @@ namespace AMI.AMIData.OtherCommands
         public async Task SendGifEmote(string action = null, IUser target = null, params string[] args)
         {
             
-            if(target?.Id == Program.clientCopy.CurrentUser.Id && Context.User.Id != 201875246091993088)
+            if(target?.Id == Handlers.DiscordBotHandler.Client.CurrentUser.Id && Context.User.Id != 201875246091993088)
             {
                 throw NeitsilliaError.ReplyError(Utils.RandomElement("Blasphemy!", "I will not allow this.", "Cease this.",
                     "I do not condone this behavior.", "Your desires are of no concern to me.", "A pitiful wish, it will remain denied.",
@@ -384,7 +385,7 @@ namespace AMI.AMIData.OtherCommands
         public async Task ConnectDBL()
         {
             await Program.dblAPI?.Connect();
-            Program.dblAPI?.UpdateServerCount(Program.clientCopy);
+            Program.dblAPI?.UpdateServerCount(Handlers.DiscordBotHandler.Client);
             await ReplyAsync(Program.dblAPI?.connected ?? false ? "Connected to top.gg API" : "Could not connect to top.gg API");
         }
 

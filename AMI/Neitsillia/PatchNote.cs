@@ -8,10 +8,9 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Fixed daily rewards being too high tier for level < 5 {Environment.NewLine}"
-                + $"Added `help schematic` to inform people of the (2) different schems types {Environment.NewLine}"
-                + $"Fixed parties failing to save due to the wrong _id being used {Environment.NewLine}"
-                + $"Fixed party data not properly being shared {Environment.NewLine}"
+                $"Fixed inventory display issues {Environment.NewLine}"
+                + $" Arena survival now grants 5x xp multiplier to compensate for lack of loot during fights {Environment.NewLine}"
+                + $"Fixed wrong floor cap causing players not being able to go to floors above their levels {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -24,9 +23,9 @@ namespace AMI.Neitsillia
         }
         public static string ItemsPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Fixed Unique items being scrappable {Environment.NewLine}"
+                $" {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()
@@ -45,9 +44,9 @@ namespace AMI.Neitsillia
         }
         public static string WorldPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
+                $"Fixed issues with NEST system {Environment.NewLine}"
                 + $" {Environment.NewLine}"
                 ;
         }

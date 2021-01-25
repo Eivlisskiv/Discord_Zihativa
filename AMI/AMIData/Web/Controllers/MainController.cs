@@ -1,6 +1,7 @@
 ﻿using AMI.Methods;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AMI.AMIData.Web.Controllers
@@ -29,10 +30,18 @@ namespace AMI.AMIData.Web.Controllers
             await Response.WriteAsync(json);
         }
 
-        public async Task Error(string error)
+        public async Task<bool> NullError(T item)
         {
-            Response.Headers.Add("Content-Type", "application/json");
-            await Response.WriteAsync($"{{error: {error} }}");
+            if (item == null)
+            {
+                await Error("Item not found");
+                return true;
+            }
+
+            return false;
         }
+
+        public async Task Error(string error)
+         => await Json(new Dictionary<string, string>() { { "error", error } });
     }
 }

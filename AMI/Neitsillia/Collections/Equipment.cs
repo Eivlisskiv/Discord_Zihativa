@@ -40,7 +40,7 @@ namespace AMI.Neitsillia.Collections
                 case Item.IType.Weapon: return weapon;
                 case Item.IType.Helmet: return helmet;
                 case Item.IType.Mask: return mask;
-                case Item.IType.Chestp: return chestp;
+                case Item.IType.Chest: return chestp;
                 case Item.IType.Jewelry: return jewelry[i];
                 case Item.IType.Trousers: return trousers;
                 case Item.IType.Boots: return boots;
@@ -75,7 +75,7 @@ namespace AMI.Neitsillia.Collections
                 case 1: return Item.IType.Weapon;
                 case 2: return Item.IType.Helmet;
                 case 3: return Item.IType.Mask;
-                case 4: return Item.IType.Chestp;
+                case 4: return Item.IType.Chest;
                 case 5: 
                 case 6: 
                 case 7: return Item.IType.Jewelry;
@@ -112,7 +112,7 @@ namespace AMI.Neitsillia.Collections
                 case Item.IType.Weapon: weapon = item; break;
                 case Item.IType.Helmet: helmet = item; break;
                 case Item.IType.Mask: mask = item; break;
-                case Item.IType.Chestp: chestp = item; break;
+                case Item.IType.Chest: chestp = item; break;
                 case Item.IType.Jewelry: jewelry[i] = item; break;
                 case Item.IType.Trousers: trousers = item; break;
                 case Item.IType.Boots: boots = item; break;

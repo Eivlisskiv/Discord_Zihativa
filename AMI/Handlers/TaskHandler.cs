@@ -26,7 +26,7 @@ namespace AMI.Handlers
 
         public static void Initiate()
         {
-            if (!Neitsillia.Areas.Nests.Nest.disabled)
+            if (!Neitsillia.Areas.Nests.Nest.DISABLED)
                 Add("Nests", 15, Neitsillia.Areas.Nests.Nest.NestChecks);
 
             Add("ArenaFights", 60 * 48, Neitsillia.Areas.Arenas.ArenaGlobalData.RefreshAllQuests);

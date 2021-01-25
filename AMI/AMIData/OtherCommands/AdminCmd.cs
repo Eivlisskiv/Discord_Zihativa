@@ -674,7 +674,7 @@ namespace AMI.AMIData.OtherCommands
         {
             if (Context.AdminCheck())
             {
-                var guild = Program.clientCopy.GetGuild(id);
+                var guild = Handlers.DiscordBotHandler.Client.GetGuild(id);
                 if (guild == null)
                 {
                     await ReplyAsync("Guild not found");
@@ -690,7 +690,7 @@ namespace AMI.AMIData.OtherCommands
         {
             if (Context.AdminCheck())
             {
-                var guilds = Program.clientCopy.Guilds;
+                var guilds = Handlers.DiscordBotHandler.Client.Guilds;
                 foreach (var guild in guilds)
                 {
                     GuildSettings gs = GuildSettings.Load(guild);

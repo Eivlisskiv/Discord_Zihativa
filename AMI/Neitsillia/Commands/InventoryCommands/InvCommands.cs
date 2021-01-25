@@ -23,6 +23,17 @@ namespace AMI.Neitsillia.InventoryCommands
 {
     public class Inventory : ModuleBase<CustomSocketCommandContext>
     {
+        public static (int, string) ParseInvUIData(string data)
+        {
+            string filter = "all";
+            if (!int.TryParse(data, out int i))
+            {
+                string[] s = data.Split(';');
+                int.TryParse(s[0], out i);
+                if (s.Length > 1) filter = s[1];
+            }
+            return (i, filter);
+        }
         internal static async Task UpdateinventoryUI(Player player, IMessageChannel chan, bool skipSave = false)
         {
             if (player.ui?.type != MsgType.Inventory)
@@ -33,9 +44,9 @@ namespace AMI.Neitsillia.InventoryCommands
 
             if (player.inventory.inv.Count == 0) player.SaveFileMongo();
 
-            int.TryParse(player.ui.data, out int page);
+            (int page, string filter) = ParseInvUIData(player.ui.data);
 
-            await GameCommands.DisplayInventory(player, chan, page, isEdit: true);
+            await GameCommands.DisplayInventory(player, chan, page, filter, true);
         }
 
         [Command("Equip")]
@@ -116,7 +127,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 {"weapon", Item.IType.Weapon },
                 {"helmet", Item.IType.Helmet },
                 {"mask", Item.IType.Mask },
-                {"chest", Item.IType.Chestp },
+                {"chest", Item.IType.Chest },
                 {"trousers", Item.IType.Trousers },
                 {"boots", Item.IType.Boots },
             };
@@ -240,7 +251,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 //case Item.IType.weapon: index = 1; break;
                 case Item.IType.Helmet: index = 2; break;
                 case Item.IType.Mask: index = 3; break;
-                case Item.IType.Chestp: index = 4; break;
+                case Item.IType.Chest: index = 4; break;
                 case Item.IType.Jewelry:
                     {
                         for (int i = 0; i < player.equipment.jewelry.Length; i++)
@@ -268,7 +279,7 @@ namespace AMI.Neitsillia.InventoryCommands
         [Command("Unequip")][Alias("uneq")]
         [Summary("Unequip gear. You must precise the gear slot you want to unequip from plus a number from 1 to 3 for the jewelry slot.")]
         public async Task Unequip(
-            [Summary("The name of the slot to unequip. Write an invalid slot to get the list of slot names.")]
+            [Summary("The name of the slot to unequip [ all, weapon, helmet, mask, chest, jewelry(1- 3), trousers, boots ].")]
             string gearSlot,
             [Summary("For jewelry slot only. 1-3, which jewelry.")]
             int slot = 0)
@@ -322,7 +333,7 @@ namespace AMI.Neitsillia.InventoryCommands
         {
             Player player = Context.Player;
             string result = null;
-            for(int i =0; i < Equipment.gearCount; i++)
+            for(int i = 0; i < Equipment.gearCount; i++)
             {
                 Item gear = player.equipment.GetGear(i);
                 if(gear != null)

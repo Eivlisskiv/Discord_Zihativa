@@ -11,7 +11,7 @@ namespace AMI.Neitsillia.User.UserInterface
 {
     partial class UI
     {
-        static Action[] OptionsInitializers = { InitO_Events, InitO_Area};
+        static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, InitO_Inventory};
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 
         public static void InitialiseOptionLoaderDict()
@@ -31,15 +31,6 @@ namespace AMI.Neitsillia.User.UserInterface
                     {
                         EUI.explore,EUI.tpost, EUI.help
                     };
-                    break;
-                case MsgType.Inventory:
-                    {
-                        options = new List<string>
-                        {
-                            EUI.prev, EUI.next,
-                            EUI.loot, EUI.help
-                        };
-                    }
                     break;
                 case MsgType.Sheet:
                     options = new List<string>

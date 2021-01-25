@@ -15,8 +15,6 @@ namespace AMI.Handlers
         public static bool cycle = true;
         public static int delaySeconds = 60;
 
-        ProgramData Data => Program.data;
-
         private DiscordSocketClient client;
         private bool cycling = false;
         private int currentCycle = 0;

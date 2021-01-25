@@ -76,7 +76,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         private void LoadFight(int level)
         {
             (name, enemies) = BadBatch(level);
-            dropChance = 100; //difficulty * 10;
+            dropChance = difficulty * 10;
             drops = dropsByDifficulty[difficulty - 1];
         }
     }

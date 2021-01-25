@@ -23,7 +23,9 @@ namespace AMI.Neitsillia.Areas.Arenas
         public enum ArenaMode { Survival, };
         static readonly string[] ModesDesc =
         {
-            "Survive never ending waves of enemies with no breaks in between each fight.",
+            "Survive never ending waves of enemies to test your endurance."
+            + Environment.NewLine + "Bonus: 5x XP" 
+            + Environment.NewLine + "Loot and coins are given out once you quit or are deafeated (no defeat cost)",
             "Test Mode 1.",
             "Test Mode 2.",
             "Test Mode 3.",
@@ -92,6 +94,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                 eMobRate = 100,
                 floors = -1,
                 arena = new Arena((ArenaMode)mode, boolArray),
+                junctions = new List<NeitsilliaEngine.Junction>() { new NeitsilliaEngine.Junction(parent, 0, 0) }
             };
 
             await player.SetArea(dungeon);
@@ -107,7 +110,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         public Arena(ArenaMode mode, string[] boolArray = null)
         {
             gameMode = mode;
-            Modifiers = new ArenaModifier(boolArray);
+            Modifiers = new ArenaModifier(mode, boolArray);
         }
 
         private Inventory GetLoot(Area arena, int level)
@@ -202,7 +205,7 @@ namespace AMI.Neitsillia.Areas.Arenas
 
             //Koins rewards
             enc.koinsToGain += NumbersM.NParse<long>(Modifiers.CurrentScore * Modifiers.koinMult);
-            enc.xpToGain += NumbersM.NParse<long>((Modifiers.CurrentScore * arena.level) * Modifiers.xPMult);
+            enc.xpToGain += NumbersM.NParse<long>((Modifiers.CurrentScore * arena.level) * Modifiers.xpMult);
         }
 
         internal bool WaveProgress(int floor)

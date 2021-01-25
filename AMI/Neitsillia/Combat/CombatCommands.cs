@@ -482,11 +482,9 @@ namespace AMI.Neitsillia.Combat
         [Summary("Spawns a training dummy to practice combat")]
         public async Task Train()
         {
-            Context.WIPCheck();
-
             Player player = Context.Player;
             if(player.IsEncounter("Combat")) { await ReplyAsync("You main not train while in combat."); return; }
-
+            if(player.Area.type == Areas.AreaType.Arena) { await ReplyAsync("You main not train in an Arena."); return; }
             if (!player.IsLeader) { await ReplyAsync("You must be party leader to initiate a training session."); return; }
 
             player.NewEncounter(Encounter.Names.Mob, true);

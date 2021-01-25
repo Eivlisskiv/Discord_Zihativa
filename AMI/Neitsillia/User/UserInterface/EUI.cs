@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Neitsillia.Items.Item;
+using System;
 using System.Collections.Generic;
 
 namespace AMI.Neitsillia.User.UserInterface
@@ -11,6 +12,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
         internal const string prev = "◀";
         internal const string next = "▶";
+        internal const string cycle = "🔄";
         internal const string uturn = "↩️";
         internal const string sheet = "📝";
         internal const string stats = "📊";
@@ -75,7 +77,7 @@ namespace AMI.Neitsillia.User.UserInterface
             "<:Dice_2_Dark:721087834668138538>",
         };
         internal static string Dice(int i)
-            => dices[i-1];
+            => dices[i - 1];
         internal static int Dice(string d)
         {
             int i = dices.FindIndex(x => x == d);
@@ -87,11 +89,11 @@ namespace AMI.Neitsillia.User.UserInterface
         internal const string card_hit = "<:plus_card:723651321189761095>";
         internal const string card_stand = "🎴";
         #endregion
-    
+
         #region Others
         internal static string ItemType(Item.IType type)
         {
-            switch(type)
+            switch (type)
             {
                 case Item.IType.Material: return "<:material:737722612108623942>";
                 case Item.IType.Healing:
@@ -110,7 +112,7 @@ namespace AMI.Neitsillia.User.UserInterface
         internal const string ok = "<:confirm:717080796908748910>"; //"✅";
         internal const string cancel = "<:cancel:717080808099414118>";//"❌";
         //
-        internal static string[] specs = 
+        internal static string[] specs =
         {
             "🃏", //Joker
             "🗡️", //Fighter
@@ -155,7 +157,7 @@ namespace AMI.Neitsillia.User.UserInterface
         internal static string GetElement(int k) => GetElement((ReferenceData.DamageType)k);
         internal static string GetElement(ReferenceData.DamageType k)
         {
-            switch(k)
+            switch (k)
             {
                 case ReferenceData.DamageType.Physical: return "<:Physical:729706182175883334>";
                 case ReferenceData.DamageType.Blaze: return "<:Fire:729706176543195236>";
@@ -199,7 +201,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
         internal static string GetLetter(int i)
         {
-            switch(i)
+            switch (i)
             {
                 case 0: return "🇦"; //U+1F1E6
                 case 1: return "🇧";
@@ -275,102 +277,67 @@ namespace AMI.Neitsillia.User.UserInterface
 
         internal static string GetReactionDescription(string s, MsgType type)
         {
-            switch (s)
+            return s switch
             {
-                case ok:
-                    switch (type)
-                    {
-                        case MsgType.ArenaModifiers:
-                            return "Activate Modifier";
-                        default:
-                            return "Confirm";
-                    }
-                case cancel:
-                    switch (type)
-                    {
-                        case MsgType.ArenaModifiers:
-                            return "Deactivate Modifier";
-                        case MsgType.SetSkill:
-                            return "Re assign stats";
-                        case MsgType.Adventure:
-                            return "End or Cancel adventure";
-                        default:
-                            return "Cancel";
-                    }
-                case prev:
-                    return "Go to previous page";
-                case next:
-                    return "Go to next page";
-                case uturn:
-                    switch (type)
-                    {
-                        case MsgType.ArenaModifiers:
-                            return "Return to challenge selection.";
-                        default:
-                            return "Back";
-                    }
-                case stats:
-                    return "View short stats sheet (use ``~ls`` to view full stats)";
-                case sheet:
-                    return "View custom character information";
-                    //Ability\Leveling
-                case ability:
-                    return "View character abilities and levels";
-                case xp:
-                    return "View character level and level options";
-                case pickSpec:
-                    return "Select character specialization";
-                case skills:
-                    return "Spend stat point";
-                case classAbility:
-                    return "View available specialization Abilities";
-                case classPerk:
-                    return "View available specialization perks";
-                    //
-                case inv:
-                    return "View inventory";
-                case schem:
-                    return "View known permanent schematics";
-                case loot:
-                    return "Loot all loot (Use ``~view loot`` to view the list and ``~loot #`` to loot specifics)";
-                case trade:
-                    return type == MsgType.Event ? "View event shop" : "View NPC's trading inventory";
-                    //Combat
-                case brawl:
-                    return "Reuse last attack on last target (default: Brawl on m0)";
-                case run:
-                    return "Attempt to run from combat";
-                    //Exploring
-                case tpost:
-                    return "View and travel to accessible areas";
-                case explore:
-                    return "Explore current area";
-                case enterFloor:
-                    switch(type)
-                    {
-                        case MsgType.ArenaModifiers:
-                            return "Enter Arena";
-                        default:
-                        return "Enter Floor/Dungeon";
-                    }
-                case ticket:
-                    return "Buy a lottery ticket";
-                case eventQuest:
-                    return "View Event Quests";
-                case mainQuest:
-                    return "View Main Quests";
-                case sideQuest:
-                    return "View Side Quests";
-            }
-
-            /*if(GetNum(s) > -1)
-            {
-                switch (type)
+                ok => type switch
                 {
-                    default:
-                        return $"Custom Option {GetNum(s)}";
-                }
-            }//*/
+                    MsgType.ArenaModifiers => "Activate Modifier",
+                    _ => "Confirm",
+                },
+                cancel => type switch
+                {
+                    MsgType.ArenaModifiers => "Deactivate Modifier",
+                    MsgType.SetSkill => "Re assign stats",
+                    MsgType.Adventure => "End or Cancel adventure",
+                    _ => "Cancel",
+                },
+                prev => "Go to previous page",
+                next => "Go to next page",
+                uturn => type switch
+                {
+                    MsgType.ArenaModifiers => "Return to challenge selection.",
+                    _ => "Back",
+                },
+                cycle => type switch
+                {
+                    MsgType.Inventory => "Cycle filter type [all > gear > consumable]",
+                    _ => "Cycle"
+                },
+                stats => "View short stats sheet (use ``~ls`` to view full stats)",
+                sheet => "View custom character information",
+                //Ability\Leveling
+                ability => "View character abilities and levels",
+                xp => "View character level and level options",
+                pickSpec => "Select character specialization",
+                skills => "Spend stat point",
+                classAbility => "View available specialization Abilities",
+                classPerk => "View available specialization perks",
+                //
+                inv => "View inventory",
+                schem => "View known permanent schematics",
+                loot => "Loot all loot (Use ``~view loot`` to view the list and ``~loot #`` to loot specifics)",
+                trade => type == MsgType.Event ? "View event shop" : "View NPC's trading inventory",
+                //Combat
+                brawl => "Reuse last attack on last target (default: Brawl on m0)",
+                run => "Attempt to run from combat",
+                //Exploring
+                tpost => "View and travel to accessible areas",
+                explore => "Explore current area",
+                enterFloor => type switch
+                {
+                    MsgType.ArenaModifiers => "Enter Arena",
+                    _ => "Enter Floor/Dungeon",
+                },
+                ticket => "Buy a lottery ticket",
+                eventQuest => "View Event Quests",
+                mainQuest => "View Main Quests",
+                sideQuest => "View Side Quests",
+
+                _ => OtherReactionDescription(s, type),
+            };
+        }
+        private static string OtherReactionDescription(string s, MsgType type)
+        {
             if (GetLetter(s) > -1)
             {
                 switch (type)

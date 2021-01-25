@@ -85,7 +85,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 VerifyOptions();
 
                 oldops.RemoveAll(e => options.Contains(e));
-                _ = msg.RemoveReactionsAsync(Program.clientCopy.CurrentUser, oldops.Select(x => EUI.ToEmote(x)).ToArray());
+                _ = msg.RemoveReactionsAsync(Handlers.DiscordBotHandler.Client.CurrentUser, oldops.Select(x => EUI.ToEmote(x)).ToArray());
 
                 LoadOptions(msg);
             }
@@ -158,7 +158,7 @@ namespace AMI.Neitsillia.User.UserInterface
         internal async Task<IUserMessage> GetUiMessage()
         {
             try {
-                return message ??= (IUserMessage)await ((ISocketMessageChannel)Program.clientCopy.GetChannel(channelID)).GetMessageAsync(msgId);
+                return message ??= (IUserMessage)await ((ISocketMessageChannel)Handlers.DiscordBotHandler.Client.GetChannel(channelID)).GetMessageAsync(msgId);
 
             } catch (Exception) { return null; }
         }
@@ -200,7 +200,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 if (sendIfFail)
                 {
                     if (chan == null)
-                        chan = ((IMessageChannel)Program.clientCopy.GetChannel(channelID));
+                        chan = ((IMessageChannel)Handlers.DiscordBotHandler.Client.GetChannel(channelID));
                     return
                         await chan.SendMessageAsync(content, false, embed);
                 }
@@ -212,7 +212,7 @@ namespace AMI.Neitsillia.User.UserInterface
         {
             msg = msg ?? message ?? await GetUiMessage();
 
-            var bot = Program.clientCopy.CurrentUser;
+            var bot = Handlers.DiscordBotHandler.Client.CurrentUser;
 
             _ = msg.RemoveReactionsAsync(bot, options.Select(x => EUI.ToEmote(x)).ToArray());
         }
@@ -226,7 +226,7 @@ namespace AMI.Neitsillia.User.UserInterface
             options.Remove(e.ToString());
             msg = msg ?? await GetUiMessage();
             _ = msg.RemoveReactionAsync(e,
-                  bot ?? Program.clientCopy.CurrentUser);
+                  bot ?? Handlers.DiscordBotHandler.Client.CurrentUser);
         }
         internal Task RemoveReaction(string e, IUserMessage msg = null,
             SocketSelfUser bot = null) => RemoveReaction(EUI.ToEmote(e), msg, bot);
@@ -762,7 +762,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
                 IMessageChannel chan = reaction.Channel is IGuildChannel gChan
                     && (await gChan.Guild.GetUserAsync(target.userid)) != null ? reaction.Channel :
-                    (IMessageChannel)(await Program.clientCopy.GetUser(target.userid).GetOrCreateDMChannelAsync());
+                    (IMessageChannel)(await Handlers.DiscordBotHandler.Client.GetUser(target.userid).GetOrCreateDMChannelAsync());
 
                 await chan.SendMessageAsync($"<@{target.userid}>, You've received a new offer. View all offers using " +
                     $"`Received Offers`");
@@ -927,20 +927,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
             }
         }
-        public async Task Inventory(SocketReaction reaction, IUserMessage msg)
-        {
-            int.TryParse(data, out int i);
-            switch (reaction.Emote.ToString())
-            {
-                case prev:
-                    await GameCommands.DisplayInventory(player, reaction.Channel, i - 1, "none", true);
-                    break;
-                case next:
-                    await GameCommands.DisplayInventory(player, reaction.Channel, i + 1, "none", true);
-                    break;
-            }
-        }
-
+        
         public async Task Loot(SocketReaction reaction, IUserMessage msg)
         {
             int p = 0;
@@ -1335,7 +1322,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 player.Quest_Trigger(Quest.QuestTrigger.QuestLine, "XI");
                 await reaction.Channel.SendMessageAsync($"Quest {quest.title} accepted!");
 
-                await msg.RemoveReactionAsync(reaction.Emote, Program.clientCopy.CurrentUser);
+                await msg.RemoveReactionAsync(reaction.Emote, Handlers.DiscordBotHandler.Client.CurrentUser);
 
                 await dq.ShowBoard(player, reaction.Channel);
 

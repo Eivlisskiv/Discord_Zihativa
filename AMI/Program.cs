@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AMYPrototype.Commands;
 using AMI.Methods;
 using Discord.WebSocket;
-using Discord;
-using AMI.AMIData.Servers;
 using AMI.AMIData;
 using AMI.Handlers;
 using AMI.AMIData.Webhooks;
@@ -19,6 +16,7 @@ namespace AMYPrototype
             get;
             private set;
         }
+        public static DiscordSocketClient clientCopy => DiscordBotHandler.Client;
         public static bool FirstBoot { get; private set; } = true;
 
         internal static bool isDev;
@@ -27,8 +25,6 @@ namespace AMYPrototype
         internal static Random rng = new Random(Guid.NewGuid().GetHashCode());
         internal static System.Reflection.Assembly assembly
             = System.Reflection.Assembly.GetExecutingAssembly();
-
-        internal static DiscordSocketClient clientCopy;
 
         internal static ProgramData data;
         internal static DiscordBotList_Top dblAPI;
@@ -48,9 +44,6 @@ namespace AMYPrototype
 
             CurrentState = newState;
         }
-
-        private DiscordSocketClient _client;
-        private CommandHandler _handler;
 
         private static void Main(string[] args)
         {
@@ -77,63 +70,52 @@ namespace AMYPrototype
             }
         }
 
-        public Program()
+        private Program()
         {
             Console.WriteLine(typeof(string).Assembly.ImageRuntimeVersion);
             tokens = Tokens.Load(@"./Settings/token.txt");
-        }
-
-        async Task CreateClient()
-        {
-            _client = new DiscordSocketClient();
-
-            _client.Log += LogAsync;
-            _client.Ready += Ready;
-            _client.JoinedGuild += OnJoinedGuild;
-            _client.LeftGuild += OnLeftGuild;
-            _client.ReactionAdded += ReactionHandler.ReactionAddedEvent;
-
-            await _client.LoginAsync(TokenType.Bot, tokens.discord);
-
-            await _client.StartAsync();
-            await _client.SetGameAsync("Booting...");
-
-            clientCopy = _client;
-
-            if(_handler == null) _handler = new CommandHandler(_client);
-            else _handler.SetClient(_client);
         }
 
         async Task Connect()
         {
             try
             {
-                await CreateClient();
+                await DiscordBotHandler.Connect(Ready, tokens.discord);
             }
             catch(Exception e)
             {
                 Log.LogS(e, "Connect");
-                await _client.LogoutAsync();
                 _ = Connect();
             }
         }
 
         public async Task Start()
         {
-            await Connect();
+            try
+            {
+                await Connect();
 
-            dblAPI = new DiscordBotList_Top(tokens.dbl);
+                dblAPI = new DiscordBotList_Top(tokens.dbl);
 
-            await Task.Delay(-1);
+                await Task.Delay(-1); 
+            }
+            catch(Exception e)
+            {
+                Log.LogS(e);
+            }
+
+            await Exit();
         }
 
         private async Task Ready()
         {
-            Console.WriteLine($"{_client.CurrentUser} is connected!");
+            var client = DiscordBotHandler.Client;
+
+            Console.WriteLine($"{client.CurrentUser} is connected!");
 
             if (FirstBoot)
             {
-                isDev = _client.CurrentUser.Id == 535577053651664897;
+                isDev = client.CurrentUser.Id == 535577053651664897;
 
                 CheckMissingPerkEffects();
 
@@ -145,54 +127,32 @@ namespace AMYPrototype
 
                 await AppConnectionAndData();
 
-                if (botActivity == null) botActivity = new BotActivityHandler(_client);
-                else botActivity.SetClient(_client);
-
                 TaskHandler.Add("Refresh", 60 * 5, AppConnectionAndData);
 
-                //_ = (tokens.platform == Tokens.Platforms.Linux ?
-                //WebServer.CreateKestrelHost(isDev) :
                 _ = WebServer.CreateHostW(isDev);
             }
+
+            if (botActivity == null) botActivity = new BotActivityHandler(client);
+            else botActivity.SetClient(client);
 
             SetState(State.Ready);
             Log.LogS("Ready");
             FirstBoot = false;
         }
 
-        private Task LogAsync(LogMessage log)
-        {
-            if (log.Exception != null)
-                Log.LogS(log.Exception, $"LogAsync => {log.Source} {log.Message} {Environment.NewLine}");
-            else Log.LogS(log.ToString());
-
-            return Task.CompletedTask;
-        }
-
         internal async Task AppConnectionAndData()
         {
+            var client = DiscordBotHandler.Client;
+
             rng = new Random(Guid.NewGuid().GetHashCode());
 
-            _ = dblAPI.Connect();
-            dblAPI.UpdateServerCount(_client);
+            await dblAPI.Connect();
+            dblAPI.UpdateServerCount(client);
 
-            clientCopy = _client;
             if (data != null && data.activity != null)
                 data.activity.Save();
 
             await Task.Delay(1);
-        }
-
-        private Task OnJoinedGuild(SocketGuild arg)
-        {
-            clientCopy = _client;
-            arg.Owner.SendMessageAsync($"Thank you for adding {_client.CurrentUser.Mention} to {arg.Name}", embed: new AMI.AMIData.HelpPages.Help().H_server);
-            return Task.CompletedTask;
-        }
-
-        private async Task OnLeftGuild(SocketGuild arg)
-        {
-            await data.database.database.GetCollection<GuildSettings>("Guilds").DeleteOneAsync($"{{_id:{arg.Id}}}");
         }
 
         internal static async Task Exit(string message = null)
@@ -203,17 +163,17 @@ namespace AMYPrototype
             SetState(State.Exiting);
 
             //Inform Exit
-            _ = clientCopy?.SetGameAsync(message ?? "Exiting...", type: ActivityType.Playing);
+            var bot = DiscordBotHandler.bot;
+            await bot.SetGameAsync(message ?? "Exiting...");
 
             //Tie Loose ends
             data?.activity?.Save();
             await AMI.Neitsillia.Areas.Nests.Nest.SaveNests();
             AMI.Neitsillia.NPCSystems.PopulationHandler.ReturnAll();
 
-            _ = clientCopy?.SetStatusAsync(UserStatus.Offline);
             //Exit
             await Task.Delay(5000); // A Little 5 seconds to make sure everything had the time to complete
-            try { await clientCopy?.StopAsync(); } catch(Exception) { }
+            await bot.Stop();
             Environment.Exit(0);
         }
 
@@ -232,7 +192,6 @@ namespace AMYPrototype
         {
             string message = null;
             var methodes = typeof(AMI.Neitsillia.Items.Perks.PerkLoad.PerkLoad).GetMethods();
-            var perk = new AMI.Neitsillia.Items.Perk();
             foreach (var m in methodes)
             {
                 try

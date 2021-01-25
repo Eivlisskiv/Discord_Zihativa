@@ -1,5 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Combat;
+using System;
 
 namespace AMI.Neitsillia.Items
 {
@@ -41,7 +42,7 @@ namespace AMI.Neitsillia.Items
                 rank++;
             }
 
-            owner.perkProcs.Add($"Gladiator Patientia: +{buff}% PHY DMG");
+            owner.perkProcs.Add($"Gladiator Patientia: +{Math.Round(buff, 2)}% PHY DMG");
 
             owner.damageMultiplier = ArrayM.AddEach(owner.damageMultiplier, buff / 100.00);
 
