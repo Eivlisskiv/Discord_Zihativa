@@ -1,13 +1,12 @@
 ﻿using AMI.AMIData.Servers;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class GuildCommands : ModuleBase<Commands.CustomSocketCommandContext>
+    public class Guild : ModuleBase<Commands.CustomSocketCommandContext>
     {
         [Command("View Permissions")]
         [Alias("View Perms")]

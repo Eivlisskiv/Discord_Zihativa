@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class OtherCommands : ModuleBase<CustomSocketCommandContext>
+    public class Other : ModuleBase<CustomSocketCommandContext>
     {
         //TODO using Lookup on Discord.CommandInfo and commandInfoEmbed
         [Command("Modules")] [Alias("Module")]

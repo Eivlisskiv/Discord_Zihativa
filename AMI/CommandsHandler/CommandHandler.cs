@@ -112,7 +112,7 @@ namespace AMYPrototype.Commands
 
             string prefix = guildSet == null ? "" : guildSet.prefix == null || guildSet.prefix.Length < 1 ? defaultPrefix : guildSet.prefix;
 
-            if (MessageIsApproved(msg, prefix, out int argPosition) && await GameMasterCommands.VerifyChannel(context, guildSet))
+            if (MessageIsApproved(msg, prefix, out int argPosition) && await GameMaster.VerifyChannel(context, guildSet))
             {
                 switch (Program.CurrentState)
                 {

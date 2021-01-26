@@ -2,42 +2,49 @@
 {
     public enum MsgType
     {
-        Inventory, Sheet, Stats, Schems,
+        Other,
+        //Basics
+        Main, Inventory, Sheet, Stats, Schems, Junctions,
+        //Levels
         XP, Skills, Abilities, AbilityLevel,
-        NPC, NPCInv, Combat, Loot, Main,
-        SetSkill, ConfirmSkills, ConfirmCharDel, Adventure,
-        Rest, EndRest, ConfirmUpgrade, Other,
-        PartyInvite, ConfirmOffer, InspectOffer,
-        ChooseRace, DuelOffer, StarterAbilities,
-        Tutorial, Lottery, NewStronghold, Junctions,
-        OfferList, AcceptBuilding,
-        SandboxInventory,
+        //NPC
+        NPC, NPCInv, ConfirmTransaction,
+        //Encounter
+        Combat, Loot, Puzzle,
+        //Character Creation
+        SetSkill, ConfirmSkills, ConfirmCharDel, 
+        ChooseRace, StarterAbilities, AutoNewCharacter,
+        //Adventure
+        Adventure, AdventureQuest,
+        //Rest
+        Rest, EndRest, 
+        //Crafting
+        ConfirmUpgrade, Craft,
+        //Social
+        PartyInvite, DuelOffer, 
+        //Trading
+        OfferList, ConfirmOffer, InspectOffer,
+        //Speciality
         SpecSelection, SpecMain,
-        SpecPerks,
-        SpecAbility,
-        AcceptBuildingUpgrade,
-        BountyBoard,
-        ArenaGameMode, ArenaModifiers,
+        SpecPerks, SpecAbility,
+        //Arena
+        ArenaGameMode, ArenaModifiers, ArenaService, ArenaFights,
         ResourceCrateList, ResourceCrateOpening,
-        EggPocket, ConfirmEggDiscard, EggInfo, PetList, otheregg2, otheregg3, otheregg4,
-        QuestList, QuestInfo, AcceptQuests,
-        PetShop,
-        InspectPet,
-        AutoNewCharacter,
-        ConfirmTransaction,
-        Tavern,
-        DailyQuestBoard,
+        //Pets
+        EggPocket, ConfirmEggDiscard, EggInfo, PetList, 
+        PetUpgrade, PetEvolve, PetShop, InspectPet,
+        //Quest
+        QuestList, QuestInfo, AcceptQuests, DailyQuestBoard,
+        //Tavern Service
+        Tavern, BountyBoard,
+        //Gambling
+        Lottery, GamblingGames, DiceGame, CardGame,
+        //Event
+        Event, EventShop,
+        //House
+        House, HouseStorage, HouseTile, HouseFollowers, 
 
-        GamblingGames,
-        DiceGame,
-        CardGame,
-        PetUpgrade, PetEvolve,
-
-        Puzzle,
-
-        Event,
-        EventShop,
-        ArenaService,
-        ArenaFights
+        //Stronghold
+        AcceptBuilding, SandboxInventory, AcceptBuildingUpgrade, NewStronghold,
     }
 }

@@ -69,7 +69,7 @@ namespace AMI.Neitsillia.Areas.Nests
                 null, color, DUtils.NewField("Timed Event:", "Soon, the nest will have served its purpose and we'll have more trouble to deal with. Clear the nest before that happens."
                 + Environment.NewLine + $"Time Left: {Timers.CoolDownToString(nest.expire, "Hatching")} | Ends: {nest.expire.ToShortTimeString()} [UTC]"));
 
-            await GameMasterCommands.SendToSubscribed(null, notice.Build());
+            await GameMaster.SendToSubscribed(null, notice.Build());
 
             lastSpawn = DateTime.UtcNow;
         }
@@ -274,7 +274,7 @@ namespace AMI.Neitsillia.Areas.Nests
                 Console.WriteLine("embed built");
 
                 if(!DISABLED)
-                    await GameMasterCommands.SendToSubscribed("Nest Notification", embed.Build());
+                    await GameMaster.SendToSubscribed("Nest Notification", embed.Build());
                 await Delete();
 
                 return false;
@@ -288,7 +288,7 @@ namespace AMI.Neitsillia.Areas.Nests
                             );
 
                 if (!DISABLED)
-                    await GameMasterCommands.SendToSubscribed("Nest Notification", embed.Build());
+                    await GameMaster.SendToSubscribed("Nest Notification", embed.Build());
 
                 await Delete();
 

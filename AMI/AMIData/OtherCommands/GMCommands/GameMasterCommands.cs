@@ -3,7 +3,6 @@ using AMI.Commands;
 using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia;
-using AMI.Neitsillia.Areas;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Encounters;
@@ -28,7 +27,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public partial class GameMasterCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public partial class GameMaster : ModuleBase<AMI.Commands.CustomSocketCommandContext>
     {
         internal static MongoDatabase Database => AMYPrototype.Program.data.database;
         //level 0; GMs wanna-be, low and always random, monthly limits
@@ -795,7 +794,7 @@ namespace AMI.AMIData.OtherCommands
                     case "patchnotes":
                     case "patch note":
                     case "patch notes":
-                            noti = OtherCommands.UpdateLog();
+                            noti = Other.UpdateLog();
                         break;
 
                     default:

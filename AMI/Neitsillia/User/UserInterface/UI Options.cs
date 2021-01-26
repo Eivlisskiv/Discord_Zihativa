@@ -11,7 +11,7 @@ namespace AMI.Neitsillia.User.UserInterface
 {
     partial class UI
     {
-        static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, InitO_Inventory};
+        static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, InitO_Inventory, InitO_Strongholds };
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 
         public static void InitialiseOptionLoaderDict()

@@ -63,7 +63,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             EmbedBuilder info = Info();
             info.Description += Environment.NewLine + 
                 "Enter `~Lottery` to view current worth and buy a ticket.";
-            return (await GameMasterCommands.SendToSubscribed(
+            return (await GameMaster.SendToSubscribed(
                 message, info.Build())).ToArray();
         }
         internal string AddEntry(Player player)
@@ -90,7 +90,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 player.KCoins += TotalValue;
                 player.SaveFileMongo();
                 string[] d = winner.Split('\\');
-                await GameMasterCommands.ReportActivityToServers(
+                await GameMaster.ReportActivityToServers(
                 $"<@{d[0]}> 's {d[1]} Won the {TotalValue}~~K~~ Lottery!", null);
                 await Handlers.DiscordBotHandler.Client.GetUser(ulong.Parse(d[0])).SendMessageAsync(
                     $"Your character {d[1]} has won the {TotalValue}~~K~~ Lottery!");

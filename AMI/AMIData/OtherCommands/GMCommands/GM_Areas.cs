@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public partial class GameMasterCommands
+    public partial class GameMaster
     {
         [Command("Move To Area")]
         [Alias("mtarea")]

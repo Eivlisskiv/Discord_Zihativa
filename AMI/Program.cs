@@ -29,18 +29,12 @@ namespace AMYPrototype
         internal static ProgramData data;
         internal static DiscordBotList_Top dblAPI;
 
-        private static BotActivityHandler botActivity;
-
         public static void SetState(State newState)
         {
             if (CurrentState == newState) return;
 
-            if(newState == State.Ready)
-            {
-                BotActivityHandler.cycle = true;
-                botActivity.CycleActivity();
-            }
-            else BotActivityHandler.cycle = false;
+            DiscordBotHandler.bot?.SetAvtivityCycling
+                (newState == State.Ready);
 
             CurrentState = newState;
         }
@@ -76,24 +70,11 @@ namespace AMYPrototype
             tokens = Tokens.Load(@"./Settings/token.txt");
         }
 
-        async Task Connect()
-        {
-            try
-            {
-                await DiscordBotHandler.Connect(Ready, tokens.discord);
-            }
-            catch(Exception e)
-            {
-                Log.LogS(e, "Connect");
-                _ = Connect();
-            }
-        }
-
         public async Task Start()
         {
             try
             {
-                await Connect();
+                await DiscordBotHandler.Connect(Ready, tokens.discord);
 
                 dblAPI = new DiscordBotList_Top(tokens.dbl);
 
@@ -131,9 +112,6 @@ namespace AMYPrototype
 
                 _ = WebServer.CreateHostW(isDev);
             }
-
-            if (botActivity == null) botActivity = new BotActivityHandler(client);
-            else botActivity.SetClient(client);
 
             SetState(State.Ready);
             Log.LogS("Ready");

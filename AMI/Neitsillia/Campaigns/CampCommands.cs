@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Module
 {
-    class CampCommands :  GameMasterCommands
+    class CampCommands :  GameMaster
     {
         
         /*[Command("New Campaign")]

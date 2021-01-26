@@ -16,7 +16,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public partial class Area
     {
-        internal static MongoDatabase Database => Program.data.database;
+        static MongoDatabase Database => Program.data.database;
 
         //private static Cache<string, Area> areasCache = new Cache<string, Area>();
         //private static Cache<string, Area> dungeonsCache = new Cache<string, Area>();

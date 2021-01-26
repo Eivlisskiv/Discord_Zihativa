@@ -35,7 +35,7 @@ namespace AMI.AMIData.Events
             {
                 if (save) Database.UpdateRecord("Events", MongoDatabase.FilterEqual<OngoingEvent, string>("_id", "ongoing"), Ongoing);
 
-                _ = GameMasterCommands.SendToSubscribed($"Event {Ongoing.name} has started", Ongoing.EmbedInfo());
+                _ = GameMaster.SendToSubscribed($"Event {Ongoing.name} has started", Ongoing.EmbedInfo());
             }
         }
 
@@ -76,7 +76,7 @@ namespace AMI.AMIData.Events
             Ongoing.endTime = Ongoing.endTime.AddDays(days);
             Database.UpdateRecord("Events", MongoDatabase.FilterEqual<OngoingEvent, string>("_id", Ongoing._id), Ongoing);
 
-            _ = GameMasterCommands.SendToSubscribed($"Event {Ongoing.name} duration was extended by {days} days", Ongoing.EmbedInfo());
+            _ = GameMaster.SendToSubscribed($"Event {Ongoing.name} duration was extended by {days} days", Ongoing.EmbedInfo());
 
             return $"Event extended by {days} days";
         }
@@ -173,7 +173,7 @@ namespace AMI.AMIData.Events
 
             Database.SaveRecord("Events", Ongoing);
 
-            _ = GameMasterCommands.SendToSubscribed("Event Ended", Ongoing.EmbedInfo());
+            _ = GameMaster.SendToSubscribed("Event Ended", Ongoing.EmbedInfo());
             Ongoing = null;
 
         }

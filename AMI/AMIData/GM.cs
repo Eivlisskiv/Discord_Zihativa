@@ -57,7 +57,7 @@ namespace AMI.Module
         void SetLimits()
         {
             for (int i = 0; i < limits.Length; i++)
-                limits[i] = AMI.AMIData.OtherCommands.GameMasterCommands.gmLimits[gmLevel][i];
+                limits[i] = AMI.AMIData.OtherCommands.GameMaster.gmLimits[gmLevel][i];
         }
     }
 }

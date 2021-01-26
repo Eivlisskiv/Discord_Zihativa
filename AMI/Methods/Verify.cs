@@ -9,14 +9,14 @@ namespace AMI.Methods
         {
             string[] splitArg = arg.Split('x', 'X', '*');
             int amount = 1;
-            int index = -1;
+            int index = 1;
             try
             {
                 index = int.Parse(splitArg[0]);
                 if (splitArg.Length > 1)
                     amount = int.Parse(splitArg[1]);
 
-            }catch (Exception) { throw Module.NeitsilliaError.ReplyError($"Incorrect format entered, Item x Count Format: ``ItemSlot*Amount``"); }
+            }catch (Exception) { throw Module.NeitsilliaError.ReplyError("Incorrect format entered, Item x Count Format: `{ItemSlot}x{Amount}`"); }
             return (index, amount);
         }
         public static List<(int index, int amount)> IndexXAmount(string[] arg)

@@ -34,6 +34,7 @@ namespace AMI.Neitsillia.InventoryCommands
             }
             return (i, filter);
         }
+
         internal static async Task UpdateinventoryUI(Player player, IMessageChannel chan, bool skipSave = false)
         {
             if (player.ui?.type != MsgType.Inventory)

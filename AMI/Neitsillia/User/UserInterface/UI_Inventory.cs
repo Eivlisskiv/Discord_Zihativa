@@ -16,30 +16,28 @@ namespace AMI.Neitsillia.User.UserInterface
            );
         }
 
-        public async Task Inventory(SocketReaction reaction, IUserMessage msg)
+        public (int i, string filter) InventoryControls(SocketReaction reaction)
         {
             (int i, string filter) = InventoryCommands.Inventory.ParseInvUIData(data);
             switch (reaction.Emote.ToString())
             {
-                case EUI.prev:
-                    await GameCommands.DisplayInventory(player, 
-                        reaction.Channel, i - 1, filter, true);
-                    break;
-                case EUI.next:
-                    await GameCommands.DisplayInventory(player, 
-                        reaction.Channel, i + 1, filter, true);
-                    break;
+                case EUI.prev: i--; break;
+                case EUI.next: i++; break;
                 case EUI.cycle:
                     filter = filter switch
                     {
                         "all" => "gear",
                         "gear" => "consumable",
                         _ => "all"
-                    };
-                    await GameCommands.DisplayInventory(player, 
-                        reaction.Channel, i, filter, true);
-                    break;
+                    };  break;
             }
+            return (i, filter);
+        }
+
+        public async Task Inventory(SocketReaction reaction, IUserMessage msg)
+        {
+            (int i, string filter) = InventoryControls(reaction);
+            await GameCommands.DisplayInventory(player, reaction.Channel, i, filter, true);
         }
     }
 }

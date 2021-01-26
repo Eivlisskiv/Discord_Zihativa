@@ -1,15 +1,27 @@
 ﻿using AMI.Methods;
+using AMI.Module;
 using AMI.Neitsillia.User.UserInterface;
 using Discord;
 using Neitsillia.Items.Item;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Collections
 {
     public class Inventory
     {
+        public static async Task<string> Transfer(Inventory from, Inventory to, int toSize, string slotxamount)
+        {
+            (int index, int amount) = Verify.IndexXAmount(slotxamount);
+            index--;
+            if (index < 0 || index > from.Count) throw NeitsilliaError.ReplyError("Invalid slot");
+            StackedItems si = from.Splice(index, amount);
+            if(!to.Add(si, toSize)) throw NeitsilliaError.ReplyError("There is not enough inventory space for this transfer.");
+            return si.ToString();
+        }
+
         const int ITEM_PER_PAGE = 15;
 
         public List<StackedItems> inv = new List<StackedItems>();

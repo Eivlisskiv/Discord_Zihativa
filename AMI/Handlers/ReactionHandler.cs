@@ -15,36 +15,42 @@ namespace AMI.Handlers
 {
     class ReactionHandler
     {
-        public static async Task ReactionAddedEvent(Cacheable<IUserMessage, ulong> cachedMessage, 
+        public static Task ReactionAddedEvent(Cacheable<IUserMessage, ulong> cachedMessage, 
             ISocketMessageChannel channel, SocketReaction reaction)
         {
-            try
+            Task.Run(async () =>
             {
-                if (Program.CurrentState != Program.State.Ready
-                    || !reaction.User.IsSpecified
-                    || reaction.User.Value.IsBot)
-                    return;
+                try
+                {
 
-                IUserMessage message = cachedMessage.Value ?? (reaction.Message.IsSpecified ? reaction.Message.Value : await cachedMessage.GetOrDownloadAsync());
+                    if (Program.CurrentState != Program.State.Ready
+                        || !reaction.User.IsSpecified
+                        || reaction.User.Value.IsBot)
+                        return;
 
-                //Currently, the bot does not need to check reactions on messages that are not its own
-                if (message == null || message.Author.Id != Program.clientCopy.CurrentUser.Id) return;
+                    IUserMessage message = cachedMessage.Value ?? (reaction.Message.IsSpecified ? reaction.Message.Value : await cachedMessage.GetOrDownloadAsync());
 
-                GuildSettings gset = channel is IGuildChannel chan ?
-                    gset = GuildSettings.Load(chan.Guild) : null;
+                    //Currently, the bot does not need to check reactions on messages that are not its own
+                    if (message == null || message.Author.Id != Program.clientCopy.CurrentUser.Id) return;
 
-                if (gset != null && gset.Ignore) return;
+                    GuildSettings gset = channel is IGuildChannel chan ?
+                        gset = GuildSettings.Load(chan.Guild) : null;
 
-                if (!CommandHandler.RunUser(reaction.UserId)) return;
+                    if (gset != null && gset.Ignore) return;
 
-                _ = new ReactionHandler(message, reaction, gset).ExecuteAsync();
+                    if (!CommandHandler.RunUser(reaction.UserId)) return;
 
-            }
-            catch (Exception e)
-            {
-                Log.LogS(e);
-                _ = UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
-            }
+                    await new ReactionHandler(message, reaction, gset).ExecuteAsync();
+
+                }
+                catch (Exception e)
+                {
+                    Log.LogS(e);
+                    await UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
+                }
+            });
+            
+            return Task.CompletedTask;
         }
 
         readonly BotUser botUser;

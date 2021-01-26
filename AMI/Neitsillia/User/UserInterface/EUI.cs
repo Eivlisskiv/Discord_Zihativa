@@ -20,6 +20,7 @@ namespace AMI.Neitsillia.User.UserInterface
         internal const string ability = "🔰";
         internal const string xp = "🏆";
         internal const string inv = "🎒";
+        internal const string storage = "📦";
         internal const string schem = "🛠";
         internal const string loot = "💰";
         internal const string trade = "💱";

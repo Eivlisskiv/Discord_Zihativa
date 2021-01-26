@@ -11,23 +11,31 @@ namespace AMI.Handlers
 {
     public class DiscordBotHandler
     {
-        public static DiscordSocketClient Client;
+        
         public static DiscordBotHandler bot;
+        public static DiscordSocketClient Client;
 
         private static Func<Task> onReady;
         private static string _token;
+        private BotActivityHandler botActivity;
 
         public static async Task<DiscordBotHandler> Connect(Func<Task> ready, string token)
         {
-            onReady ??= ready;
-            _token ??= token;
-            if(bot != null)
+            onReady = ready;
+            _token = token;
+            return await Connect();
+        }
+
+        private static async Task<DiscordBotHandler> Connect()
+        {
+            if (bot != null)
             {
                 try
                 {
                     await bot.Stop();
 
-                }catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     Log.LogS(e);
                 }
@@ -40,26 +48,33 @@ namespace AMI.Handlers
 
         private static async Task WaitReconnect(int minutes)
         {
-            for(int i = 0; i < minutes; i++)
+            Log.LogS("Watching for reconnect");
+            for (int i = 0; i < minutes; i++)
             {
                 await Task.Delay(60000);
                 //If the bot is for some reason null
                 if (bot == null)
                 {
-                    await Connect(null, null);
+                    await Connect();
                     return;
                 }
 
                 //If it managed to recconnect within {i} minutes
                 var state = bot._client.ConnectionState;
                 if (state == ConnectionState.Connected || state == ConnectionState.Connecting)
+                {
+                    Log.LogS("Bot reconnected itself");
                     return;
+                }
+                Log.LogS($"{minutes - i} minutes until force reconnect.");
             }
             //Otherwise, bot was too slow to reconnect. Reset
             Log.LogS("Bot reset due to failling reconnect");
-            await Connect(null, null);
+
+            try { await Connect(); } catch(Exception e) { Log.LogS(e); }
         }
 
+        private bool reconnect = true;
         private readonly DiscordSocketClient _client;
         private CommandHandler _handler;
         private DiscordBotHandler()
@@ -67,13 +82,12 @@ namespace AMI.Handlers
             _client = new DiscordSocketClient();
 
             _client.Log += LogAsync;
-            _client.Ready += onReady;
+            _client.Ready += OnReady;
             _client.JoinedGuild += OnJoinedGuild;
             _client.LeftGuild += OnLeftGuild;
             _client.ReactionAdded += ReactionHandler.ReactionAddedEvent;
 
             _client.Disconnected += OnDisconnect;
-            
         }
 
         public async Task Start(string token)
@@ -94,13 +108,28 @@ namespace AMI.Handlers
 
         public async Task Stop()
         {
+            reconnect = false;
             _client?.SetStatusAsync(UserStatus.Offline);
             await Logout();
             try { await _client?.StopAsync(); } catch (Exception) { }
         }
 
+        public void SetAvtivityCycling(bool set)
+        {
+            BotActivityHandler.cycle = set;
+            if (set) botActivity.CycleActivity();
+        }
+
         public async Task SetGameAsync(string name, ActivityType type = ActivityType.Playing)
            => await _client?.SetGameAsync(name, type: type);
+
+        private async Task OnReady()
+        {
+            if (botActivity == null) botActivity = new BotActivityHandler(_client);
+            else botActivity.SetClient(_client);
+
+            await onReady();
+        }
 
         private async Task OnJoinedGuild(SocketGuild guild)
         {
@@ -120,13 +149,16 @@ namespace AMI.Handlers
             if (log.Exception != null)
                 Log.LogS(log.Exception, "LogAsync => " +
                     $"{log.Source} {log.Message} {Environment.NewLine}");
-            else Log.LogS(log.ToString());
+            else Log.LogS($"{log.Source}: {log.Message}");
+
+            if(reconnect && log.Message == "Disconnecting")
+                _ = WaitReconnect(5);
         }
 
         private async Task OnDisconnect(Exception e)
         {
             Log.LogS(e);
-            _ = WaitReconnect(5);
+            //_ = WaitReconnect(5);
         }
     }
 }

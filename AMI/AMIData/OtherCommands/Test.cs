@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class TestCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class Test : ModuleBase<AMI.Commands.CustomSocketCommandContext>
     {
         [Command("Calculate Armor")]
         public async Task CalcArmor(int armor)
