@@ -8,9 +8,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Fixed inventory display issues {Environment.NewLine}"
-                + $" Arena survival now grants 5x xp multiplier to compensate for lack of loot during fights {Environment.NewLine}"
-                + $"Fixed wrong floor cap causing players not being able to go to floors above their levels {Environment.NewLine}"
+                $"Fixed the issue where bounties could spawn from the arena fights {Environment.NewLine}"
+                + $"  {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -44,9 +43,9 @@ namespace AMI.Neitsillia
         }
         public static string WorldPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Fixed issues with NEST system {Environment.NewLine}"
+                $" {Environment.NewLine}"
                 + $" {Environment.NewLine}"
                 ;
         }
@@ -66,9 +65,11 @@ namespace AMI.Neitsillia
         }
         public static string NPCPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
+                $"Fixed: followers display now shows list of followers by default {Environment.NewLine}"
+                + $"Fixed: followers not properly receiving healing after party rest {Environment.NewLine}"
+                + $"Giving invalid slots while buying/selling to npc now gives an appropriate message instead of throwing an error {Environment.NewLine}"
                 ;
         }
         public static string SocialPatchNotes()

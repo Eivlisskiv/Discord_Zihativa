@@ -145,9 +145,9 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             [Summary("inspect, give, interact or kick")]
             string action = "inspect", 
             [Summary("The slot of the npc you want to apply the action to. `pinfo` command for party member list.")]
-            int followerSlot = 1,
+            int followerSlot = 0,
             [Summary("Only needed for `give` action: {slot}x{amount} of your inventory item(s) to give")]
-            string argument = "-1")
+            string argument = null)
         {
             await FollowerAction(Player.Load(Context.BotUser), action, followerSlot - 1, 
                 argument, Context.Channel);

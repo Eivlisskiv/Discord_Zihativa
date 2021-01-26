@@ -12,7 +12,7 @@ namespace AMI.Neitsillia.Areas.House
     public class House
     {
         private const int HOUSE_PRICE = 6544;
-        public static long HousePrice(int level) => Math.Min(HOUSE_PRICE, HOUSE_PRICE * level);
+        public static long HousePrice(int level) => Math.Max(HOUSE_PRICE, HOUSE_PRICE * level);
 
         static MongoDatabase Database => Program.data.database;
 

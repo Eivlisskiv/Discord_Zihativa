@@ -16,10 +16,14 @@ namespace AMI.Neitsillia.Commands.AreaCommands
     public class HouseCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
     {
         
-        private async Task<House> LoadHouse(ulong id)
+        private async Task<House> LoadHouse()
         {
-            House house = await House.Load(id);
             Player player = Context.Player;
+            if(player.Area.type != Neitsillia.Areas.AreaType.Town)
+                throw NeitsilliaError.ReplyError("You may only access your house from a town.");
+
+            House house = await House.Load(player.userid);
+            
             
             if(house == null || !house.junctions.Contains(player.AreaInfo.path))
             {
@@ -37,7 +41,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         public async Task HouseInfo()
         {
             Player player = Context.Player;
-            House house = await LoadHouse(player.userid);
+            House house = await LoadHouse();
 
             await ViewHouseInfo(player, house, Context.Channel);
         }
@@ -55,7 +59,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             "view: filter")] string argument = null)
         {
             Player player = Context.Player;
-            House house = await LoadHouse(player.userid);
+            House house = await LoadHouse();
 
             switch (action.ToLower())
             {

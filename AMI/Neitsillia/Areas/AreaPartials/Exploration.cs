@@ -91,15 +91,18 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
             int.TryParse((player.Party != null ? player.Party.areaKey : player.AreaInfo).data, out int floorChances);
 
-            if (player.AreaInfo.floor < floors && (floorChances * 5) + 10 >= Program.rng.Next(101))
+            if (player.AreaInfo.floor < floors)
             {
-                player.NewEncounter(new Encounter(Encounter.Names.Floor, player));
-                explore = player.Encounter.GetEmbed(explore);
-                await player.AreaData("0");
-                return explore;
-            }
+                if ((floorChances * 5) + 10 >= Program.rng.Next(101))
+                {
+                    player.NewEncounter(new Encounter(Encounter.Names.Floor, player));
+                    explore = player.Encounter.GetEmbed(explore);
+                    await player.AreaData("0");
+                    return explore;
+                }
 
-            await player.AreaData((floorChances + 1).ToString());
+                await player.AreaData((floorChances + 1).ToString());
+            }
 
             try
             {

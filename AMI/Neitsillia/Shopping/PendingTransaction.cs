@@ -21,7 +21,7 @@ namespace AMI.Neitsillia.Shopping
 
         public enum Transaction { Buy = -1, Sell = 1 };
 
-        internal static string Accept(Player player, string data)
+        internal static async Task<string> Accept(Player player, string data)
         {
             NPC npc = player.Encounter.npc;
             PendingTransaction transaction;
@@ -68,8 +68,8 @@ namespace AMI.Neitsillia.Shopping
 
             }
 
-            player.ui.TryDeleteMessage().Wait();
-            
+            await player.ui.TryDeleteMessage();
+            player.ui = null;
             player.SaveFileMongo();
 
             return $"```{Dialog.GetDialog(npc, Dialog.tradingBusiness)}```";
@@ -100,6 +100,8 @@ namespace AMI.Neitsillia.Shopping
 
             foreach (var si in transaction.items)
                 player.Encounter.npc.inventory.Add(si, -1);
+
+            player.Encounter.Save();
 
             transaction?.Delete();
             _ = player.ui?.TryDeleteMessage();
@@ -194,7 +196,7 @@ namespace AMI.Neitsillia.Shopping
 
         internal EmbedFieldBuilder[] GetEmbedFields()
         {
-            EmbedFieldBuilder[] fields = new EmbedFieldBuilder[Count];
+            List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
             int count = Count;
             for(int i=0; i<count; i++)
             {
@@ -205,17 +207,19 @@ namespace AMI.Neitsillia.Shopping
                         npc.stats.PriceMod(), player.stats.PriceMod(),
                         (int)transation) * si.count;
 
-                    fields[i] = DUtils.NewField($"**{si.count}x {si.item.name} for {price} Kuts**",
-                        si.item.StatsInfo(), true);
+                    fields.Add(DUtils.NewField($"**{si.count}x {si.item.name} for {price} Kuts**",
+                        si.item.StatsInfo(), true));
                     TotalPrice += price;
                 }
             }
-            return fields;
+            return fields.ToArray();
         }
 
         internal Embed GetEmbed()
         {
             var fields = GetEmbedFields();
+
+            if (fields.Length == 0) throw NeitsilliaError.ReplyError("Item selection is empty of invalid.");
 
             return DUtils.BuildEmbed(transation.ToString() + "ing",
                 $"Total Price: {TotalPrice} {Environment.NewLine}" +

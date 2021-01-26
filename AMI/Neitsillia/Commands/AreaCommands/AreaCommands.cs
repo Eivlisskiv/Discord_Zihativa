@@ -547,6 +547,8 @@ namespace AMI.Neitsillia.Commands
                         n.Healing(hpRecovered);
                         n.StaminaE(stamRecovered);
                     }
+
+                    await player.Party.SaveData();
                 }
                 else
                 {

@@ -304,7 +304,7 @@ namespace AMI.Module
                 await chan.SendMessageAsync("Inventory Empty");
         }
         [Command("Schematics")]
-        [Alias("Schems")]
+        [Alias("schems", "schem")]
         public async Task ViewSchems(int displayPage = 1)
             => await ViewSchems(Player.Load(Context.User.Id, Player.IgnoreException.Resting), Context.Channel, displayPage);
 

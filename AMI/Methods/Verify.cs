@@ -7,17 +7,22 @@ namespace AMI.Methods
     {
         public static (int index, int amount) IndexXAmount(string arg)
         {
-            string[] splitArg = arg.Split('x', 'X', '*');
-            int amount = 1;
-            int index = 1;
             try
             {
+                string[] splitArg = arg.Split('x', 'X', '*');
+                int amount = 1;
+                int index = 1;
                 index = int.Parse(splitArg[0]);
                 if (splitArg.Length > 1)
                     amount = int.Parse(splitArg[1]);
-
-            }catch (Exception) { throw Module.NeitsilliaError.ReplyError("Incorrect format entered, Item x Count Format: `{ItemSlot}x{Amount}`"); }
-            return (index, amount);
+                return (index, amount);
+            }
+            catch (Exception) 
+            { 
+                throw Module.NeitsilliaError.ReplyError(
+                    "Incorrect format entered, Item x Count Format: `{ItemSlot}x{Amount}`");
+            }
+            
         }
         public static List<(int index, int amount)> IndexXAmount(string[] arg)
         {

@@ -32,7 +32,7 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 case EUI.ok:
                     await reaction.Channel.SendMessageAsync(
-                        Shopping.PendingTransaction.Accept(player, data));
+                        await Shopping.PendingTransaction.Accept(player, data));
                     await ShopCommands.ViewNPCInv(player, reaction.Channel, 0, true);
                     break;
                 case EUI.cancel:
