@@ -136,6 +136,8 @@ namespace AMI.AMIData
 
         internal async Task<T> LoadRecordAsync<T, I>(I id)
             => await LoadRecordAsync<T>(TableName<T>(), FilterEqual<T, I>("_id", id));
+        internal async Task<T> LoadRecordAsync<T, I>(string tabName, I id)
+           => await LoadRecordAsync<T>(tabName ?? TableName<T>(), FilterEqual<T, I>("_id", id));
 
         internal T LoadRecord<T>(string tableKey, FilterDefinition<T> filter, bool notifyOnDefault = false)
         {

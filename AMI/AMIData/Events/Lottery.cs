@@ -105,14 +105,14 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             for(int j = 0; j < Program.rng.Next(2, 6); j++)
                 i = Program.rng.Next(entries.Count);
             string winner = entries[i];
-            player = Player.Load(winner, Player.IgnoreException.All, true);
+            player = Player.Load(winner, Player.IgnoreException.All);
 
             while (player == null)
             {
                 entries.RemoveAt(i);
                 i = Program.rng.Next(entries.Count);
                 winner = entries[i];
-                player = Player.Load(winner, Player.IgnoreException.All, true);
+                player = Player.Load(winner, Player.IgnoreException.All);
             }
 
             return winner;

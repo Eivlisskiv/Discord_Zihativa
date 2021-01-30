@@ -30,6 +30,22 @@ namespace AMI.Methods
             }
             return c;
         }
+
+        internal static bool RegexName(string @string, int min = 3, int max = 30, bool @throw = true)
+        {
+            if (@string.Length < min || @string.Length > max)
+                throw Module.NeitsilliaError.ReplyError(
+                        $"Names must be between {min} and {max} characters.");
+            if (!Regex.Match(@string, @"^([a-zA-Z]|'|-|’|\s)+$").Success)
+            {
+                if(@throw)
+                    throw Module.NeitsilliaError.ReplyError(
+                        $"Names must only contain A to Z, (-), ('), (’) and spaces.");
+                return false;
+            }
+            return true;
+        }
+
         public static string TrimAt(string totrim, int toremove, bool fromstart = true)
         {
             string result = null;

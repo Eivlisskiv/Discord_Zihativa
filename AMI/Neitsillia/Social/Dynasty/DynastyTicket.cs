@@ -1,42 +1,31 @@
 ﻿using System;
-using static AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty.Dynasty;
 
 namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
 {
-    class DynastyTicket
+    public class DynastyTicket
     {
         //Link to user
         public Guid id;
-        public string dynastyName;
-
         public ulong userId;
-        public DynastyMemberRanks memberRank;
+
+        public string dynastyName;
+        public string memberRank;
+
+        internal string MemberTitle => $"{memberRank} of {dynastyName}";
 
         public DynastyTicket(Dynasty dynasty, DynastyMember member)
         {
             id = dynasty._id;
-            dynastyName = dynasty.Name;
+            dynastyName = dynasty.name;
 
-            userId = member.UserId;
-            memberRank = member.Rank;
+            userId = member.userId;
+            memberRank = dynasty.rankNames[member.rank];
         }
 
-        internal string GetDynastyTitle(bool isMale)
+        public void Update(Dynasty dynasty, int rank)
         {
-            string s = memberRank.ToString();
-            switch(memberRank)
-            {
-                case DynastyMemberRanks.Duke:
-                    s = isMale ? "Duke" : "Duchess";
-                    break;
-                case DynastyMemberRanks.Baron:
-                    s = isMale ? "Baron" : "Baroness";
-                    break;
-                case DynastyMemberRanks.HighKnight:
-                    s = "High Knight";
-                    break;
-            }
-            return s + " of " + dynastyName;
+            dynastyName = dynasty.name;
+            memberRank = dynasty.rankNames[rank];
         }
     }
 }

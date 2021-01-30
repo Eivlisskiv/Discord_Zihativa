@@ -15,6 +15,8 @@ namespace AMI.Neitsillia.Areas
 
         public Table table;
 
+        public bool TempAreaType => table == Table.Dungeons;
+
         public AreaPath(){}
 
         public AreaPath(Area area, int toFloor = 0)

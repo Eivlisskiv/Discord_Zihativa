@@ -43,7 +43,9 @@ namespace AMYPrototype
         {
             try
             {
+                
                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+                AppDomain.CurrentDomain.ProcessExit += OnExit;
                 new Program().Start().GetAwaiter().GetResult();
             }
             catch (Exception e)
@@ -135,7 +137,7 @@ namespace AMYPrototype
 
         internal static async Task Exit(string message = null)
         {
-            Log.LogS("Exiting");
+            Log.LogS(message ?? "Exiting");
             //Stop processes
             TaskHandler.Active = false;
             SetState(State.Exiting);
@@ -153,6 +155,14 @@ namespace AMYPrototype
             await Task.Delay(5000); // A Little 5 seconds to make sure everything had the time to complete
             await bot.Stop();
             Environment.Exit(0);
+        }
+
+        internal static void OnExit(object o, EventArgs _)
+        {
+            if (CurrentState != State.Exiting)
+            {
+                Exit("Unplanned Exit").Wait();
+            }
         }
 
         internal static bool Chance(int i) 

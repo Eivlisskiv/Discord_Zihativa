@@ -30,17 +30,11 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         }
         static Area LoadArea(string areaId, AreaPath.Table table)
         {
-            //Area area = table == AreaPath.Table.Area ? areasCache.Load(areaId) : dungeonsCache.Load(areaId);
-            //if (area != null) return area;
             try
             {
                 return Database.LoadRecord(table.ToString(), MongoDatabase.FilterEqual<Area, string>("AreaId", areaId))
                     ?? (table == AreaPath.Table.Dungeons ? Database.LoadRecord("Area", MongoDatabase.FilterEqual<Area, string>("AreaId", areaId)) :
                     Database.LoadRecord("Dungeons", MongoDatabase.FilterEqual<Area, string>("AreaId", areaId)));
-
-                //(table == AreaPath.Table.Area ? areasCache : dungeonsCache).Save(areaId, area);
-
-                //return area;
             }
             catch (Exception e)
             {

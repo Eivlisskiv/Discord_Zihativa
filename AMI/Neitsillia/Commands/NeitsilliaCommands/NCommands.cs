@@ -47,7 +47,7 @@ namespace AMI.Module
 
         static EmbedBuilder StatsStart(Player player)
         {
-            return DUtils.BuildEmbed(player.name,
+            return DUtils.BuildEmbed(player.name + (player.dynasty != null ? $", {player.dynasty.MemberTitle}" : null),
                 (OngoingEvent.Ongoing != null ? $"{EUI.eventQuest}**Event**{EUI.eventQuest}: __{OngoingEvent.Ongoing.name}__ {Environment.NewLine}" : null)
                 + $"Location: {player.AreaInfo.name} {Environment.NewLine}"
                 + (player.AreaInfo.floor > 0 ? $"Floor: {player.AreaInfo.floor} {Environment.NewLine}" : null)
@@ -646,7 +646,7 @@ namespace AMI.Module
         }
 
         [Command("Pray")]
-        async Task PrayCommand()
+        public async Task PrayCommand()
         {
             Player player = Context.Player;
 

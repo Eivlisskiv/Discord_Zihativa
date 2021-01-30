@@ -1,4 +1,6 @@
 ﻿using AMI.AMIData;
+using AMI.Methods;
+using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using System;
 using System.Collections.Generic;
@@ -19,17 +21,22 @@ namespace AMI.Handlers
         {
             if (!Program.FirstBoot) return;
 
-            //await CleanUsers();
+            await CleanUsers();
 
-            //await CleanNests();
+            await CleanAreas();
 
-            //await CleanAreas();
+            var players = await database.LoadRecordsAsync<Player>("Character");
 
-            //await CleanParties();
+            await CleanParties(players);
+            await CleanQuestBoards(players);
+            await CleanDecks(players);
+            await CleanEggPockets(players);
+            await CleanFaith(players);
         }
 
         private async Task CleanUsers()
         {
+            Log.LogS("Deleting empty User entries");
             await database.database.GetCollection<Neitsillia.User.BotUser>("User").DeleteManyAsync(
                 "{$and: [ {loaded:null}, {ui:null}, {$or: [{ResourceCrates:null}, {ResourceCrates: [0,0,0,0,0]} ]} ]}");
         }
@@ -41,6 +48,7 @@ namespace AMI.Handlers
 
         async Task CleanAreas()
         {
+            Log.LogS("Cleaning Areas");
             var list = database.LoadRecords<Neitsillia.Areas.AreaPartials.Area>("Area");
 
             for(int i = 0; i < list.Count; i++)
@@ -54,8 +62,11 @@ namespace AMI.Handlers
                 }
                 else
                 {
-                    area.junctions.RemoveAll(j => j.destination.EndsWith("Nest"));
-
+                    //If the area or nest does not exist
+                    area.junctions.RemoveAll(j => 
+                        !list.Exists(a => a.AreaId == j.filePath) &&
+                        database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
+                    );
 
                     if (area.passives != null)
                     {
@@ -85,7 +96,7 @@ namespace AMI.Handlers
             }
         }
 
-        private async Task CleanParties()
+        private async Task CleanParties(List<Player> players)
         {
             var list = database.LoadRecords<Neitsillia.NeitsilliaCommands.Party>("Party");
 
@@ -95,7 +106,7 @@ namespace AMI.Handlers
 
                 for(int i = 0; i < party.members.Count;)
                 {
-                    var player = party.members[i].LoadPlayer();
+                    var player = players.Find(p => p._id == party.members[i].Path);
                     if (player == null || player.PartyKey?._id != party._id) party.members.RemoveAt(i);
                     else i++;
                 }
@@ -126,6 +137,63 @@ namespace AMI.Handlers
                     }
                 }
             }
+        }
+
+        private async Task CleanQuestBoards(List<Player> players)
+        {
+            var items = await database.LoadRecordsAsync<Neitsillia.User.DailyQuestBoard>("DailyQuestBoard");
+            await Utils.MapAsync(items, async (item, index) =>
+            {
+                if (!players.Exists(p => p._id == item._id))
+                { 
+                    await database.DeleteRecord<Neitsillia.User.DailyQuestBoard>("DailyQuestBoard", item._id);
+                    Log.LogS($"Cleaned {item.GetType().Name} {item._id}");
+                }
+                return true;
+            });
+        }
+
+        private async Task CleanDecks(List<Player> players)
+        {
+            var items = await database.LoadRecordsAsync<Neitsillia.Gambling.Cards.Deck>("Decks");
+            await Utils.MapAsync(items, async (item, index) =>
+            {
+                var player = players.Find(p => p._id == item._id);
+                if (player?.GamblingHandKey?._id == null)
+                { 
+                    await database.DeleteRecord<Neitsillia.Gambling.Cards.Deck>("Decks", item._id);
+                    Log.LogS($"Cleaned {item.GetType().Name} {item._id}");
+                }
+                return true;
+            });
+        }
+
+        private async Task CleanEggPockets(List<Player> players)
+        {
+            var items = await database.LoadRecordsAsync<Neitsillia.NPCSystems.Companions.EggPocket>("EggPocket");
+            await Utils.MapAsync(items, async (item, index) =>
+            {
+                if (!players.Exists(p => p._id == item._id))
+                {
+                    await database.DeleteRecord<Neitsillia.NPCSystems.Companions.EggPocket>("EggPocket", item._id);
+                    Log.LogS($"Cleaned {item.GetType().Name} {item._id}");
+                }
+                return true;
+            });
+        }
+
+        private async Task CleanFaith(List<Player> players)
+        {
+            var items = await database.LoadRecordsAsync<Neitsillia.Religion.Faith>("Faith");
+            await Utils.MapAsync(items, async (item, index) =>
+            {
+                if (!players.Exists(p => p._id == item._id))
+                {
+                    await database.DeleteRecord<Neitsillia.Religion.Faith>("Faith", item._id);
+                    Log.LogS($"Cleaned {item.GetType().Name} {item._id}");
+                }
+                return true;
+            });
         }
     }
 }

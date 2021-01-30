@@ -153,6 +153,14 @@ namespace AMI.Neitsillia.NPCSystems
 
             Area area = Area.LoadArea(areaId);
 
+            if (area == null)
+            {
+                if (population[i].profession != ReferenceData.Profession.Creature)
+                    population[i].Respawn();
+                population.RemoveAt(i);
+                return;
+            }
+
             if (!await population[i].Act(area, Program.isDev ? _perSecond * 60 : _perSecond))
                 population.RemoveAt(i);
             else
@@ -160,7 +168,7 @@ namespace AMI.Neitsillia.NPCSystems
                 var areaPopulation = Population.Load(type, areaId);
                 if (IsReturnToArea(population[i], areaPopulation.Count, area.level))
                 {
-                    await Handlers.UniqueChannels.Instance.SendMessage("Population", $"[{DateTime.UtcNow.TimeOfDay.ToString("hh\\:mm")}] **{population[i].displayName}** is now available in {area.name}");
+                    await Handlers.UniqueChannels.Instance.SendMessage("Population", $"[{DateTime.UtcNow.TimeOfDay:hh\\:mm}] **{population[i].displayName}** is now available in {area.name}");
                     areaPopulation.Add(population[i]);
                     population.RemoveAt(i);
                 }

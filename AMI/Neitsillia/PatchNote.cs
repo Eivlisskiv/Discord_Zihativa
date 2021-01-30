@@ -8,8 +8,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Fixed the issue where bounties could spawn from the arena fights {Environment.NewLine}"
-                + $"  {Environment.NewLine}"
+                $" {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -65,11 +65,10 @@ namespace AMI.Neitsillia
         }
         public static string NPCPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Fixed: followers display now shows list of followers by default {Environment.NewLine}"
-                + $"Fixed: followers not properly receiving healing after party rest {Environment.NewLine}"
-                + $"Giving invalid slots while buying/selling to npc now gives an appropriate message instead of throwing an error {Environment.NewLine}"
+                $" {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string SocialPatchNotes()

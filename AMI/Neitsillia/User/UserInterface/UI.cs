@@ -24,6 +24,7 @@ using AMI.AMIData;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.Areas.InteractiveAreas;
+using AMI.Neitsillia.Areas.InteractiveAreas;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
@@ -750,7 +751,7 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 //{o.i.index, o.i.amount, o.i.cost, t.id, o.note}
                 string[] args = JsonConvert.DeserializeObject<string[]>(data);
-                Player target = Player.Load(ulong.Parse(args[3]), Player.IgnoreException.All, true);
+                Player target = Player.Load(ulong.Parse(args[3]), Player.IgnoreException.All);
 
                 int amount = int.Parse(args[1]);
                 int index = int.Parse(args[0]);
@@ -874,7 +875,7 @@ namespace AMI.Neitsillia.User.UserInterface
                             { await EditMessage($"{player.name} does not have enough Kutsyei Coins"); }
                             else
                             {
-                                Player offerer = Player.Load(offer.sender, Player.IgnoreException.None, true);
+                                Player offerer = Player.Load(offer.sender, Player.IgnoreException.None);
                                 if (!player.CollectItem(offer.offer, true))
                                     await EditMessage($"{player.name} does not have inventory storage");
                                 else
@@ -900,7 +901,7 @@ namespace AMI.Neitsillia.User.UserInterface
                             em.WithTitle($"{player.name} denied the following trade.");
                             em.WithDescription(offer.ToInfo(false));
                             //
-                            Player sender = Player.Load(offer.sender, Player.IgnoreException.All, true);
+                            Player sender = Player.Load(offer.sender, Player.IgnoreException.All);
                             sender.inventory.Add(offer.offer, -1);
                             sender.SaveFileMongo();
                             await sender.SendMessageToDM("Offer Items returned to inventory.", em, reaction.Channel);
@@ -914,7 +915,7 @@ namespace AMI.Neitsillia.User.UserInterface
                             em.WithTitle($"<@{player.userid}> canceled the following trade.");
                             em.WithDescription(offer.ToInfo(false));
                             //
-                            Player receiver = Player.Load(offer.receiver, Player.IgnoreException.All, true);
+                            Player receiver = Player.Load(offer.receiver, Player.IgnoreException.All);
                             player.inventory.Add(offer.offer, -1);
                             player.SaveFileMongo();
                             await receiver.SendMessageToDM(null, em, reaction.Channel);

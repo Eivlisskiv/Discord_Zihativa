@@ -209,6 +209,35 @@ namespace AMI.Methods
             r = null;
             return false;
         }
+
+        public static void Map<T>(List<T> @this, Func<T, int, bool> func)
+        {
+            int count = @this.Count;
+            for(int i = 0; i < count; i++)
+            {
+                if (!func(@this[i], i)) i++;
+                else
+                {
+                    @this.RemoveAt(i);
+                    count = @this.Count;
+                }
+            }
+        }
+
+        public static async System.Threading.Tasks.Task MapAsync<T>
+            (List<T> @this, Func<T, int, System.Threading.Tasks.Task<bool>> func)
+        {
+            int count = @this.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (!await func(@this[i], i)) i++;
+                else
+                {
+                    @this.RemoveAt(i);
+                    count = @this.Count;
+                }
+            }
+        }
     }
     static class Time
     {

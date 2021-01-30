@@ -632,7 +632,7 @@ namespace AMI.AMIData.OtherCommands
         {
             if(await IsGMLevel(4))
             {
-                Player player = Player.Load(user.Id, Player.IgnoreException.All, true);
+                Player player = Player.Load(user.Id, Player.IgnoreException.All);
                 if (index < 0 || index > player.abilities.Count)
                     NeitsilliaError.ReplyError("Invalid index");
                 player.abilities.RemoveAt(index);

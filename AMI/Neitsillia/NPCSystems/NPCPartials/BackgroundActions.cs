@@ -194,7 +194,7 @@ namespace AMI.Neitsillia.NPCSystems
             if (xpMult < 1) xpMult = 1;
 
             maxXP = Math.Max(maxXP, minXP + 1);
-            maxCoins = Math.Max(maxXP, minCoins + 1);
+            maxCoins = Math.Max(maxCoins, minCoins + 1);
             maxItemTier = Math.Max(maxItemTier, minItemTier + 1);
             ///
             long kutsGained = Convert.ToInt64(rng.Next(minCoins, maxCoins) * coinsMult);

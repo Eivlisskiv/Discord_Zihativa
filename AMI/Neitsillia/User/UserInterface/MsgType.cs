@@ -46,5 +46,10 @@
 
         //Stronghold
         AcceptBuilding, SandboxInventory, AcceptBuildingUpgrade, NewStronghold,
+
+        //Dynasty
+        DynastyUpgrade, DynastyInvite,
+        DynastyMembership,
+        DynastyMember,
     }
 }

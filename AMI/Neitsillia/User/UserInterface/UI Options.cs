@@ -11,7 +11,8 @@ namespace AMI.Neitsillia.User.UserInterface
 {
     partial class UI
     {
-        static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, InitO_Inventory, InitO_Strongholds };
+        static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, 
+            InitO_Inventory, InitO_Strongholds, InitO_Dynasty };
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 
         public static void InitialiseOptionLoaderDict()
@@ -494,6 +495,8 @@ namespace AMI.Neitsillia.User.UserInterface
                 case MsgType.NewStronghold:
                 case MsgType.AcceptBuilding:
                 case MsgType.ConfirmEggDiscard:
+                case MsgType.DynastyUpgrade:
+                case MsgType.DynastyInvite:
                     options = new List<string> { ok, cancel };
                     break;
                 #endregion

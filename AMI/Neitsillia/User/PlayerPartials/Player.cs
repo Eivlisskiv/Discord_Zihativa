@@ -9,6 +9,7 @@ using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NeitsilliaCommands;
+using AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.NPCSystems.Companions;
 using AMI.Neitsillia.User.UserInterface;
@@ -61,17 +62,17 @@ namespace AMI.Neitsillia.User.PlayerPartials
         /// <param name="userID">A string of the user's ID to find the save file</param>
         /// <param name="ignore"> ignore possible errors</param>
         /// <returns></returns>
-        public static Player Load(ulong userID, IgnoreException ignore = IgnoreException.None, bool skipKeyLoads = false)
+        public static Player Load(ulong userID, IgnoreException ignore = IgnoreException.None)
         {
             User.BotUser u = User.BotUser.Load(userID);
             string characterId = $"{userID}\\{u.loaded}";
-            return Load(characterId, ignore, skipKeyLoads);
+            return Load(characterId, ignore);
         }
 
-        internal static Player Load(User.BotUser u, IgnoreException ignore = IgnoreException.None, bool skipKeyLoads = false)
-            => Load($"{u._id}\\{u.loaded}", ignore, skipKeyLoads);
+        internal static Player Load(User.BotUser u, IgnoreException ignore = IgnoreException.None)
+            => Load($"{u._id}\\{u.loaded}", ignore);
 
-        public static Player Load(string charPath, IgnoreException ignore = IgnoreException.None, bool skipKeyLoads = false)
+        public static Player Load(string charPath, IgnoreException ignore = IgnoreException.None)
         {
             Player player = AMYPrototype.Program.data.database.LoadRecord("Character", MongoDatabase.FilterEqual<Player, string>("_id", charPath));
             if (player == null) throw NeitsilliaError.CharacterDoesNotExist();
@@ -291,7 +292,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
                 Party.RemoveAllPets(this);
                 if (IsSolo)
                 {
-                    if(AreaInfo.table == AreaPath.Table.Dungeons)
+                    if(AreaInfo.TempAreaType)
                     {
                         await AMYPrototype.Program.data.database.DeleteRecord<Areas.AreaPartials.Area>("Dungeons",
                             AreaInfo.path, "AreaId");
@@ -312,6 +313,12 @@ namespace AMI.Neitsillia.User.PlayerPartials
             ProgressDataKey?.Delete();
             FaithKey?.Delete();
             AdventureKey?.Delete();
+
+            var dynastyData = await Dynasty.Load(this);
+            if (dynasty != null)
+            {
+                await dynastyData.Item1.RemoveMember(this);
+            }
 
             //Delete entries
             await AMYPrototype.Program.data.database.DeleteRecord<Player>("Character", _id, "_id");

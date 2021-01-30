@@ -161,7 +161,7 @@ namespace AMI.Neitsillia.Commands
             {
                 // Calc the amount of floors to go:
                 //           (if lower than area level, only ever 1 [else] difference of player's level and area's lvl capped at 6) capped at available floors
-                int floors = Math.Min(player.level < player.Area.level ? 1 : Math.Min((player.level - player.Area.level) / 5, 6), player.Area.floors - player.AreaInfo.floor);
+                int floors = FloorIncrease(player);
                 player.AreaInfo.floor += floors;
                 result = player.Area.AreaInfo(player.AreaInfo.floor).WithColor(player.userSettings.Color());
                 message = $"You've advanced {floors} floors " + player.Area.name;
@@ -173,6 +173,11 @@ namespace AMI.Neitsillia.Commands
             await player.NewUI(await chan.SendMessageAsync(message,
                 embed: result.Build()), uiType);
         }
+
+        private static int FloorIncrease(Player player)
+            => player.Area.type == AreaType.Dungeon || player.Area.type == AreaType.Arena ? 1 :
+            Math.Min(player.level < player.Area.level ? 1 : Math.Min((player.level - player.Area.level) / 5, 6), player.Area.floors - player.AreaInfo.floor);
+
         internal static async Task EnterJunction(Player player, Junction junction, ISocketMessageChannel chan)
         {
             junction.PassJunction(player);
@@ -211,9 +216,9 @@ namespace AMI.Neitsillia.Commands
         [Command("Travel Post")][Alias("tp", "travel")]
         [Summary("View accessible areas from your location.")]
         public async Task ViewJunctions(int page = 1)
-            => await ViewJunctions(Context.Player, Context.Channel, page - 1);
+            => await ViewJunctions(Context.Player, Context.Channel, page - 1, false);
 
-        internal static async Task ViewJunctions(Player player, ISocketMessageChannel chan, int page)
+        internal static async Task ViewJunctions(Player player, ISocketMessageChannel chan, int page, bool edit = true)
         {
             string juncList = null;
             Area pArea = player.Area;
@@ -241,7 +246,8 @@ namespace AMI.Neitsillia.Commands
             junctions.WithTitle(pArea.name + " Junctions");
             junctions.WithDescription(juncList);
             junctions.WithFooter($"Use reactions to enter Areas");
-            await player.NewUI(await chan.SendMessageAsync(embed: junctions.Build()), MsgType.Junctions,
+
+            await player.EnUI(edit, null, junctions.Build(), chan, MsgType.Junctions,
                 $"{page};{(pArea.junctions?.Count ?? 0)};{JsonConvert.SerializeObject(juncIds)}");
         }
 

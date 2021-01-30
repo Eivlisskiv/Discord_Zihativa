@@ -162,9 +162,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 List<NPCSystems.NPC> followers = player.Party.NPCMembers;
                 if (player.IsEncounter("Npc"))
                     player.Party.UpdateFollower(player.Encounter.npc);
-                if (slot < 0 || slot > followers.Count - 1)
-                    throw NeitsilliaError.ReplyError("Slot is empty or non existent");
-
+                
                 MsgType? uiType = null;
                 string uidata = null;
 
