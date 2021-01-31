@@ -96,6 +96,47 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
                 MsgType.DynastyInvite);
         }
 
+        [Command("Dynasty Edit")]
+        [Alias("dedit")]
+        public async Task DynastyEdit(string field, [Remainder]string value)
+        {
+            Player player = Context.Player;
+            (Dynasty dan, DynastyMember _) = await GetDynasty(player);
+
+            switch (field?.ToLower())
+            {
+                case "desc":
+                case "description":
+                    if(value.Length > 240)
+                    {
+                        await ReplyAsync("Description may not be longer than 240 characters");
+                        return;
+                    }
+                    dan.description = value;
+                    await dan.Save();
+                    break;
+                case "message":
+                    if (value.Length > 120)
+                    {
+                        await ReplyAsync("Description may not be longer than 120 characters");
+                        return;
+                    }
+                    dan.messageOfTheDay = value;
+                    await dan.Save();
+                    break;
+                case "name":
+                    if (await Dynasty.Exist(value))
+                    {
+                        await ReplyAsync($"Dyansty name {value} is already in use");
+                        return;
+                    }
+                    StringM.RegexName(value, 5);
+                    dan.name = value;
+                    await dan.Save();
+                    break;
+            }
+        }
+
         [Command("Dynasty User")]
         [Alias("duser")]
         [Summary("View or manage a user's players in this Dynasty")]
@@ -110,25 +151,29 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             bool listing = playerId == null && user != 0;
             bool manage = false;
             (Dynasty dan, DynastyMember manager) = await GetDynasty(player);
-            EmbedBuilder embed = listing ? DynastyUserEmbed(dan, user) 
+            EmbedBuilder embed = listing ? DynastyUserEmbed(dan, user, out playerId) 
                 : DynastyMemberEmbed(dan, manager, playerId, out manage);
+
             embed.WithColor(player.userSettings.Color());
+
             await player.EnUI(!listing, null, embed.Build(), chan, 
                 manage ? MsgType.DynastyMembership : MsgType.DynastyMember, 
-                playerId ?? user.ToString());
+                playerId);
         }
 
-        static EmbedBuilder DynastyUserEmbed(Dynasty dan, ulong user)
+        static EmbedBuilder DynastyUserEmbed(Dynasty dan, ulong user, out string memberCount)
         {
             DynastyMember[] members = dan.members.FindAll(m => m.userId == user).ToArray();
             if (members.Length == 0)
                 throw NeitsilliaError.ReplyError("This user has no characters in your Dynasty");
 
+            memberCount = members.Join(";", (m, i) => m.PlayerId);
+
             return DUtils.BuildEmbed($"{dan.name} Dynasty User",
                 $"<@{user}> has {members.Length} characters in this dynasty",
                 null, default, DUtils.NewField("Characters",
                     members.Join(Environment.NewLine, (m, i) =>
-                        $"{EUI.GetNum(i)} {m.name}")));
+                        $"{EUI.GetNum(i + 1)} {m.name}")));
         }
 
         static EmbedBuilder DynastyMemberEmbed(Dynasty dan, DynastyMember manager, string playerId, out bool manage)
@@ -137,7 +182,13 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             DynastyMember member = dan.GetMember(playerId);
             if (member == null)
                 throw NeitsilliaError.ReplyError($"This character was not found in the {dan.name} Dynasty");
-            EmbedBuilder embed = member.ToEmbed(dan, manager);
+            return DynastyMemberEmbed(dan, manager, member, out manage);
+        }
+
+        public static EmbedBuilder DynastyMemberEmbed(Dynasty dan, DynastyMember manager, DynastyMember member, out bool manage)
+        {
+            manage = false;
+            EmbedBuilder embed = member.ToEmbed(dan);
 
             if (manager != null && manager.rank < member.rank && manager.rank < 4)
             {

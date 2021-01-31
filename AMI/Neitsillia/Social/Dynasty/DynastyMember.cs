@@ -25,10 +25,11 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             joined = DateTime.UtcNow;
         }
 
-        internal EmbedBuilder ToEmbed(Dynasty dan, DynastyMember manager = null)
+        internal EmbedBuilder ToEmbed(Dynasty dan)
         {
             return DUtils.BuildEmbed($"{name}, {dan.rankNames[rank]} of {dan.name}",
-                $"", 
+                $"User: <@{userId}>" + Environment.NewLine +
+                $"Member since {joined.ToShortDateString()}", 
                 null, default);
         }
     }

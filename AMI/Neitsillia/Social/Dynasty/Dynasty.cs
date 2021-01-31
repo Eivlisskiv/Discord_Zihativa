@@ -97,6 +97,8 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
 
         public List<DynastyMember> members;
 
+        public int tier;
+
         private Dynasty(Player founder, string name)
         {
             _id = new Guid();
@@ -121,8 +123,9 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
          => DUtils.BuildEmbed($"The {name} Dynasty",
                 $"{description ?? "No description"}" +
                 (messageOfTheDay != null ?
-                $"{Environment.NewLine}{Environment.NewLine}Message: {messageOfTheDay}" 
-                : ""), null, default, fields);
+                $"```Message: {messageOfTheDay}```" : "")+
+                $"{Environment.NewLine}Member Count: {members.Count}/{(1 + tier) * 4}",
+                null, default, fields);
 
         public EmbedField MemberField(DynastyMember membership)
             => DUtils.NewField($"{rankNames[membership.rank]} of the {name} Dynasty",
@@ -156,6 +159,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
         {
             DynastyMember member = new DynastyMember(player.userid, player.name, rankNames.Length - 1);
             player.dynasty = new DynastyTicket(this, member);
+            members.Add(member);
             await Save();
             player.SaveFileMongo();
             return member;

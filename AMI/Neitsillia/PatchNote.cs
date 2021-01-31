@@ -8,8 +8,9 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $" {Environment.NewLine}"
-                + $" {Environment.NewLine}"
+                $"Added Promoting an demoting Dynasty members {Environment.NewLine}"
+                + $"Added other commands for managing a Dynasty {Environment.NewLine}"
+                + $"Dynasties are still work in progress and currently not available to all users {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()

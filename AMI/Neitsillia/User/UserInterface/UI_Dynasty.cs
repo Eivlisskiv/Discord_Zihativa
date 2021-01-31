@@ -1,9 +1,9 @@
 ﻿using AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty;
+using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User.UserInterface
@@ -16,6 +16,19 @@ namespace AMI.Neitsillia.User.UserInterface
                 ui.options = new List<string>()
                 { EUI.greaterthan, EUI.lowerthan, EUI.cancel }
             );
+
+            OptionsLoad.Add(MsgType.DynastyMember, ui => {
+                if(ui.data != null)
+                {
+                    string[] nums = ui.data?.Split(';');
+                    if (nums.Length > 0)
+                    {
+                        ui.options = new List<string>();
+                        for (int i = 0; i < nums.Length; i++)
+                            ui.options.Add(EUI.GetNum(i + 1));
+                    }
+                }
+            });
         }
 
         public async Task DynastyUpgrade(SocketReaction reaction, IUserMessage msg)
@@ -23,7 +36,7 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case EUI.ok:
-                    (Dynasty dan, DynastyMember _, string _) = await Dynasty.Load(player);
+                    _ = await Dynasty.Load(player);
                     if (player.dynasty == null)
                     {
                         if (await Dynasty.Exist(data))
@@ -32,7 +45,7 @@ namespace AMI.Neitsillia.User.UserInterface
                                 $"Dyansty name {data} is already in use");
                             return;
                         }
-                        dan = await Dynasty.CreateDynasty(player, data);
+                        Dynasty dan = await Dynasty.CreateDynasty(player, data);
                         await DynastyCommands.DynastyHub(player, dan, null, reaction.Channel);
                     }
                     else
@@ -74,6 +87,16 @@ namespace AMI.Neitsillia.User.UserInterface
             }
         }
 
+        public async Task DynastyMember(SocketReaction reaction, IUserMessage _)
+        {
+            int index = EUI.GetNum(reaction.Emote.ToString()) - 1;
+            if(index > -1)
+            {
+                string[] ids = data?.Split(';');
+                await DynastyCommands.DynastyUser(player, 0, reaction.Channel, ids[index]);
+            }
+        }
+
         public async Task DynastyMembership(SocketReaction reaction, IUserMessage msg)
         {
             (Dynasty dan, DynastyMember manager) = await DynastyCommands.GetDynasty(player);
@@ -83,6 +106,11 @@ namespace AMI.Neitsillia.User.UserInterface
                 return;
             }
             DynastyMember target = dan.GetMember(data);
+            if (manager.rank > 3 || manager.rank > target.rank)
+            {
+                await reaction.Channel.SendMessageAsync("You do not have the authority for this.");
+                return;
+            }
             switch (reaction.Emote.ToString())
             {
                 case EUI.greaterthan:
@@ -92,8 +120,10 @@ namespace AMI.Neitsillia.User.UserInterface
                     {
                         target.rank--;
                         await dan.Save();
-                        await reaction.Channel.SendMessageAsync($"{target.name} was promoted to {dan.rankNames[target.rank]}");
-                        //await DynastyCommands.DynastyUser(player, reaction.Channel, dan, manager, target);
+                        DUtils.DeleteMessage(await reaction.Channel.SendMessageAsync(
+                                $"{target.name} was promoted to {dan.rankNames[target.rank]}"));
+                        _ = msg.ModifyAsync(m => m.Embed = DynastyCommands.DynastyMemberEmbed(
+                            dan, manager, target, out _).WithColor(player.userSettings.Color()).Build());
                     }
                     break;
                 case EUI.lowerthan:
@@ -103,7 +133,10 @@ namespace AMI.Neitsillia.User.UserInterface
                     {
                         target.rank++;
                         await dan.Save();
-                        await reaction.Channel.SendMessageAsync($"{target.name} was demoted to {dan.rankNames[target.rank]}");
+                        DUtils.DeleteMessage(await reaction.Channel.SendMessageAsync(
+                            $"{target.name} was demoted to {dan.rankNames[target.rank]}"));
+                        _ = msg.ModifyAsync(m => m.Embed = DynastyCommands.DynastyMemberEmbed(
+                           dan, manager, target, out _).WithColor(player.userSettings.Color()).Build());
                     }
                     break;
                 case EUI.cancel:
