@@ -1,6 +1,7 @@
 ﻿using AMI.AMIData.HelpPages;
 using AMI.AMIData.Servers;
 using AMI.Commands;
+using AMI.Handlers;
 using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia;
@@ -20,6 +21,22 @@ namespace AMI.AMIData.OtherCommands
 {
     public class Other : ModuleBase<CustomSocketCommandContext>
     {
+        public static async Task<string> GetSupportInvite()
+        {
+            var guild = DiscordBotHandler.Client.GetGuild(201877884313403392);
+            var invs = await guild.GetInvitesAsync();
+            var botInvites = invs.Where(inv => inv.Inviter.Id == DiscordBotHandler.Client.CurrentUser.Id);
+            if (botInvites.Any())
+            {
+                return botInvites.First().Url;
+            }
+
+            var gs = GuildSettings.Load(guild);
+            var chan = (ITextChannel)guild.GetChannel(gs.mainChannel.id);
+            var inv = await chan.CreateInviteAsync(null);
+            return inv.Url;
+        }
+
         //TODO using Lookup on Discord.CommandInfo and commandInfoEmbed
         [Command("Modules")] [Alias("Module")]
         public async Task Help2(string moduleName = null, params string[] commandName)
@@ -83,23 +100,8 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("Support Server")][Alias("Support", "support invite")]
-        public async Task Createinvite()
-        {
-            var guild = Context.Client.GetGuild(201877884313403392);
-            var invs = await guild.GetInvitesAsync();
-            var botInvites = invs.Where(inv => inv.Inviter.Id == Context.Client.CurrentUser.Id);
-            if(botInvites.Any())
-            {
-                await ReplyAsync(botInvites.First().Url);
-                return;
-            }
+        public async Task Createinvite() =>  await ReplyAsync(await GetSupportInvite());
 
-            var gs = GuildSettings.Load(guild);
-            var chan = (ITextChannel)guild.GetChannel(gs.mainChannel.id);
-            var inv = await chan.CreateInviteAsync(null);
-            await ReplyAsync(inv.Url);
-
-        }
         [Command("Roll")]
         public async Task Roll(params string[] message)
         {

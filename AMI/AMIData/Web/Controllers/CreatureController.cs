@@ -11,19 +11,26 @@ namespace AMI.AMIData.Web.Controllers
     {
         static AMIData.MongoDatabase Database => Program.data.database;
 
-        internal override NPC PravitizeObject(NPC obj)
+        internal override NPC PrivitizeObject(NPC obj)
         {
             obj.inventory = null;
             obj.equipment = null;
             return obj;
         }
 
-        [HttpGet("{name}")]
+        [HttpGet("id/{name}")]
         public async Task Get(string name)
         {
             NPC npc = Database.LoadRecord("Creature", MongoDatabase.FilterEqual<NPC, string>(
                 "displayName", name));
             await ToJson(npc);
+        }
+
+        [HttpGet("search/{filter}")]
+        public async Task GetContains(string filter)
+        {
+            var npcs = await Database.LoadRecordsContain<NPC>("Creature", "displayName", filter);
+            await ToJson(npcs.ToArray());
         }
     }
 }

@@ -132,7 +132,17 @@ namespace AMYPrototype.Commands
                 if (!RunUser(s.Author.Id)) return;
 
                 _ = context.BotUser;
-                _ = _command.ExecuteAsync(context, argPosition, null);
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _command.ExecuteAsync(context, argPosition, null);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.LogS(e);
+                    }
+                });
 
             }
         }

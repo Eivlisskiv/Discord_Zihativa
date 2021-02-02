@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.Web.Controllers
 {
-    [Route("api/areas")]
+    [Route("api/area")]
     [ApiController]
     public class AreasController : MainController<Area>
     {
-        internal override Area PravitizeObject(Area area)
+        internal override Area PrivitizeObject(Area area)
         {
             //remove private data unless token is owner or admin
             if (area.sandbox != null)
@@ -24,7 +24,7 @@ namespace AMI.AMIData.Web.Controllers
         }
 
         // GET api/<AreasController>/5
-        [HttpGet("{address}")]
+        [HttpGet("id/{address}")]
         public async Task Get(string address)
         {
             string id = address.Replace(';', '\\');

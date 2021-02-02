@@ -17,10 +17,21 @@ namespace AMI.AMIData.Web.Controllers
 
         }
 
-        internal abstract T PravitizeObject(T obj);
+        internal abstract T PrivitizeObject(T obj);
+        internal T[] PrivitizeObjects(T[] items)
+        {
+            for(int i = 0; i < items.Length; i++)
+                items[i] = PrivitizeObject(items[i]);
+
+            return items;
+        }
 
         public async Task ToJson(T item)
-            => await Json(PravitizeObject(item));
+            => await Json(PrivitizeObject(item));
+
+        public async Task ToJson(T[] item)
+            => await Json(PrivitizeObjects(item));
+
         public async Task Json(object obj)
             => await JsonWriteAsync(Utils.JSON(obj));
 

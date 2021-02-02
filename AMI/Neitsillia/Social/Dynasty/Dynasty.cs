@@ -54,7 +54,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             {
                 player.dynasty = null;
                 player.SaveFileMongo();
-                return (dan, membership, "You were removed from the Dynasty " + dan.name);
+                return (dan, membership, "You were removed from the dynasty " + dan.name);
             }
 
             return (dan, membership, null);

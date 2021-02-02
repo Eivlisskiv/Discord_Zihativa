@@ -10,7 +10,7 @@ namespace AMI.AMIData.Web.Controllers
     [ApiController]
     public class CharacterController : MainController<Player>
     {
-        internal override Player PravitizeObject(Player obj)
+        internal override Player PrivitizeObject(Player obj)
         {
             return obj;
         }

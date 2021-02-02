@@ -321,13 +321,13 @@ namespace AMI.Neitsillia.Combat
             bool top = TopFloor;
             if(currentArea.type == AreaType.Arena)
             {
-                Log.LogS("In Arena");
+                Log.LogS("CombatEndHandler/OtherLoot: In Arena");
                 if (top)
                 {
-                    Log.LogS("In top floor Arena");
+                    Log.LogS("CombatEndHandler/OtherLoot: In top floor Arena");
                     if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
                     {
-                        Log.LogS("Arena loot");
+                        Log.LogS("CombatEndHandler/OtherLoot: Arena loot");
                         int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
                         enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
                     }
@@ -368,9 +368,17 @@ namespace AMI.Neitsillia.Combat
 
         string EventRewards(Encounter enc, out (string name, int amount) eventReward)
         {
+            Log.LogS("CombatEndHandler/EventRewards: Arena loot");
             int amount = 0;
             AMIData.Events.OngoingEvent cevent = AMIData.Events.OngoingEvent.Ongoing;
+            if (cevent == null)
+            {
+                Log.LogS("CombatEndHandler/EventRewards: No event");
+                eventReward = (null, 0);
+                return null;
+            }
 
+            Log.LogS("CombatEndHandler/EventRewards: Has Event");
             if (currentEncounter.Name == Encounter.Names.Bounty && cevent.BountyReward != null)
                 amount += 1;
 
@@ -383,6 +391,7 @@ namespace AMI.Neitsillia.Combat
 
             }
 
+            Log.LogS("CombatEndHandler/EventRewards: Finishing");
             eventReward = amount > 0 ? (cevent.Currency, amount) : (null, 0);
             return eventReward.name != null ? $"**+{eventReward.amount} {eventReward.name}**" + Environment.NewLine : null;
         }

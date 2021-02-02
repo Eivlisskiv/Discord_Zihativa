@@ -134,8 +134,10 @@ namespace AMI.Handlers
         private async Task OnJoinedGuild(SocketGuild guild)
         {
             await guild.Owner.SendMessageAsync("Thank you for adding " +
-                $"{_client.CurrentUser.Mention} to {guild.Name}", 
-                embed: new AMI.AMIData.HelpPages.Help().H_server);
+                $"{_client.CurrentUser.Mention} to {guild.Name}. " +
+                $"We greatly suggest that you visit our support server for help: " +
+                await AMIData.OtherCommands.Other.GetSupportInvite(), 
+                embed: new AMIData.HelpPages.Help().H_server);
         }
 
         private async Task OnLeftGuild(SocketGuild arg)
@@ -155,10 +157,6 @@ namespace AMI.Handlers
                 _ = WaitReconnect(5);
         }
 
-        private async Task OnDisconnect(Exception e)
-        {
-            Log.LogS(e);
-            //_ = WaitReconnect(5);
-        }
+        private async Task OnDisconnect(Exception e) =>  Log.LogS(e);
     }
 }

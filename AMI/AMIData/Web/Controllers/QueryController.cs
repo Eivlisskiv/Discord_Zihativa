@@ -10,7 +10,7 @@ namespace AMI.AMIData.Web.Controllers
     {
         static MongoDatabase Database => AMYPrototype.Program.data.database;
 
-        internal override object PravitizeObject(object obj)
+        internal override object PrivitizeObject(object obj)
             => obj;
 
         // GET /api/query/Character?query={level:{$gt:0}}

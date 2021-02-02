@@ -144,7 +144,7 @@ namespace AMYPrototype
 
             //Inform Exit
             var bot = DiscordBotHandler.bot;
-            await bot.SetGameAsync(message ?? "Exiting...");
+            _ = bot?.SetGameAsync(message ?? "Exiting...");
 
             //Tie Loose ends
             data?.activity?.Save();

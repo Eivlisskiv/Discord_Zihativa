@@ -192,17 +192,7 @@ namespace AMI.AMIData.OtherCommands
         [Command("Benchmark")]
         public async Task BenchmarkCommand()
         {
-            try
-            {
-                Neitsillia.Areas.AreaPartials.Area area = null;
-                area.GetPopulation(Neitsillia.Areas.AreaExtentions.Population.Type.Population);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            //if (i == 1) await Benchmark1();
-            //if (i == 2) await Benchmark2();
+
         }
 
         public async Task Benchmark1(int i = 0)

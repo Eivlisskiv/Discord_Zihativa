@@ -167,6 +167,10 @@ namespace AMI.AMIData
             var result = filter != null ? docs.Find(filter ?? "{}") : docs.Find(_ => true);
             return result.ToList();
         }
+
+        public async Task<List<T>> LoadRecordsContain<T>(string tableKey, string fieldSearch, string contains)
+         => await LoadRecordsAsync<T>(tableKey, $"{{ \"{fieldSearch}\" : {{$regex : \".*{contains}.*\", $options: \"i\" }} }}");
+
         internal List<T> LoadSortRecords<T>(string tableKey, FilterDefinition<T> filter, string sort)
         {
             var result = database.GetCollection<T>(TableName<T>(tableKey)).Find(filter).Sort(sort);
@@ -178,7 +182,7 @@ namespace AMI.AMIData
 
         //Verify Existence
         internal bool IdExists<T, U>(string tableKey, U targetID, string idVariableName = "_id")
-            => database.GetCollection<T>(tableKey = TableName<T>(tableKey)).Find(FilterEqual<T, U>(idVariableName, targetID)).CountDocuments() > 0;
+            => database.GetCollection<T>(TableName<T>(tableKey)).Find(FilterEqual<T, U>(idVariableName, targetID)).CountDocuments() > 0;
 
         internal string Query(string tableKey, string jsonQuery, string fields = null)
         {

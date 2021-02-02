@@ -36,7 +36,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             membership ??= dynasty.GetMember(player);
             await chan.SendMessageAsync(embed: dynasty.ToEmbed(
                 dynasty.MemberField(membership)
-                ).Build() );
+                ).Build());
         }
 
         [Command("Create Dynasty")]
@@ -54,7 +54,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
 
             Player player = Context.Player;
 
-            if(player.level < 20)
+            if(player.userid != 201875246091993088 && player.level < 20)
             {
                 await ReplyAsync("Character must be minimum level 20 to create a Dynasty.");
                 return;
@@ -76,7 +76,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             Player player = Context.Player;
             (Dynasty dan, DynastyMember _) = await GetDynasty(player);
 
-            Player invited = Player.Load(user.Id);
+            Player invited = Player.Load(user.Id, Player.IgnoreException.All);
             if (invited.level < 20) await ReplyAsync($"{invited.name} must be minimum level 20 to join a Dynasty.");
             else if (invited.dynasty != null) await ReplyAsync($"{invited.name} is already in the {invited.dynasty.dynastyName} Dynasty");
             else await invited.NewUI(await ReplyAsync(
