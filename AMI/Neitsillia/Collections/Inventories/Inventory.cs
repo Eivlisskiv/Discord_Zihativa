@@ -12,7 +12,7 @@ namespace AMI.Neitsillia.Collections
 {
     public class Inventory
     {
-        public static async Task<string> Transfer(Inventory from, Inventory to, int toSize, string slotxamount)
+        public static string Transfer(Inventory from, Inventory to, int toSize, string slotxamount)
         {
             (int index, int amount) = Verify.IndexXAmount(slotxamount);
             index--;
@@ -93,13 +93,11 @@ namespace AMI.Neitsillia.Collections
             if (index < 0) return false;
             else if (inv[index] == null || inv[index].item == null)
             { inv.RemoveAt(index); return true; }
-            else
-            {
-                if (inv[index].count > amount) inv[index].count -= amount; 
-                else inv.RemoveAt(index);
 
-                return true;
-            }
+            if (inv[index].count > amount) inv[index].count -= amount; 
+            else inv.RemoveAt(index);
+
+            return true;
         }
 
         internal StackedItems Splice(int index, int amount, bool remove = true)

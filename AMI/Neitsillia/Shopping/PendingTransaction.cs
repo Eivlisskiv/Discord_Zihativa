@@ -223,7 +223,7 @@ namespace AMI.Neitsillia.Shopping
 
             return DUtils.BuildEmbed(transation.ToString() + "ing",
                 $"Total Price: {TotalPrice} {Environment.NewLine}" +
-                $"Your wallet: {player.KCoins} => {player.KCoins + (TotalPrice * (int)transation)}", null, player.userSettings.Color(),
+                $"Your wallet: {player.KCoins} => {player.KCoins + (TotalPrice * (int)transation)}", null, player.userSettings.Color,
                 fields).Build();
         }
 

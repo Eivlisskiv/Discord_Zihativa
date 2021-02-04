@@ -105,7 +105,7 @@ namespace AMI.Neitsillia.Items.Quests
             Player player, int page, ISocketMessageChannel channel)
         {
             EmbedBuilder e = DUtils.BuildEmbed($"{player.name}'s Quests", 
-                "__Click on the emotes to view details of a quest__", null, player.userSettings.Color());
+                "__Click on the emotes to view details of a quest__", null, player.userSettings.Color);
 
             if (player.quests.Count < 1)
                 e.Description = "No Quests";

@@ -149,7 +149,7 @@ namespace AMI.Neitsillia.Commands
                 { mobs = new NPCSystems.NPC[] { mob } });
 
                 result = DUtils.BuildEmbed("Boss Battle", "You've encountered a " + mob.name,
-                    null, player.userSettings.Color(),
+                    null, player.userSettings.Color,
                 DUtils.NewField(mob.displayName,
                     "Level: " + mob.level + Environment.NewLine +
                     "Rank: " + mob.Rank() + Environment.NewLine +
@@ -163,7 +163,7 @@ namespace AMI.Neitsillia.Commands
                 //           (if lower than area level, only ever 1 [else] difference of player's level and area's lvl capped at 6) capped at available floors
                 int floors = FloorIncrease(player);
                 player.AreaInfo.floor += floors;
-                result = player.Area.AreaInfo(player.AreaInfo.floor).WithColor(player.userSettings.Color());
+                result = player.Area.AreaInfo(player.AreaInfo.floor).WithColor(player.userSettings.Color);
                 message = $"You've advanced {floors} floors " + player.Area.name;
             }
 
@@ -289,7 +289,7 @@ namespace AMI.Neitsillia.Commands
             }
             if (embed != null)
             {
-                embed.WithColor(player.userSettings.Color());
+                embed.WithColor(player.userSettings.Color);
                 MsgType menuType = MsgType.Main;
                 if (player.Encounter != null)
                 {
@@ -767,7 +767,7 @@ namespace AMI.Neitsillia.Commands
                                         if (!int.TryParse(argument, out int index))
                                             index = -1;
 
-                                        SandBox sb = player.Area.sandbox;
+                                        OldSandBox sb = player.Area.sandbox;
                                         if (index <= -1 || index >= sb.buildings.Count)
                                             em = sb.BuildingList();
                                         else if (sb.buildings[index].Tier >= sb.buildings[index].MaxTier)
@@ -847,7 +847,7 @@ namespace AMI.Neitsillia.Commands
         }
         async Task<string> SHDepositCoins(Player player, long amount)
         {
-            SandBox sb = player.Area.sandbox;
+            OldSandBox sb = player.Area.sandbox;
             if (player.KCoins < amount)
                 return $"{player.name} has insufficient funds for this transaction.";
             else if (amount < 1)
@@ -860,7 +860,7 @@ namespace AMI.Neitsillia.Commands
         }
         async Task<string> SHWithdrawCoins(Player player, long amount)
         {
-            SandBox sb = player.Area.sandbox;
+            OldSandBox sb = player.Area.sandbox;
             if (sb.treasury < amount)
                 return $"{player.Area.name}'s Treasury has insufficient funds for this transaction.";
             else if (amount < 1)
@@ -873,7 +873,7 @@ namespace AMI.Neitsillia.Commands
         }
         async Task<string> SHDepositItem(Player player, int slot, int amount)
         {
-            SandBox sb = player.Area.sandbox;
+            OldSandBox sb = player.Area.sandbox;
             Item it = null;
             if ((it = player.inventory.GetItem(slot)) == null)
                 return $"No item binded to slot {slot}, please verify your inventory.";
@@ -883,7 +883,7 @@ namespace AMI.Neitsillia.Commands
             else if (it.type == Item.IType.BuildingBlueprint && !sb.buildingBlueprints.Contains(it.name.Split(':')[1].Trim()))
             {
                 string newBBPName = it.name.Split(':')[1].Trim();
-                if (BuildingSchematic.GetSchem(newBBPName, 0) != null && Building.Load(newBBPName, 0) != null)
+                if (TileSchematic.GetSchem(newBBPName, 0) != null && Building.Load(newBBPName, 0) != null)
                 {
                     sb.buildingBlueprints.Add(newBBPName);
                     player.inventory.Remove(slot, amount);
@@ -905,7 +905,7 @@ namespace AMI.Neitsillia.Commands
         }
         async Task<string> SHWithdrawItem(Player player, int slot, int amount)
         {
-            SandBox sb = player.Area.sandbox;
+            OldSandBox sb = player.Area.sandbox;
             Item it = null;
             if ((it = sb.stock.GetItem(slot)) == null)
                 return $"No item binded to slot {slot}, please verify area stock.";
@@ -923,7 +923,7 @@ namespace AMI.Neitsillia.Commands
         //Building
         async Task StrongholdBuild(Player player, string bn, int tier, MsgType type)
         {
-            BuildingSchematic bs = BuildingSchematic.GetSchem(bn, tier);
+            TileSchematic bs = TileSchematic.GetSchem(bn, tier);
             string result = bs.HasFunds(player.Area.sandbox);
             if (result == null)
                 await player.NewUI(await ReplyAsync(embed: player.UserEmbedColor(bs.Embed(
@@ -936,7 +936,7 @@ namespace AMI.Neitsillia.Commands
         internal static async Task BuildBuilding(Area stronghold, string BuildingName, int tier, 
             ISocketMessageChannel chan)
         {
-            string result = BuildingSchematic.GetSchem(BuildingName, tier)
+            string result = TileSchematic.GetSchem(BuildingName, tier)
                 .ConsumeSchematic(stronghold.sandbox);
             if (result == null)
             {
@@ -951,7 +951,7 @@ namespace AMI.Neitsillia.Commands
         internal static async Task UpgradeBuilding(Area stronghold, int index, int tier, 
             ISocketMessageChannel chan)
         {
-            string result = BuildingSchematic.GetSchem(stronghold.sandbox.buildings[index].Name, tier)
+            string result = TileSchematic.GetSchem(stronghold.sandbox.buildings[index].Name, tier)
                 .ConsumeSchematic(stronghold.sandbox);
             if (result == null)
             {

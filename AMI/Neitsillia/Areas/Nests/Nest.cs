@@ -211,7 +211,7 @@ namespace AMI.Neitsillia.Areas.Nests
 
             if(!rewarded.Contains(player._id) && Program.Chance(2 * score))
             {
-                EmbedBuilder reward = DUtils.BuildEmbed("You've picked up something.", null, null, player.userSettings.Color());
+                EmbedBuilder reward = DUtils.BuildEmbed("You've picked up something.", null, null, player.userSettings.Color);
                 bool red = false;
                 if(player.EggPocket != null && player.EggPocket.egg == null)
                 {

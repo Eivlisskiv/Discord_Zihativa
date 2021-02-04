@@ -24,9 +24,6 @@ namespace AMI.Neitsillia.User
 
         }
 
-        public Discord.Color Color()
-        {
-            return new Discord.Color(RGB[0], RGB[1], RGB[2]);
-        }
+        public Discord.Color Color => new Discord.Color(RGB[0], RGB[1], RGB[2]);
     }
 }

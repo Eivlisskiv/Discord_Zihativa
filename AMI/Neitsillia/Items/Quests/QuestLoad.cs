@@ -563,6 +563,7 @@ namespace AMI.Neitsillia.Items.Quests
                             trigger = Quest.QuestTrigger.CollectingDaily,
 
                             koinsReward = 100,
+                            itemReward = new StackedObject<string, int>("Odez's Gift", 1),
 
                             nextId = new[]
                             {
@@ -1157,7 +1158,6 @@ namespace AMI.Neitsillia.Items.Quests
                 },
             },
         };
-
 
         public static Quest CollectDailyQuest(int n)
         {

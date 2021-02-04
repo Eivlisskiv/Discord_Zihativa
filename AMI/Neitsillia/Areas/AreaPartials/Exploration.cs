@@ -158,7 +158,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             Random rng = Program.rng;
             //Create Encounter
             Encounter encounter = new Encounter("Loot", player);
-            explore.Color = player.userSettings.Color();
+            explore.Color = player.userSettings.Color;
             explore.Description = "While exploring " + name + " you've discovered loot.";
             //Get Loot Count
             int lootCount = rng.Next(0, Methods.NumbersM.CeilParse<int>(player.stats.GetPER() * Collections.Stats.LootPerPerc)) + 2;

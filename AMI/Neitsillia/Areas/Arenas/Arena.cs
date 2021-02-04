@@ -9,7 +9,6 @@ using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
-using MongoDB.Bson.Serialization.Attributes;
 using Neitsillia.Items.Item;
 using System;
 using System.Collections.Generic;
@@ -38,7 +37,7 @@ namespace AMI.Neitsillia.Areas.Arenas
             await player.NewUI("", DUtils.BuildEmbed("Arena Lobby Services",
                 $"{EUI.sideQuest} View arena quests" + Environment.NewLine +
                 $"{EUI.bounties} View arena challenges",
-                null, player.userSettings.Color()).Build(), chan, MsgType.ArenaService);
+                null, player.userSettings.Color).Build(), chan, MsgType.ArenaService);
         }
 
         internal static async Task SelectMode(Player player, int i, ISocketMessageChannel chan, bool edit = false)
@@ -51,7 +50,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                 i = modes.Length - 1;
             //Create Embed
             EmbedBuilder embed = DUtils.BuildEmbed(
-                "Arena", "Select Challenge", color : player.userSettings.Color(),
+                "Arena", "Select Challenge", color : player.userSettings.Color,
                 fields : DUtils.NewField($"**{(ArenaMode)i}** (Level {player.Area.level}+)", ModesDesc[i])
                 );
             if (edit)
@@ -73,7 +72,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                 page = mods.Length - 1;
 
             EmbedBuilder embed = DUtils.BuildEmbed(
-                "Arena", "Activate Modifiers", color: player.userSettings.Color(),
+                "Arena", "Activate Modifiers", color: player.userSettings.Color,
                 fields: DUtils.NewField( $"**{(ArenaModifier.ArenaModifiers)page}**" ,
                 ArenaModifier.ModifiersDesc[page])
                 );

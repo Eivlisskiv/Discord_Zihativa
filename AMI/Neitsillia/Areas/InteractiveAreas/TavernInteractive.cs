@@ -6,8 +6,6 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.InteractiveAreas
@@ -20,7 +18,7 @@ namespace AMI.Neitsillia.Areas.InteractiveAreas
                 await chan.SendMessageAsync(
                     embed: DUtils.BuildEmbed("Tavern",
                     "Welcome, Traveler! What service may I offer you?",
-                    null, player.userSettings.Color(), 
+                    null, player.userSettings.Color, 
                     DUtils.NewField("Services", 
                     $"{EUI.bounties} Bounties"
                     + $"{Environment.NewLine} {EUI.sideQuest} Quests Board"

@@ -315,7 +315,7 @@ namespace AMI.Neitsillia.Combat
                     "Turn " + (player.Encounter.turn++),
                     ((player.Party == null || player.Party.members.Count == 1) ? $"{EUI.brawl} : {abilityName}" : null)
                     + $"           [{watch.ElapsedMilliseconds}ms]",
-                    player.userSettings.Color(),
+                    player.userSettings.Color,
                     DUtils.NewField("__Player Party__", p, true),
                     DUtils.NewField("__Creature Party__", m, true)
                     );

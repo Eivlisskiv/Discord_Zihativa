@@ -320,7 +320,7 @@ namespace AMI.Neitsillia.Encounters
                     }
                     break;
             }
-            return embed.WithColor(player?.userSettings?.Color() ?? Color.DarkBlue);
+            return embed.WithColor(player?.userSettings?.Color ?? Color.DarkBlue);
         }
         public void TurnIntoLoot(Player player)
         {

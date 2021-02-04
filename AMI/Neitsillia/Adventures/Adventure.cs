@@ -30,7 +30,7 @@ namespace AMI.Neitsillia.Adventures
                 "Adventures are automatic with no turn based combat or other player controls with the exception of aborting the adventure." +
                 Environment.NewLine + " Success depends on the character's stats, ignoring abilities and perks."
                 + Environment.NewLine + "**If defeated, all loot, coins and xp collected during the adventure will be lost**",
-                null, player.userSettings.Color(),
+                null, player.userSettings.Color,
 
                 DUtils.NewField($"{EUI.ok} Free Roam", 
                 "Free roam adventures have no objective or time limit. The character automatically explores until recalled or defeated.")
@@ -54,7 +54,7 @@ namespace AMI.Neitsillia.Adventures
             EmbedBuilder embed = DUtils.BuildEmbed($"{player.name}'s Planned Adventure",
                 "Select the adventure's difficulty." +  Environment.NewLine +
                 "**If defeated, all loot, coins and xp collected during the adventure will be lost**",
-                null, player.userSettings.Color(), fields);
+                null, player.userSettings.Color, fields);
 
             await player.EditUI("Select a difficulty", embed.Build(), chan, MsgType.Adventure, "Difficulty");
         }
@@ -126,7 +126,7 @@ namespace AMI.Neitsillia.Adventures
                 $"{EUI.health} {Utils.Display(player.health)}/{Utils.Display(player.Health())} | " + 
                 $"{EUI.stamina} {Utils.Display(player.stamina)}/{Utils.Display(player.Stamina())}" + Environment.NewLine    
                 + $"Been adventuring for {User.Timers.CoolDownToString(DateTime.UtcNow - start)}" + quest?.TimeLeft(start)
-                , null, player.userSettings.Color(),
+                , null, player.userSettings.Color,
                     DUtils.NewField("Loot",
                         $"Unidentified Loot: {loot} {Plus(looted?.nloot)}" + Environment.NewLine +
                         $"Kutsyei Coins:     {coins} {Plus(looted?.koins)}" + Environment.NewLine +

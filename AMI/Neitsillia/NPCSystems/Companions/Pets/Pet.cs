@@ -59,7 +59,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions.Pets
         internal async Task GetInfo(Player player, IMessageChannel channel, int i, bool isEdit = true)
         {
             var (title, desc) = GetField();
-            EmbedBuilder em = DUtils.BuildEmbed(title, desc, color: player.userSettings.Color());
+            EmbedBuilder em = DUtils.BuildEmbed(title, desc, color: player.userSettings.Color);
             await player.EnUI(isEdit, null, em.Build(), channel, MsgType.InspectPet, i.ToString());
         }
 
@@ -119,7 +119,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions.Pets
                 desc += $"{EUI.GetNum(k)} {ups[k]} : {(PetUpgrades.Costs.ContainsKey(pet.race) ? PetUpgrades.Costs[pet.race] : PetUpgrades.Costs["Default"])[k]} pts {Environment.NewLine}";
             }
             EmbedBuilder embed = DUtils.BuildEmbed($"Training {pet.displayName}",
-                desc, $"Points: {points}", player.userSettings.Color());
+                desc, $"Points: {points}", player.userSettings.Color);
 
             await player.EnUI(isEdit, null, embed.Build(), chan, MsgType.PetUpgrade, i.ToString());
         }
@@ -158,7 +158,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions.Pets
             }
 
             EmbedBuilder embed = DUtils.BuildEmbed($"Training {pet.displayName}'s {(PetUpgrades.Upgrade)k}",
-                desc, $"Points: {points}", player.userSettings.Color());
+                desc, $"Points: {points}", player.userSettings.Color);
 
             await player.EditUI(null, embed.Build(), chan, MsgType.PetUpgrade, $"{i};{k}");
         }
@@ -204,7 +204,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions.Pets
                 desc += $"{EUI.GetNum(k)} => {(hasLevel ? null : "~~")}{options[k].name} {(hasLevel ? null : $"~~ (Requires level {options[k].level})")}" + Environment.NewLine;
             }
 
-            EmbedBuilder embed = DUtils.BuildEmbed($"Evolving {pet.displayName}", desc, null, player.userSettings.Color());
+            EmbedBuilder embed = DUtils.BuildEmbed($"Evolving {pet.displayName}", desc, null, player.userSettings.Color);
 
             await player.EnUI(isEdit, null, embed.Build(), channel, MsgType.PetEvolve, $"{i};{options.Length}");
         }

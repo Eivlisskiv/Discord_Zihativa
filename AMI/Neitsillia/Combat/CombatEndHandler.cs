@@ -257,7 +257,7 @@ namespace AMI.Neitsillia.Combat
 
             lootDisplay += EventRewards(enc, out (string name, int amount) specialCurrencyReward);
 
-            foreach (var cb in playerParty)
+            await Utils.MapAsync(playerParty, async (cb, i) =>
             {
                 PerkLoad.CheckPerks(cb.character, Perk.Trigger.EndFight, cb.character);
 
@@ -273,22 +273,22 @@ namespace AMI.Neitsillia.Combat
                     //NPC looting
                     if (follower.IsPet())
                         follower.AddItemToInv(Item.RandomItem(follower.level, 1), follower.level);
-                    else if (enc.loot.Count > 4)
+                    else if (enc.loot != null && enc.loot.Count > 4)
                     {
                         int randomLoot = Program.rng.Next(enc.loot.Count);
                         int amount = Program.rng.Next(1, enc.loot.GetCount(randomLoot) + 1);
                         follower.AddItemToInv(enc.loot.GetItem(randomLoot), amount, true);
                         enc.loot.Remove(randomLoot, amount);
                     }
-                    else follower.AddItemToInv(Item.RandomItem(follower.level));
+                    else follower.AddItemToInv(Item.RandomItem(follower.level * 5));
                     //
                     FollowerCheck(follower, party, allPlayersDead);
                 }
 
-            }
+            });
 
             //Manage Encounters
-            if (party != null) enc.Save();
+            if (party != null) enc?.Save();
             currentEncounter = null;
 
             FinalizeResultEmbed(invLoot, result, lootDisplay);
@@ -321,7 +321,6 @@ namespace AMI.Neitsillia.Combat
             bool top = TopFloor;
             if(currentArea.type == AreaType.Arena)
             {
-                Log.LogS("CombatEndHandler/OtherLoot: In Arena");
                 if (top)
                 {
                     Log.LogS("CombatEndHandler/OtherLoot: In top floor Arena");
@@ -368,7 +367,6 @@ namespace AMI.Neitsillia.Combat
 
         string EventRewards(Encounter enc, out (string name, int amount) eventReward)
         {
-            Log.LogS("CombatEndHandler/EventRewards: Arena loot");
             int amount = 0;
             AMIData.Events.OngoingEvent cevent = AMIData.Events.OngoingEvent.Ongoing;
             if (cevent == null)

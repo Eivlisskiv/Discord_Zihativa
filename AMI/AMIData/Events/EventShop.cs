@@ -51,7 +51,7 @@ namespace AMI.AMIData.Events
         }
 
         EmbedBuilder BaseEmbed(Player player) => DUtils.BuildEmbed($"{currency} Event Shop", $"{player.name}'s {currency}: {player.Currency.Get(currency)}",
-                "Use the \"event\" command for more event related stuff", player.userSettings.Color());
+                "Use the \"event\" command for more event related stuff", player.userSettings.Color);
 
         public async Task ViewShop(Player player, IMessageChannel chan, int item, bool edit)
          => await player.EnUI(edit, null, BaseEmbed(player).AddField(item >= 0 ? GetStock(item, GetMaximum(item, player.Currency.Get(currency))) : GetStock() ).Build(), chan, MsgType.EventShop, item >= 0 ? item.ToString() : null);

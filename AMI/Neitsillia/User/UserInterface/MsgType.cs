@@ -44,12 +44,14 @@
         //House
         House, HouseStorage, HouseTile, HouseFollowers, 
 
-        //Stronghold
-        AcceptBuilding, SandboxInventory, AcceptBuildingUpgrade, NewStronghold,
+        //Sandbox
+        ComfirmBuilding, BuildingControls,
 
         //Dynasty
         DynastyUpgrade, DynastyInvite,
         DynastyMembership,
         DynastyMember,
+
+        NewStronghold, SandboxInventory, AcceptBuilding, AcceptBuildingUpgrade,
     }
 }

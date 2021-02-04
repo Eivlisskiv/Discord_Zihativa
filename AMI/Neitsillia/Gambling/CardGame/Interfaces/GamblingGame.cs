@@ -38,7 +38,7 @@ namespace AMI.Neitsillia.Gambling.Games
             gamesInfo.TryGetValue(game, out description);
 
 
-            EmbedBuilder embed = DUtils.BuildEmbed(game, description, null, player.userSettings.Color(),
+            EmbedBuilder embed = DUtils.BuildEmbed(game, description, null, player.userSettings.Color,
                 DUtils.NewField("Initial Bet",
                 $"Starting bet: {bet} Kuts {Environment.NewLine}" +
                 $"{EUI.two} : Multiply bet by 2 {Environment.NewLine}" +
@@ -272,7 +272,7 @@ namespace AMI.Neitsillia.Gambling.Games
             Hand hand = player.GamblingHand;
 
             EmbedBuilder embed = DUtils.BuildEmbed(title, description,
-                null, player.userSettings.Color(),
+                null, player.userSettings.Color,
                 DUtils.NewField("Current Hand",
                 $"Bet: {hand.bet} Kuts {Environment.NewLine}" +
                 $"Cards: [{string.Join("] [", hand.cards)}] {Environment.NewLine}" + 

@@ -154,7 +154,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             EmbedBuilder embed = listing ? DynastyUserEmbed(dan, user, out playerId) 
                 : DynastyMemberEmbed(dan, manager, playerId, out manage);
 
-            embed.WithColor(player.userSettings.Color());
+            embed.WithColor(player.userSettings.Color);
 
             await player.EnUI(!listing, null, embed.Build(), chan, 
                 manage ? MsgType.DynastyMembership : MsgType.DynastyMember, 

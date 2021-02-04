@@ -49,7 +49,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions.Pets
 
         internal async Task BuildUI(Player player, ISocketMessageChannel channel)
         {
-            EmbedBuilder e = DUtils.BuildEmbed($"{player.name}'s Pets", Pets.Count > 0 ? null : $"{player.name} has no pets", null, player.userSettings.Color());
+            EmbedBuilder e = DUtils.BuildEmbed($"{player.name}'s Pets", Pets.Count > 0 ? null : $"{player.name} has no pets", null, player.userSettings.Color);
             if(Pets.Count > 0)
             {
                 for (int i = 0; i < Pets.Count; i++)

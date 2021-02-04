@@ -65,7 +65,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
             }
         }
         //
-        internal StrongholdProduction Cycle(SandBox sandbox, 
+        internal StrongholdProduction Cycle(OldSandBox sandbox, 
             StrongholdProduction sp)
         {
             if (role != BuildingRole.Production || DateTime.UtcNow < Ready)

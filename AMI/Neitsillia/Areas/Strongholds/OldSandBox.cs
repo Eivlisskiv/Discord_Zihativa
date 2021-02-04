@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace AMI.Neitsillia.Areas.Strongholds
 {
     [BsonIgnoreExtraElements]
-    public class SandBox
+    public class OldSandBox
     {
         public ulong leader;
         //
@@ -30,7 +30,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
         public List<string> buildingBlueprints = new List<string>()
         { "Warehouse", "Herb Farm", "Metal Mines"};
 
-        public SandBox(ulong arg, int argSize)
+        public OldSandBox(ulong arg, int argSize)
         {
             leader = arg;
             size = argSize;
@@ -38,7 +38,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
         }
         //public SandBox(Player arg)
         //{ leader = arg.id; lastCollect = DateTime.UtcNow; }
-        public SandBox(){}
+        public OldSandBox(){}
         //
         internal string[] Collect(Area area)
         {

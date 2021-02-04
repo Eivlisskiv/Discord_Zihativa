@@ -8,9 +8,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Added Promoting an demoting Dynasty members {Environment.NewLine}"
-                + $"Added other commands for managing a Dynasty {Environment.NewLine}"
-                + $"Dynasties are still work in progress and currently not available to all users {Environment.NewLine}"
+                $"Farm and Mines may now be built in houses {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -83,7 +82,7 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                 $" {Environment.NewLine}"
+                 $"Tutorial Quest now grants a special item {Environment.NewLine}"
                 ;
         }
     }

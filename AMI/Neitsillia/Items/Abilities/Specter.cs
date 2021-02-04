@@ -66,7 +66,7 @@ namespace AMI.Neitsillia.Items.Abilities
 
         public EmbedBuilder Info(Player player)
         {
-            return DUtils.BuildEmbed($"{player.name}'s Binded Specter", null, null, player.userSettings.Color(),
+            return DUtils.BuildEmbed($"{player.name}'s Binded Specter", null, null, player.userSettings.Color,
                 DUtils.NewField("Power", $"Tier [{Tier}] | Level { Utils.XpDetail(level, xp, ReferenceData.xpToLvlAbility * (Tier + 1))}"),
                 DUtils.NewField(essence?.name ?? "Essence", essence == null ? "Virgin Specter are without essence. Use a `Essence Vial` on your specter to grant it an element."
                 : essence.description + Environment.NewLine + Environment.NewLine + essence.GetStats())

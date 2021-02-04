@@ -4,7 +4,6 @@ using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.House
@@ -30,6 +29,8 @@ namespace AMI.Neitsillia.Areas.House
         public int storageSpace;
         public Inventory storage;
 
+        public Sandbox.Sandbox sandbox;
+
         public House(Player player)
         {
             _id = player.userid;
@@ -39,6 +40,7 @@ namespace AMI.Neitsillia.Areas.House
             storage = new Inventory();
 
             player.KCoins -= HousePrice(player.Area.level);
+            sandbox = new Sandbox.Sandbox();
         }
 
         public async Task Save() => await Save(this);

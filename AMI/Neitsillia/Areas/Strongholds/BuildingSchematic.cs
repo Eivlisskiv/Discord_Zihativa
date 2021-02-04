@@ -8,14 +8,14 @@ using System.Reflection;
 
 namespace AMI.Neitsillia.Areas.Strongholds
 {
-    class BuildingSchematic
+    class TileSchematic
     {
         internal string Name;
         internal int tier;
         internal long kCost;
         internal List<StackedObject<string, int>> materials;
 
-        internal string HasFunds(SandBox sb)
+        internal string HasFunds(OldSandBox sb)
         {
             if (sb.treasury < kCost)
                 return $"Treasury is missing {kCost - sb.treasury} Kutsyei Coins";
@@ -30,7 +30,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
             }
             return null;
         }
-        internal string ConsumeSchematic(SandBox sb)
+        internal string ConsumeSchematic(OldSandBox sb)
         {
             string result = null;
             if ((result = HasFunds(sb)) != null)
@@ -57,22 +57,22 @@ namespace AMI.Neitsillia.Areas.Strongholds
                 s += mat.ToString() + Environment.NewLine;
             return s;
         }
-        internal static BuildingSchematic GetSchem(string name, int tier)
+        internal static TileSchematic GetSchem(string name, int tier)
         {
-            MethodInfo mi = Utils.GetFunction(typeof(BuildingSchematic), name, true);
+            MethodInfo mi = Utils.GetFunction(typeof(TileSchematic), name, true);
             if (mi == null)
                 throw NeitsilliaError.ReplyError("Building Schematic not found");
-            return (BuildingSchematic)mi.Invoke(null, new object[] { name, tier });
+            return (TileSchematic)mi.Invoke(null, new object[] { name, tier });
         }
         //-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//
         //-//STATS//-//
-        public static BuildingSchematic Warehouse(string name, int nextTier)
+        public static TileSchematic Warehouse(string name, int nextTier)
         {
-            BuildingSchematic bs = null;
+            TileSchematic bs = null;
             switch (nextTier)
             {
                 case 0:
-                    bs = new BuildingSchematic()
+                    bs = new TileSchematic()
                     {
                         kCost = 1000,
                         materials = new List<StackedObject<string, int>>()
@@ -82,7 +82,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
                         },
                     }; break;
                 default:
-                    bs = new BuildingSchematic()
+                    bs = new TileSchematic()
                     {
                         kCost = 500 * nextTier,
                         materials = new List<StackedObject<string, int>>()
@@ -98,11 +98,11 @@ namespace AMI.Neitsillia.Areas.Strongholds
             return bs;
         }
         //-//PRODUCTION//-//
-        public static BuildingSchematic MetalMines(string name, int nextTier)
+        public static TileSchematic MetalMines(string name, int nextTier)
         {
-            BuildingSchematic bs = null;
+            TileSchematic bs = null;
             if(nextTier == 0)
-                bs = new BuildingSchematic()
+                bs = new TileSchematic()
                 {
                     kCost = 5000,
                     materials = new List<StackedObject<string, int>>()
@@ -112,7 +112,7 @@ namespace AMI.Neitsillia.Areas.Strongholds
                         },
                 };
             else if (nextTier < 5)
-                bs = new BuildingSchematic()
+                bs = new TileSchematic()
                 {
                     kCost = 700 * nextTier,
                     materials = new List<StackedObject<string, int>>()

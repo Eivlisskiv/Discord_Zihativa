@@ -68,6 +68,7 @@ namespace AMI.Methods
             string objstring = JsonConvert.SerializeObject(arg);
             return JsonConvert.DeserializeObject<T>(objstring);
         }
+
         internal static IEnumerable<Type> GetTypesWithAttribute(Type attribute)
         {
             foreach (Type type in Program.assembly.GetTypes())
@@ -224,6 +225,13 @@ namespace AMI.Methods
             }
         }
 
+        public static void Map<T> (T[] @this, Action<T, int> func)
+        {
+            int count = @this.Length;
+            for (int i = 0; i < count; i++)
+                func(@this[i], i);
+        }
+
         public static async System.Threading.Tasks.Task MapAsync<T>
             (List<T> @this, Func<T, int, System.Threading.Tasks.Task<bool>> func)
         {
@@ -237,6 +245,14 @@ namespace AMI.Methods
                     count = @this.Count;
                 }
             }
+        }
+
+        public static async System.Threading.Tasks.Task MapAsync<T>
+            (T[] @this, Func<T, int, System.Threading.Tasks.Task> func)
+        {
+            int count = @this.Length;
+            for (int i = 0; i < count; i++)
+                await func(@this[i], i);
         }
     }
     static class Time

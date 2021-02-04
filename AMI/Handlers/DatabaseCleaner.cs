@@ -32,6 +32,8 @@ namespace AMI.Handlers
             await CleanDecks(players);
             await CleanEggPockets(players);
             await CleanFaith(players);
+
+            await CleanHouses();
         }
 
         private async Task CleanUsers()
@@ -94,6 +96,27 @@ namespace AMI.Handlers
                     await database.UpdateRecordAsync("Area", MongoDatabase.FilterEqual<Neitsillia.Areas.AreaPartials.Area, string>("_id", area.AreaId), area);
                 }
             }
+        }
+
+        async Task CleanHouses()
+        {
+            var items = await database.LoadRecordsAsync<Neitsillia.Areas.House.House>(null);
+            await Utils.MapAsync(items, async (item, index) =>
+            {
+                if (item.sandbox == null) item.sandbox = new Neitsillia.Areas.Sandbox.Sandbox();
+                else if (item.sandbox.tier == 0) item.sandbox.tier = 1;
+
+                if(item.storage != null)
+                {
+                    item.sandbox.storage.Add(item.storage, -1);
+                    item.storage = null;
+                }
+
+                await item.Save();
+
+                Log.LogS($"Fixed {item.GetType().Name} {item._id}");
+                return true;
+            });
         }
 
         private async Task CleanParties(List<Player> players)

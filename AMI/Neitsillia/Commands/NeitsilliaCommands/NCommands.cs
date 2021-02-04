@@ -52,7 +52,7 @@ namespace AMI.Module
                 + $"Location: {player.AreaInfo.name} {Environment.NewLine}"
                 + (player.AreaInfo.floor > 0 ? $"Floor: {player.AreaInfo.floor} {Environment.NewLine}" : null)
                 + (player.Encounter != null ? $"Encounter: {player.Encounter.Name} {Environment.NewLine}" : null)
-                ,null, player.userSettings.Color());
+                ,null, player.userSettings.Color);
         }
 
         [Command("Stats")]
@@ -321,7 +321,7 @@ namespace AMI.Module
             string desc = string.Join(Environment.NewLine, player.schematics.GetRange(
                 start, start + itemPerPage > count ? count - start : itemPerPage));
 
-            EmbedBuilder schems = DUtils.BuildEmbed($"{player.name}'s Schematics", desc, $"Page {displayPage}/{pages}", player.userSettings.Color());
+            EmbedBuilder schems = DUtils.BuildEmbed($"{player.name}'s Schematics", desc, $"Page {displayPage}/{pages}", player.userSettings.Color);
 
             await player.NewUI(await chan.SendMessageAsync(embed: schems.Build()), MsgType.Schems, displayPage.ToString());
         }

@@ -57,7 +57,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
 
         internal static async Task TavernGames(Player player, IMessageChannel chan)
         {
-            EmbedBuilder games = DUtils.BuildEmbed("Tavern Games", "Hello, Traveler. Would you like a gambling table?", null, player.userSettings.Color(), 
+            EmbedBuilder games = DUtils.BuildEmbed("Tavern Games", "Hello, Traveler. Would you like a gambling table?", null, player.userSettings.Color, 
                 DUtils.NewField("Dice Games", $"{EUI.Dice(1)} Even Odd"), 
                 DUtils.NewField("Card Games", $"{EUI.GetNum(0)} Blackjack") 
                 );
@@ -69,7 +69,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             if (player.Area.type != Areas.AreaType.Tavern) throw NeitsilliaError.ReplyError("You are no longer in a Tavern. You must be in a tavern to play these games.");
             if (player.KCoins < coins) throw NeitsilliaError.ReplyError("You don't have the funds to make this bet.");
 
-            EmbedBuilder embed = DUtils.BuildEmbed("Dice Game : Even Odds", "Bet your kuts on the dice's result being an even number or an odd number.", null, player.userSettings.Color());
+            EmbedBuilder embed = DUtils.BuildEmbed("Dice Game : Even Odds", "Bet your kuts on the dice's result being an even number or an odd number.", null, player.userSettings.Color);
 
             if (bet > 0 && player.ui?.type == MsgType.DiceGame)
             {

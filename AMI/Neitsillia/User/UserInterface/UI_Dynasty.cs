@@ -123,7 +123,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         DUtils.DeleteMessage(await reaction.Channel.SendMessageAsync(
                                 $"{target.name} was promoted to {dan.rankNames[target.rank]}"));
                         _ = msg.ModifyAsync(m => m.Embed = DynastyCommands.DynastyMemberEmbed(
-                            dan, manager, target, out _).WithColor(player.userSettings.Color()).Build());
+                            dan, manager, target, out _).WithColor(player.userSettings.Color).Build());
                     }
                     break;
                 case EUI.lowerthan:
@@ -136,7 +136,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         DUtils.DeleteMessage(await reaction.Channel.SendMessageAsync(
                             $"{target.name} was demoted to {dan.rankNames[target.rank]}"));
                         _ = msg.ModifyAsync(m => m.Embed = DynastyCommands.DynastyMemberEmbed(
-                           dan, manager, target, out _).WithColor(player.userSettings.Color()).Build());
+                           dan, manager, target, out _).WithColor(player.userSettings.Color).Build());
                     }
                     break;
                 case EUI.cancel:

@@ -65,7 +65,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         {
             await player.NewUI(null, DUtils.BuildEmbed("Arena Fights",
                 quests.Join(Environment.NewLine, (q, i) => q.ShortDescription(i+1)),
-                null, player.userSettings.Color()).Build(), chan, 
+                null, player.userSettings.Color).Build(), chan, 
                 User.UserInterface.MsgType.ArenaFights, $"#{quests.Length}");
         }
 
@@ -73,7 +73,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         {
             await player.NewUI(null, DUtils.BuildEmbed("Arena Fights",
                 quests[fight].LongDescription(level),
-                null, player.userSettings.Color()).Build(), chan,
+                null, player.userSettings.Color).Build(), chan,
                 User.UserInterface.MsgType.ArenaFights, $"{fight}");
         }
 

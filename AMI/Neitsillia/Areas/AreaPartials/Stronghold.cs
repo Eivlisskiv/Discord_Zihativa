@@ -9,7 +9,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 {
     public partial class Area
     {
-        public SandBox sandbox;
+        public OldSandBox sandbox;
 
         internal static async Task<Area> NewStronghold(string argname, int size, Area area, Player player)
         {
@@ -25,7 +25,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 kingdom = area.kingdom,
                 type = AreaType.Stronghold,
                 junctions = new List<Junction> { new Junction(area, 0, player.AreaInfo.floor) },
-                sandbox = new SandBox(player.userid, size)
+                sandbox = new OldSandBox(player.userid, size)
             };
             stronghold.AreaId = stronghold.GeneratePath();
 

@@ -420,7 +420,7 @@ namespace AMI.Neitsillia.InventoryCommands
                     await ReplyAsync($"{player.name} may not consume an item while in a {hpstate} state.");
                 else
                 {
-                    EmbedBuilder effect = DUtils.BuildEmbed(player.name, null, null, player.userSettings.Color(), Consume(player, item, amount, out int consumed));
+                    EmbedBuilder effect = DUtils.BuildEmbed(player.name, null, null, player.userSettings.Color, Consume(player, item, amount, out int consumed));
                     player.UserEmbedColor(effect);
                     player.inventory.Remove(index, consumed);
                     await DUtils.Replydb(Context, embed: effect.Build());
@@ -457,7 +457,7 @@ namespace AMI.Neitsillia.InventoryCommands
 
             int index = player.inventory.inv.FindIndex(si => si.item.type == Item.IType.Healing);
 
-            EmbedBuilder embed = DUtils.BuildEmbed(player.name, color: player.userSettings.Color());
+            EmbedBuilder embed = DUtils.BuildEmbed(player.name, color: player.userSettings.Color);
             while (index > -1 && player.health < mhp)
             {
                 embed.AddField(Consume(player, player.inventory.GetItem(index), player.inventory.GetCount(index), out _));
@@ -560,7 +560,7 @@ namespace AMI.Neitsillia.InventoryCommands
                     return;
             }
 
-            data.embed?.WithColor(player.userSettings.Color());
+            data.embed?.WithColor(player.userSettings.Color);
             await DUtils.Replydb(Context, data.message, data.embed?.Build());
 
             if (inCombat)
@@ -855,7 +855,7 @@ namespace AMI.Neitsillia.InventoryCommands
 
                 EmbedBuilder inLoot = player.Encounter.loot.ToEmbed(ref page, "Loot", -1, player.equipment);
                 inLoot.WithDescription($"Use `Loot` command to loot a specific item. Example: `~loot 2x5` loots 5 of the item in slot 2");
-                inLoot.WithColor(player.userSettings.Color());
+                inLoot.WithColor(player.userSettings.Color);
 
                 if (isEdit && player.ui != null)
                     await player.EditUI("Loot Instance", inLoot.Build(),chan, MsgType.Loot, page.ToString());

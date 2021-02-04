@@ -180,7 +180,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             if (e > 0) SetASkill(player, e - 1, rolls, rused);
 
             EmbedBuilder em = DUtils.BuildEmbed(player.name, "Select a number from the rolls list using reactions to set that roll as the following stat", 
-                null, player.userSettings.Color());
+                null, player.userSettings.Color);
 
             MsgType type = MsgType.SetSkill;
 

@@ -10,8 +10,8 @@ namespace AMI.Methods
             Console.WriteLine(Environment.NewLine + DateTime.Now + ": " + logs);
             try
             {
-                using (StreamWriter log = new StreamWriter("Log.log", true))
-                    log.WriteLine(Environment.NewLine +  DateTime.Now + ": " + logs);
+                using StreamWriter log = new StreamWriter("Log.log", true);
+                log.WriteLine(Environment.NewLine + DateTime.Now + ": " + logs);
             }
             catch (Exception) { }
         }

@@ -98,7 +98,7 @@ namespace AMI.Neitsillia.User
 
         internal async Task ShowBoard(Player player, ISocketMessageChannel chan)
         {
-            EmbedBuilder embed = DUtils.BuildEmbed($"{player.name}'s Quest Board", "Use the reactions to accept Quests.", null, player.userSettings.Color());
+            EmbedBuilder embed = DUtils.BuildEmbed($"{player.name}'s Quest Board", "Use the reactions to accept Quests.", null, player.userSettings.Color);
             List<int> options = new List<int>();
 
             var d = LoadCategory(player, Cycle.Daily);

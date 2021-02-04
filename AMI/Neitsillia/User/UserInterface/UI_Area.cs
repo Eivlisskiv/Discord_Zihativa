@@ -173,7 +173,7 @@ namespace AMI.Neitsillia.User.UserInterface
                             await EditMessage(null, DUtils.BuildEmbed($"Entered {player.Area.name}", 
                                 "Complete your challenge to gain rewards." + Environment.NewLine +
                                 "**Warning:** Running away, dying or leaving the area will end the challenge" + Environment.NewLine +
-                                "Use the `Explore` command to continue", null, player.userSettings.Color()).Build(), reaction.Channel);
+                                "Use the `Explore` command to continue", null, player.userSettings.Color).Build(), reaction.Channel);
                         }
                     }
                     break;
