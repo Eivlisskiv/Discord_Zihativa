@@ -1,15 +1,13 @@
-﻿using AMI.Methods;
-using AMI.Neitsillia.Collections;
+﻿using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.NPCSystems;
 using AMYPrototype;
 using System;
-using System.Linq;
 
 namespace AMI.Neitsillia.Items.Perks.PerkLoad
 {
     static partial class PerkLoad
     {
-        private static AMIData.ReflectionCache reflectionCache = new AMIData.ReflectionCache(typeof(PerkLoad));
+        private static readonly AMIData.ReflectionCache reflectionCache = new AMIData.ReflectionCache(typeof(PerkLoad));
 
         #region Checks
         internal static object[] CheckPerksM(CharacterMotherClass player,

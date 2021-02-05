@@ -50,9 +50,8 @@ namespace AMI.Neitsillia.Collections
             return b;
         }
         public bool Add(StackedItems i, int size)
-        {
-            return Add(i.item, i.count, size);
-        }
+            => Add(i.item, i.count, size);
+
         public bool Add(Item it, int amount, int size)
         {
             if (amount < 1) return true;

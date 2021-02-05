@@ -1,10 +1,9 @@
 ﻿using AMI.Neitsillia.Areas.House;
+using AMI.Neitsillia.Areas.Sandbox;
 using AMI.Neitsillia.Commands.AreaCommands;
 using Discord;
 using Discord.WebSocket;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User.UserInterface
@@ -16,15 +15,9 @@ namespace AMI.Neitsillia.User.UserInterface
             OptionsLoad.Add(MsgType.House, ui =>
                 ui.options = (ui.data == "upgrade" ? 
                 new List<string>() { EUI.ok, EUI.cancel } : 
-                new List<string>() { EUI.storage }
+                new List<string>() { EUI.storage, EUI.building }
                 )
             );
-
-            OptionsLoad.Add(MsgType.HouseStorage, ui =>
-            {
-                ui.options = new List<string>()
-                   { EUI.prev, EUI.cycle, EUI.next };
-            });
         }
 
         public async Task House(SocketReaction reaction, IUserMessage _)
@@ -52,15 +45,9 @@ namespace AMI.Neitsillia.User.UserInterface
                     break;
                 case EUI.cancel: await TryDeleteMessage(); break;
 
-                case EUI.storage: await HouseCommands.ViewHouseStorage(player, house, 0, "all", reaction.Channel); break;
+                case EUI.storage: await SandboxActions.StorageView(player, house.sandbox, "house", 0, "all", reaction.Channel); break;
+                case EUI.building: await SandboxActions.ViewTiles(player, house.sandbox, "house", reaction.Channel); break;
             }
-        }
-
-        public async Task HouseStorage(SocketReaction reaction, IUserMessage _)
-        {
-            House house = await Areas.House.House.Load(player.userid);
-            (int i, string filter) = InventoryControls(reaction);
-            await HouseCommands.ViewHouseStorage(player, house, i, filter, reaction.Channel);
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using AMI.Neitsillia.Collections;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using AMI.Neitsillia.Areas.Sandbox.Schematics;
+using AMI.Neitsillia.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AMI.Neitsillia.Areas.Sandbox
 {
@@ -11,10 +12,11 @@ namespace AMI.Neitsillia.Areas.Sandbox
 
         public int tier;
 
-        public int StorageSize => (tier + 1) * 20;
+        public int StorageSize => 20 + GetWarehouseSize();
         public Inventory storage;
 
         public long treasury;
+        public long xp;
 
         public List<SandboxTile> tiles;
 
@@ -24,6 +26,9 @@ namespace AMI.Neitsillia.Areas.Sandbox
             storage = new Inventory();
             tiles = new List<SandboxTile>();
         }
+
+        public int GetWarehouseSize()
+           => tiles.Select(tile => tile.type == SandboxTile.TileType.Warehouse ? ((tile.tier + 1) * 5) : 0).Sum();
 
         public SandboxTile Build(SandboxTile.TileType type)
         {

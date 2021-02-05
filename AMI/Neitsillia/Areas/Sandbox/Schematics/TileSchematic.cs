@@ -6,7 +6,7 @@ using AMI.Neitsillia.User.UserInterface;
 using System;
 using System.Collections.Generic;
 
-namespace AMI.Neitsillia.Areas.Sandbox
+namespace AMI.Neitsillia.Areas.Sandbox.Schematics
 {
     public class TileSchematic
     {

@@ -492,7 +492,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 case MsgType.ConfirmOffer:
                 case MsgType.InspectOffer:
                 case MsgType.DuelOffer:
-                case MsgType.ComfirmBuilding:
+                case MsgType.ComfirmTile:
                 case MsgType.ConfirmEggDiscard:
                 case MsgType.DynastyUpgrade:
                 case MsgType.DynastyInvite:

@@ -58,6 +58,11 @@ namespace AMI.Neitsillia.User.UserInterface
         internal const string lowerthan = "🔻";
         internal const string equalStats = "🔸";
 
+        internal const string building = "🏘";
+        internal const string explosive = "💥";
+        internal const string produce = "🔧";
+        internal const string collect = "📥";
+
         #region Numbers
         internal const string zero = "\u0030\u20e3";
         internal const string one = "\u0031\u20e3";

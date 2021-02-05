@@ -1,21 +1,10 @@
-﻿using AMI.Methods;
-using AMI.Module;
-using AMI.Neitsillia.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-
-namespace AMI.Neitsillia.Areas.Sandbox
+﻿namespace AMI.Neitsillia.Areas.Sandbox.Schematics
 {
     public static class TileSchematics
-    {        
+    {
+        private static readonly AMIData.ReflectionCache reflectionCache = new AMIData.ReflectionCache(typeof(TileSchematics));
         internal static TileSchematic GetSchem(SandboxTile.TileType type, int tier)
-        {
-            MethodInfo mi = Utils.GetFunction(typeof(TileSchematics), type.ToString(), true);
-            if (mi == null)
-                throw NeitsilliaError.ReplyError("Building Schematic not found");
-            TileSchematic schem = (TileSchematic)mi.Invoke(null, new object[] { type, tier });
-            return schem;
-        }
+            => reflectionCache.Run<TileSchematic>(type.ToString(), type, tier);
 
         public static TileSchematic Warehouse(SandboxTile.TileType type, int nextTier)
         {

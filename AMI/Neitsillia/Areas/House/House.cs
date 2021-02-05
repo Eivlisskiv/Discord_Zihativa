@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.House
 {
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class House
     {
         private const int HOUSE_PRICE = 6544;
@@ -26,7 +27,6 @@ namespace AMI.Neitsillia.Areas.House
 
         public List<string> junctions;
 
-        public int storageSpace;
         public Inventory storage;
 
         public Sandbox.Sandbox sandbox;
@@ -36,7 +36,6 @@ namespace AMI.Neitsillia.Areas.House
             _id = player.userid;
             junctions = new List<string>() { player.Area.AreaId };
 
-            storageSpace = 20;
             storage = new Inventory();
 
             player.KCoins -= HousePrice(player.Area.level);

@@ -42,10 +42,10 @@
         //Event
         Event, EventShop,
         //House
-        House, HouseStorage, HouseTile, HouseFollowers, 
+        House, SandboxStorage, HouseFollowers, 
 
         //Sandbox
-        ComfirmBuilding, BuildingControls,
+        ComfirmTile, TileControls, TileProductions, TileProduce,
 
         //Dynasty
         DynastyUpgrade, DynastyInvite,
@@ -53,5 +53,6 @@
         DynastyMember,
 
         NewStronghold, SandboxInventory, AcceptBuilding, AcceptBuildingUpgrade,
+        
     }
 }

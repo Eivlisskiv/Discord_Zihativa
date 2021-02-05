@@ -71,14 +71,14 @@ namespace AMI.AMIData
         }
 
         internal R Run<R>(string name, params object[] parameters) =>
-            (R)GetFunction(name, staticMethods)?.Invoke(null, parameters);
+            (R)(GetFunction(name, staticMethods)?.Invoke(null, parameters) ?? default);
 
         internal void Run(string name, params object[] parameters) =>
             GetFunction(name, staticMethods)?.Invoke(null, parameters);
 
 
         //Fields
-        internal FieldInfo GetField(string name, Dictionary<string, FieldInfo> dict)
+        internal FieldInfo GetField(string name, Dictionary<string, FieldInfo> dict = null)
         {
             if (dict.TryGetValue(name, out FieldInfo field)) return field;
 

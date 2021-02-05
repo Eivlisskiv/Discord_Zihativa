@@ -3,11 +3,10 @@ using AMI.Module;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Areas.House;
 using AMI.Neitsillia.Areas.Sandbox;
-using AMI.Neitsillia.Collections;
+using AMI.Neitsillia.Areas.Sandbox.Schematics;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype.Commands;
-using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
@@ -18,7 +17,6 @@ namespace AMI.Neitsillia.Commands.AreaCommands
     [Name("House")]
     public class HouseCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
     {
-        
         private static async Task<House> LoadHouse(Player player, ISocketMessageChannel chan)
         {
             if(player.Area.type != Neitsillia.Areas.AreaType.Town)
@@ -57,43 +55,14 @@ namespace AMI.Neitsillia.Commands.AreaCommands
 
         public static async Task ViewHouseInfo(Player player, House house, ISocketMessageChannel chan)
         {
+            Sandbox sb = house.sandbox;
             await player.NewUI("House options", DUtils.BuildEmbed($"{player.name}'s house, from {player.AreaInfo.name}",
-                $"{EUI.storage} `House Storage {{action}}` {house.storage.Count}/{house.storageSpace}",
+                $"{EUI.info} Commands" + Environment.NewLine +
+                $"`House Funds {{action}} {{amount}}` {sb.treasury} Kutsyei Coins" + Environment.NewLine +
+                $"{EUI.storage} `House Storage {{action}}` {sb.storage.Count}/{sb.StorageSize}" + Environment.NewLine +
+                $"{EUI.building} `House Build {{building name}}` {sb.tiles.Count}/{sb.tier}"// + Environment.NewLine +
+                ,
                 null, player.userSettings.Color).Build(), chan, MsgType.House);
-        }
-
-        [Command("House Storage")]
-        public async Task HouseStorage([Summary("view, withdraw or deposit")] string action = "view", 
-            [Summary("withdraw or deposit: Item {slot}x{amount} \n" +
-            "view: filter")] string argument = null)
-        {
-            Player player = Context.Player;
-            House house = await LoadHouse(player, Context.Channel);
-
-            switch (action.ToLower())
-            {
-                case "deposit":
-                    {
-                        string item = Inventory.Transfer(
-                        player.inventory, house.storage, house.storageSpace, argument);
-                        await ReplyAsync($"Successfully deposited {item} in storage.");
-                        await house.Save();
-                        await Neitsillia.InventoryCommands.Inventory.UpdateinventoryUI(player, Context.Channel);
-                    }
-                    break;
-                case "withdraw":
-                    {
-                        string item = Inventory.Transfer(
-                        house.storage, player.inventory, player.InventorySize(), argument);
-                        await ReplyAsync($"Successfully withdrew {item} from storage.");
-                        await house.Save();
-                        await Neitsillia.InventoryCommands.Inventory.UpdateinventoryUI(player, Context.Channel);
-                    }
-                    break;
-                default:
-                    await ViewHouseStorage(player, house, 0, argument ?? "all", Context.Channel, false);
-                    break;
-            }
         }
 
         [Command("House Funds")]
@@ -103,32 +72,17 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             House house = await LoadHouse(player, Context.Channel);
             Sandbox sb = house.sandbox;
 
-            switch (action.ToLower())
+            if (SandboxActions.TransferFunds(player, sb, action, amount, out string result))
             {
-                case "deposit":
-                    {
-                        if (player.KCoins < amount) { await ReplyAsync("You do not have enough Kutsyei Coins for this transfer"); return; }
-                        player.KCoins -= amount;
-                        sb.treasury += amount;
-                        await house.Save();
-                        player.SaveFileMongo();
-                        await ViewHouseInfo(player, house, Context.Channel);
-                    }
-                    break;
-                case "withdraw":
-                    {
-                        if (sb.treasury < amount) { await ReplyAsync("Treasury does not have enough Kutsyei Coins for this transfer"); return; }
-                        player.KCoins += amount;
-                        sb.treasury -= amount;
-                        await house.Save();
-                        player.SaveFileMongo();
-                        await ViewHouseInfo(player, house, Context.Channel);
-                    }
-                    break;
+                await house.Save();
+                player.SaveFileMongo();
+                await ViewHouseInfo(player, house, Context.Channel);
             }
+
+            await ReplyAsync(result);
         }
 
-        [Command("House Stock")]
+        [Command("House Storage")]
         public async Task HouseStock([Summary("view, withdraw or deposit")] string action = "view",
         [Summary("withdraw or deposit: Item {slot}x{amount} \n" +
             "view: filter")] string argument = null)
@@ -137,45 +91,19 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             House house = await LoadHouse(player, Context.Channel);
             Sandbox sb = house.sandbox;
 
-            switch (action.ToLower())
+            if (SandboxActions.TransferItem(player, sb, action, argument, out string reply))
             {
-                case "deposit":
-                    {
-                        string item = Inventory.Transfer(
-                        player.inventory, sb.storage, house.storageSpace, argument);
-                        await ReplyAsync($"Successfully deposited {item} in storage.");
-                        await house.Save();
-                        await Neitsillia.InventoryCommands.Inventory.UpdateinventoryUI(player, Context.Channel);
-                    }
-                    break;
-                case "withdraw":
-                    {
-                        string item = Inventory.Transfer(
-                        sb.storage, player.inventory, player.InventorySize(), argument);
-                        await ReplyAsync($"Successfully withdrew {item} from storage.");
-                        await house.Save();
-                        await Neitsillia.InventoryCommands.Inventory.UpdateinventoryUI(player, Context.Channel);
-                    }
-                    break;
-                default:
-                    await ViewHouseStorage(player, house, 0, argument ?? "all", Context.Channel, false);
-                    break;
+                await house.Save();
+                await Neitsillia.InventoryCommands.Inventory.
+                    UpdateinventoryUI(player, Context.Channel);
+                await ReplyAsync(reply);
             }
-        }
-
-        public static async Task ViewHouseStorage(Player player, House house, int page, string filter, ISocketMessageChannel chan, bool edit = true)
-        {
-            Embed embed = house.storage.ToEmbed(ref page, ref filter,
-                "Storage", house.storageSpace, player.equipment).Build();
-            if (edit) await player.EditUI(null, embed, chan, MsgType.HouseStorage, $"{page};{filter}");
-            else await player.NewUI(null, embed, chan, MsgType.HouseStorage, $"{page};{filter}");
+            else await SandboxActions.StorageView(player, house.sandbox, "house", 0, argument ?? "all",  Context.Channel, false);
         }
 
         [Command("House Build")]
         public async Task HouseBuild([Remainder] string build_name = null)
         {
-            Context.WIPCheck();
-
             Player player = Context.Player;
             House house = await LoadHouse(player, Context.Channel);
             Sandbox sb = house.sandbox;
@@ -186,7 +114,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             {
                 TileSchematic ts = TileSchematics.GetSchem(result, 0);
                 await player.NewUI($"Are you sure you wish to build a {ts}?",
-                    ts.ToEmbed(player.userSettings.Color), Context.Channel, MsgType.ComfirmBuilding, $"0;{(int)result};house");
+                    ts.ToEmbed(player.userSettings.Color), Context.Channel, MsgType.ComfirmTile, $"house;0;{(int)result}");
             }
             else
                 await ReplyAsync($"{build_name} is not a valid build name. Please write a valid name:"
@@ -199,11 +127,47 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         {
             House house = await LoadHouse(player, chan);
             Sandbox sb = house.sandbox;
-            SandboxTile tile = sb.Build(type);
+            sb.Build(type);
             await house.Save();
 
-            await player.EditUI(null, tile.ToEmbed(sb.tier, player.userSettings.Color), chan, 
-                MsgType.BuildingControls, $"{sb.tiles.Count - 1};{tile.production ?? tile.productionOptions.ToString()}");
+            await SandboxActions.InspectTile(player, sb, "house", sb.tiles.Count - 1, chan);
+        }
+
+        internal static async Task DestroyTile(Player player, int index, ISocketMessageChannel channel)
+        {
+            House house = await LoadHouse(player, channel);
+            Sandbox sb = house.sandbox;
+            sb.tiles.RemoveAt(index);
+            await house.Save();
+            await channel.SendMessageAsync("Tile was destoyed");
+        }
+
+        internal static async Task Produce(Player player, int tileIndex, ProductionRecipe recipe, int amount, ISocketMessageChannel channel)
+        {
+            House house = await LoadHouse(player, channel);
+            Sandbox sb = house.sandbox;
+            recipe.Consume(sb, amount);
+            sb.tiles[tileIndex].Start(recipe, amount);
+            await house.Save();
+            await SandboxActions.InspectTile(player, sb, "house", tileIndex, channel);
+        }
+
+        internal static async Task CollectProduction(Player player, int i, ISocketMessageChannel channel)
+        {
+            House house = await LoadHouse(player, channel);
+            Sandbox sb = house.sandbox;
+            await channel.SendMessageAsync(sb.tiles[i].Collect(sb));
+            await house.Save();
+            await SandboxActions.InspectTile(player, sb, "house", i, channel);
+        }
+
+        internal static async Task CancelProduction(Player player, int i, ISocketMessageChannel channel)
+        {
+            House house = await LoadHouse(player, channel);
+            Sandbox sb = house.sandbox;
+            await channel.SendMessageAsync(sb.tiles[i].Cancel(sb));
+            await house.Save();
+            await SandboxActions.InspectTile(player, sb, "house", i, channel);
         }
     }
 }
