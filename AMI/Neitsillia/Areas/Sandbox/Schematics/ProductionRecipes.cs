@@ -36,12 +36,22 @@ namespace AMI.Neitsillia.Areas.Sandbox.Schematics
 
         public static readonly Dictionary<string, ProductionRecipe> Farm_Recipes = new Dictionary<string, ProductionRecipe>()
         {
-             { "Healing Herb", new ProductionRecipe(("Healing Herb", 3), 10, 1, 0.5, ("Healing Herb", 1)) },
+             { "Farm Healing Herbs", new ProductionRecipe(("Healing Herb", 3), 10, 1, 1, ("Healing Herb", 1)) },
         };
 
         public static readonly string[][] Farm =
         {
-             new string[] { "Healing Herb" }
+             new string[] { "Farm Healing Herbs" }
+        };
+
+        public static readonly Dictionary<string, ProductionRecipe> Warehouse_Recipes = new Dictionary<string, ProductionRecipe>()
+        {
+             { "General Work", new ProductionRecipe(("General Work", 0), 100, 100, 1) },
+        };
+
+        public static readonly string[][] Warehouse =
+        {
+             new string[] { "General Work" }
         };
     }
 }

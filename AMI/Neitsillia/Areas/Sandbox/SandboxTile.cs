@@ -17,7 +17,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
     {
         public enum TileType
         {
-            Warehouse, Mine, Farm
+            Warehouse, Farm
         }
 
         public string Name => $"{type} {NumbersM.GetLevelMark(tier)}";
@@ -63,7 +63,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
                 int ready = AmountReady;
                 description = $"Producing {amount}x ({production})" + Environment.NewLine +
                 $"Time left: {hours:00}:{minutes:00}" + Environment.NewLine +
-                (ready > 0 ? $"{EUI.storage} Collect {ready}" : $"{EUI.cancel} Cancel");
+                (ready > 0 ? $"{EUI.collect} Collect {ready}" : $"{EUI.cancel} Cancel");
             }
             return DUtils.NewField("Production", description);
         }
@@ -89,7 +89,8 @@ namespace AMI.Neitsillia.Areas.Sandbox
             if (ready == 0) return "Nothing to collect";
             var spoils = production.spoils;
 
-            sandbox.storage.Add(new StackedItems(spoils.item, spoils.count * ready), -1);
+            if(spoils.count > 0)
+                sandbox.storage.Add(new StackedItems(spoils.item, spoils.count * ready), -1);
             xp += production.xp * ready;
             sandbox.xp += production.xp * ready;
 

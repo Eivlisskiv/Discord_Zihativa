@@ -110,7 +110,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
 
             if (sb.tiles.Count >= (sb.tier + 1))
                 await ReplyAsync($"A tier {sb.tier} House may not have more than {sb.tier + 1} buildings");
-            else if (EnumExtention.IsEnum(build_name.Replace(' ', '_'), out SandboxTile.TileType result))
+            else if (EnumExtention.IsEnum(build_name?.Replace(' ', '_'), out SandboxTile.TileType result))
             {
                 TileSchematic ts = TileSchematics.GetSchem(result, 0);
                 await player.NewUI($"Are you sure you wish to build a {ts}?",
