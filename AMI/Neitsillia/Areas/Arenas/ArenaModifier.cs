@@ -23,10 +23,12 @@ namespace AMI.Neitsillia.Areas.Arenas
         public long CurrentScore = 0;
         public int wave = 0;
         //
-        public int wavesPerRounds = 5;
+        public int wavesPerRounds = 3;
         public double koinMult = 1;
         public double xpMult = 1;
         public double lootMult;
+
+        public ArenaModifier(bool json) { }
 
         public ArenaModifier(ArenaMode mode, string[] bools)
         {

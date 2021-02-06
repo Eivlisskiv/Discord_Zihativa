@@ -24,9 +24,9 @@
                     kCost = 500 * nextTier,
                     materials = new (string, int)[]
                         {
-                            ("Wood", 50 * nextTier),
-                            ("Metal Scrap", 20 * nextTier),
-                            ("Polished Metal", 10 * nextTier),
+                            ("Wood", 200 * nextTier),
+                            ("Metal Scrap", 100 * nextTier),
+                            ("Polished Metal", 20 * nextTier),
                         },
                 },
             };
@@ -42,7 +42,9 @@
                     materials = new (string, int)[]
                         {
                             ("Wood", 500),
-                            ("Metal Scrap", 100),
+                            ("Leather", 50),
+                            ("Cloth", 100),
+                            ("String", 100),
                         },
                 },
                 _ => new TileSchematic(type, nextTier)
@@ -50,9 +52,11 @@
                     kCost = 500 * nextTier,
                     materials = new (string, int)[]
                         {
-                            ("Wood", 50 * nextTier),
-                            ("Metal Scrap", 20 * nextTier),
-                            ("Polished Metal", 10 * nextTier),
+                            ("Wood", 250 * nextTier),
+                            ("Leather", 25 * nextTier),
+                            ("Cloth", 50 * nextTier),
+                            ("String", 50 * nextTier),
+                            ("Polished Metal", 5 * nextTier),
                         },
                 },
             };

@@ -39,9 +39,13 @@ namespace AMI.Neitsillia.Areas.Sandbox.Schematics
             return new SandboxTile(type);
         }
 
-        public bool Upgrade(Sandbox sb, SandboxTile tile)
+        internal void Upgrade(Sandbox sb, SandboxTile tile)
         {
-            return false;
+            if (!tile.HasXP(out long missing))
+                throw NeitsilliaError.ReplyError($"Tiles needs {Utils.Display(missing)} more XP to be upgraded. Increase it's xp by collecting productions.");
+            ConsumeFunds(sb);
+            ConsumeSchematic(sb.storage);
+            tile.tier++;
         }
 
         internal void ConsumeSchematic(Inventory inventory)

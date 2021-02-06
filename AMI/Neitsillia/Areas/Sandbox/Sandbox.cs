@@ -22,7 +22,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
 
         public Sandbox()
         {
-            tier = 0;
+            tier = 1;
             storage = new Inventory();
             tiles = new List<SandboxTile>();
         }
@@ -36,6 +36,13 @@ namespace AMI.Neitsillia.Areas.Sandbox
             SandboxTile tile = ts.Build(this);
             tiles.Add(tile);
 
+            return tile;
+        }
+
+        public SandboxTile Upgrade(SandboxTile tile)
+        {
+            TileSchematic ts = TileSchematics.GetSchem(tile.type, tile.tier + 1);
+            ts.Upgrade(this, tile);
             return tile;
         }
     }

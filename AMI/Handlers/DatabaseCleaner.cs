@@ -103,18 +103,19 @@ namespace AMI.Handlers
             var items = await database.LoadRecordsAsync<Neitsillia.Areas.House.House>(null);
             await Utils.MapAsync(items, async (item, index) =>
             {
-                if (item.sandbox == null) item.sandbox = new Neitsillia.Areas.Sandbox.Sandbox();
-                else if (item.sandbox.tier == 0) item.sandbox.tier = 1;
-
-                if(item.storage != null)
+                if (item.sandbox == null)
                 {
-                    item.sandbox.storage.Add(item.storage, -1);
-                    item.storage = null;
+                    item.sandbox = new Neitsillia.Areas.Sandbox.Sandbox();
+                    await item.Save();
+                    Log.LogS($"Fixed {item.GetType().Name} {item._id}");
+                }
+                else if (item.sandbox.tier == 0)
+                {
+                    item.sandbox.tier = 1;
+                    await item.Save();
+                    Log.LogS($"Fixed {item.GetType().Name} {item._id}");
                 }
 
-                await item.Save();
-
-                Log.LogS($"Fixed {item.GetType().Name} {item._id}");
                 return true;
             });
         }

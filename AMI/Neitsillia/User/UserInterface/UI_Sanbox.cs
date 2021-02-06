@@ -88,16 +88,15 @@ namespace AMI.Neitsillia.User.UserInterface
 
         public async Task ComfirmTile(SocketReaction reaction, IUserMessage msg)
         {
+            //tier: -1(destroy), 0(build), ...(upgrade)
+            //{locations};{tier};{type || index}
+            //{house | stronghold};{int};{int}
+            string[] ds = data.Split(';');
+            string source = ds[0];
+            int tier = int.TryParse(ds[1], out int t) ? t : 0;
             switch (reaction.Emote.ToString())
             {
                 case EUI.ok:
-                    //tier: -1(destroy), 0(build), ...(upgrade)
-                    //{tier};{type || index};{locations}
-                    //{int};{int};{house | stronghold}
-                    string[] ds = data.Split(';');
-                    string source = ds[0];
-                    int tier = int.TryParse(ds[1], out int t) ? t : 0;
-
                     if (tier == 0) //new build
                     {
                         SandboxTile.TileType type = int.TryParse(ds[2], out t) ? (SandboxTile.TileType)t : 0;
@@ -111,20 +110,29 @@ namespace AMI.Neitsillia.User.UserInterface
                     else
                     {
                         int index = int.TryParse(ds[2], out t) ? t : 0;
-                        if (tier == -1) 
-                            switch (source)
-                            {
-                                case "house":
+                        switch (source)
+                        {
+                            case "house":
+                                if (tier == -1)
+                                {
                                     await HouseCommands.DestroyTile(player, index, reaction.Channel);
                                     await TryDeleteMessage();
-                                    break;
-                                case "stronghold": break;
-                            }
-
+                                }
+                                else await HouseCommands.UpgradeTile(player, index, reaction.Channel);
+                                break;
+                            case "stronghold": break;
+                        }
                     }
                     break;
                 case EUI.cancel:
-                    await TryMSGDel(msg);
+                    Sandbox sb = await LoadSource(source);
+                    if (tier == 0)
+                        await SandboxActions.ViewTiles(player, sb, source, reaction.Channel);
+                    else 
+                    {
+                        int index = int.TryParse(ds[2], out t) ? t : 0;
+                        await SandboxActions.InspectTile(player, sb, source, index, reaction.Channel);
+                    }
                     break;
             }
         }
@@ -153,6 +161,18 @@ namespace AMI.Neitsillia.User.UserInterface
                         switch (source)
                         {
                             case "house": await HouseCommands.CollectProduction(player, i, reaction.Channel); break;
+                        }
+                        break;
+                    case EUI.greaterthan:
+                        var tile = sb.tiles[i];
+                        int tier = tile.tier + 1;
+                        if (tier > sb.tier)
+                            await reaction.Channel.SendMessageAsync($"Tiles may not be higher tier than your {source}. Max Tier: {sb.tier}");
+                        else
+                        {
+                            var schem = TileSchematics.GetSchem(tile.type, tier);
+                            await player.EditUI($"Upgrade {tile.Name} to tier {tier}?", 
+                                schem.ToEmbed(player.userSettings.Color), reaction.Channel, MsgType.ComfirmTile, $"{source};{tier};{i}");
                         }
                         break;
                     case EUI.explosive:

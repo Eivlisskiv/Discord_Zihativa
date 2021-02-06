@@ -26,17 +26,12 @@ namespace AMI.Neitsillia.Areas.House
         public ulong _id;
 
         public List<string> junctions;
-
-        public Inventory storage;
-
         public Sandbox.Sandbox sandbox;
 
         public House(Player player)
         {
             _id = player.userid;
             junctions = new List<string>() { player.Area.AreaId };
-
-            storage = new Inventory();
 
             player.KCoins -= HousePrice(player.Area.level);
             sandbox = new Sandbox.Sandbox();

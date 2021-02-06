@@ -124,63 +124,6 @@ namespace AMI.Module
                 await transaction.SendTransaction(player, Context.Channel);
             }
         }
-        string BulkSell(Player player, List<int[]> i)
-        {
-            string grandResult = null;
-            NPC n = player.Encounter.npc;
-            foreach (int[] d in i)
-            {
-                Item item = player.inventory.GetItem(d[0]);
-                if (item != null)
-                {
-                    int amount = Verify.MinMax(d[1], player.inventory.GetCount(d[0]), 1);
-                    int price = GetPrice(item.GetValue(), n.stats.PriceMod(), player.stats.PriceMod(), 1);
-                    if (n.KCoins < price * amount)
-                    {
-                        grandResult += "Insufficient funds to continue purchases";
-                        break;
-                    }
-                    else
-                    {
-                        n.AddItemToInv(item, amount);
-                        n.KCoins -= price * amount;
-                        player.KCoins += price * amount;
-                        player.inventory.Remove(d[0], amount);
-                        grandResult += $"Sold {amount} {item.name} for {price * amount} ~~K~~";
-                    }
-                    grandResult += Environment.NewLine;
-                }
-            }
-            n.GetsAProfession(ReferenceData.Profession.Merchant);
-            return grandResult;
-        }
-        //
-        List<(int index, int amount)> BulkShopAction(string[] args, out int invalids)
-        {
-            invalids = 0;
-            Player player = Context.Player;
-            if (player.IsEncounter(Neitsillia.Encounters.Encounter.Names.NPC))
-            {
-                List<(int index, int amount)> bulks = new List<(int index, int amount)>();
-                foreach (string s in args)
-                {
-                    try
-                    {
-                        var ia = Verify.IndexXAmount(s);
-                        ia.index--;
-                        if (!bulks.Exists(x => x.index == ia.index))
-                        bulks.Add(ia);
-                    }
-                    catch (Exception) { invalids++; }
-                }
-                if (bulks.Count > 0)
-                {
-                    bulks.Sort((x, y) => y.index.CompareTo(x.index));
-                    return bulks;
-                }
-            }
-            return null;
-        }
 
         [Command("Recruit")]
         public async Task RecruitNPC()
@@ -200,7 +143,7 @@ namespace AMI.Module
             {
 
                 NPC n = player.Encounter.npc;
-                if (player.level - player.stats.GetCHA() > n.level && player.userid != 201875246091993088)
+                if ((player.level * 0.9) - player.stats.GetCHA() > n.level && player.userid != 201875246091993088)
                     await DUtils.DeleteBothMsg(Context, await ReplyAsync(
                         $"```{Dialog.GetDialog(n, Dialog.weakRecruit)}```"));
                 else

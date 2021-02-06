@@ -143,7 +143,7 @@ namespace AMI.Neitsillia.Areas.Arenas
             return loot;
         }
 
-        internal EmbedBuilder Explore(Area area, Player player, EmbedBuilder embed)
+        internal EmbedBuilder Explore(Player player, EmbedBuilder embed)
         {
             return gameMode switch
             {
@@ -155,7 +155,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         private EmbedBuilder EncounterBadBatch(Player player, EmbedBuilder embed)
         {
             int level = Math.Max(player.Area.level, 1);
-            string[] mobNames = ArenaQuest.BadBatch(level, player.IsSolo ? 2 : (player.Party.MemberCount + 1)).mobs;
+            string[] mobNames = ArenaQuest.BadBatch(level, (player.Party?.MemberCount ?? 1) + 1 ).mobs;
 
             NPC[] mobs = new NPC[mobNames.Length];
 
@@ -209,11 +209,11 @@ namespace AMI.Neitsillia.Areas.Arenas
 
         internal bool WaveProgress(int floor)
         {
-            return Modifiers.WaveProgress(floor * gameMode switch
+            return Modifiers.WaveProgress(floor * (gameMode switch
             {
                 ArenaMode.Survival => 5,
                 _ => 1,
-            });
+            }));
         }
     }
     //TEST - IGNORE

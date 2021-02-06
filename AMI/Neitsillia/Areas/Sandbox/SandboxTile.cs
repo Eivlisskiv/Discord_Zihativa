@@ -20,6 +20,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
             Warehouse, Farm
         }
 
+        private const long XP_PER_TIER = 7179;
         public string Name => $"{type} {NumbersM.GetLevelMark(tier)}";
 
         public TileType type;
@@ -45,7 +46,10 @@ namespace AMI.Neitsillia.Areas.Sandbox
         internal Embed ToEmbed(int maxTier = 0, Color color = default)
             => DUtils.BuildEmbed(Name,
                 $"Type: {type}" + Environment.NewLine +
-                $"Tier: {tier}/{maxTier}", null, color, ProductionField(), OtherControls()).Build();
+                $"Tier: {tier}/{maxTier}" + Environment.NewLine +
+                (HasXP(out long missing) ? "Upgrade Ready" : 
+                $"{Utils.Display(missing)} XP left until next upgrade"), 
+                null, color, ProductionField(), OtherControls()).Build();
 
         private EmbedFieldBuilder ProductionField()
         {
@@ -70,7 +74,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
             
         private EmbedFieldBuilder OtherControls()
             => DUtils.NewField("Controls", 
-                $"{EUI.greaterthan} Upgrade (Unavailable)" + Environment.NewLine +
+                $"{EUI.greaterthan} Upgrade" + Environment.NewLine +
                 $"{EUI.explosive} Detroy Tile");
 
         internal void Start(ProductionRecipe recipe, int amount)
@@ -113,5 +117,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
             production = null;
             return result;
         }
+
+        internal bool HasXP(out long missing) => (missing = (XP_PER_TIER * (tier + 1)) - xp) <= 0;
     }
 }

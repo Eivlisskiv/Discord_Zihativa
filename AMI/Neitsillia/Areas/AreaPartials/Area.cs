@@ -160,58 +160,8 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             return false;
         }
 
-        internal bool ValidTable(IEnumerable<string>[] table)
-        {
-            return table != null && table.Length > 0;
-        }
-
-        public void AutoExplore(Player player, Random rng, bool depricated)
-        {
-            if (player.Encounter == null)
-                player.NewEncounter(new Encounter("Adventure", player), false);
-            if (player.stamina > 0)
-            {
-                int x = rng.Next(1, eLootRate + eMobRate + ePassiveRate + eQuestRate + 1);
-                if (x <= eLootRate)
-                {
-                    int t = ArrayM.IndexWithRates(loot.Length, rng);
-                    player.Encounter.AddLoot(Item.LoadItem(loot[t][ArrayM.IndexWithRates(loot[t].Count, rng)]));
-                }
-                else if (x <= eMobRate + eLootRate)
-                {
-                    NPC mob = GetAMob(rng, player.AreaInfo.floor);
-                    double playerPower = player.PowerLevel();
-                    double mobPower = mob.PowerLevel();
-                    double mod = playerPower - mobPower;
-                    double result = rng.Next(1, 200) + mod;
-                    if (result >= 140)
-                        player.Encounter.AddLoot(Item.LoadItem(mob.MobDrops(1)[0]));
-                    else if (result <= 100)
-                        player.health--;
-                }
-                else if (x <= ePassiveRate + (eMobRate + eLootRate))
-                {
-                    player.Encounter.xpToGain += 10;
-                    player.Encounter.koinsToGain += 1;
-                }
-                else
-                {
-                    if (player.health + 1 < player.Health())
-                        player.health++;
-                    player.stamina += Verify.Max(5, player.Stamina() - player.stamina);
-                }
-                player.stamina--;
-            }
-            else if(rng.Next(101) <= 20)
-            {
-                if (player.health + 1 < player.Health())
-                    player.health++;
-                player.stamina += Verify.Max(5, player.Stamina() - player.stamina);
-            }
-        }
-        
-        
-
+        internal bool ValidTable(IEnumerable<string>[] table) =>  table != null && table.Length > 0;
+       
         public NPC GetAMob(Random rng, int floor)
         {
             int mlevel = GetAreaFloorLevel(rng, floor);

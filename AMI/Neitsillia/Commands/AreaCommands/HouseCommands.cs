@@ -50,13 +50,13 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             Player player = Context.Player;
             House house = await LoadHouse(player, Context.Channel);
 
-            await ViewHouseInfo(player, house, Context.Channel);
+            await ViewHouseInfo(player, house, Context.Channel, false);
         }
 
-        public static async Task ViewHouseInfo(Player player, House house, ISocketMessageChannel chan)
+        public static async Task ViewHouseInfo(Player player, House house, ISocketMessageChannel chan, bool edit = true)
         {
             Sandbox sb = house.sandbox;
-            await player.NewUI("House options", DUtils.BuildEmbed($"{player.name}'s house, from {player.AreaInfo.name}",
+            await player.EnUI(edit, "House options", DUtils.BuildEmbed($"{player.name}'s house, from {player.AreaInfo.name}",
                 $"{EUI.info} Commands" + Environment.NewLine +
                 $"`House Funds {{action}} {{amount}}` {sb.treasury} Kutsyei Coins" + Environment.NewLine +
                 $"{EUI.storage} `House Storage {{action}}` {sb.storage.Count}/{sb.StorageSize}" + Environment.NewLine +
@@ -108,8 +108,8 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             House house = await LoadHouse(player, Context.Channel);
             Sandbox sb = house.sandbox;
 
-            if (sb.tiles.Count >= (sb.tier + 1))
-                await ReplyAsync($"A tier {sb.tier} House may not have more than {sb.tier + 1} buildings");
+            if (sb.tiles.Count >= sb.tier)
+                await ReplyAsync($"A tier {sb.tier} House may not have more than {sb.tier} buildings");
             else if (EnumExtention.IsEnum(build_name?.Replace(' ', '_'), out SandboxTile.TileType result))
             {
                 TileSchematic ts = TileSchematics.GetSchem(result, 0);
@@ -128,6 +128,16 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             House house = await LoadHouse(player, chan);
             Sandbox sb = house.sandbox;
             sb.Build(type);
+            await house.Save();
+
+            await SandboxActions.InspectTile(player, sb, "house", sb.tiles.Count - 1, chan);
+        }
+
+        public static async Task UpgradeTile(Player player, int index, ISocketMessageChannel chan)
+        {
+            House house = await LoadHouse(player, chan);
+            Sandbox sb = house.sandbox;
+            sb.Upgrade(sb.tiles[index]);
             await house.Save();
 
             await SandboxActions.InspectTile(player, sb, "house", sb.tiles.Count - 1, chan);

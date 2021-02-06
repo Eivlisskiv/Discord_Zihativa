@@ -14,6 +14,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
     public static class SandboxActions
     {
         public const int RECIPE_PERP = 5;
+
         public static bool TransferFunds(Player player, Sandbox sb, string action, long amount, out string result)
         {
             if(amount < 1)

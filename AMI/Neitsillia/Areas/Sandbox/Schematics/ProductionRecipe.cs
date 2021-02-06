@@ -34,11 +34,12 @@ namespace AMI.Neitsillia.Areas.Sandbox.Schematics
         public override string ToString() => (spoils.count > 1 ? $"{spoils.count} " : "") + spoils.item;
 
         internal Discord.EmbedFieldBuilder ToField(int amount)
-            => DUtils.NewField(ToString(), 
+            => DUtils.NewField(ToString(),
                 $"Coins Cost: {cost * amount}" + Environment.NewLine +
                 $"Time: {hours * amount} Hours" + Environment.NewLine +
-                "Materials:" + Environment.NewLine +
-                materials.Join(Environment.NewLine, s => $"{(s.count * amount)}x {s.item}"));
+                $"XP: {xp * amount}" + Environment.NewLine +
+                (materials.Count > 0 ? "Materials:" + Environment.NewLine +
+                materials.Join(Environment.NewLine, s => $"{(s.count * amount)}x {s.item}") : null));
 
         internal void Consume(Sandbox sb, int amount)
         {

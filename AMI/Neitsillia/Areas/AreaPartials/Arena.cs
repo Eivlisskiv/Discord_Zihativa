@@ -12,7 +12,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         {
             if(arena != null)
             {
-                return arena.Explore(this, player, embed);
+                return arena.Explore(player, embed);
             }
 
             return embed;

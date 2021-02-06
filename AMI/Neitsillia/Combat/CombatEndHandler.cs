@@ -319,34 +319,39 @@ namespace AMI.Neitsillia.Combat
         async Task<long> OtherLoot(Encounter enc, long xpGain)
         {
             bool top = TopFloor;
-            if(currentArea.type == AreaType.Arena)
+            if (currentArea.type == AreaType.Arena)
+                xpGain = await ArenaLoot(enc, xpGain, top);
+
+            return xpGain;
+        }
+
+        async Task<long> ArenaLoot(Encounter enc, long xpGain, bool top)
+        {
+            if (top)
             {
-                if (top)
+                Log.LogS("CombatEndHandler/OtherLoot: In top floor Arena");
+                if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
                 {
-                    Log.LogS("CombatEndHandler/OtherLoot: In top floor Arena");
-                    if (currentArea.loot != null && Program.Chance(currentArea.eLootRate))
-                    {
-                        Log.LogS("CombatEndHandler/OtherLoot: Arena loot");
-                        int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
-                        enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
-                    }
-                    else if (Program.Chance(currentArea.eLootRate))
-                    {
-                        Item reward = Item.RandomGear(currentArea.level * 5);
-                        enc.AddLoot(reward);
-                    }
+                    Log.LogS("CombatEndHandler/OtherLoot: Arena loot");
+                    int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
+                    enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
                 }
-
-                if (currentArea.arena != null) 
-                { 
-                    MainAreaPath.floor++;
-                    if(currentArea.arena.WaveProgress(MainAreaPath.floor))
-                        currentArea.level++;
-
-                    xpGain = NumbersM.CeilParse<long>(xpGain * (float)(currentArea.arena.Modifiers?.xpMult ?? 1));
-
-                    await currentArea.UploadToDatabase();
+                else if (Program.Chance(currentArea.eLootRate))
+                {
+                    Item reward = Item.RandomGear(currentArea.level * 5);
+                    enc.AddLoot(reward);
                 }
+            }
+
+            if (currentArea.arena != null)
+            {
+                MainAreaPath.floor++;
+                if (currentArea.arena.WaveProgress(MainAreaPath.floor))
+                    currentArea.level++;
+
+                xpGain = NumbersM.CeilParse<long>(xpGain * (float)(currentArea.arena.Modifiers?.xpMult ?? 1));
+
+                await currentArea.UploadToDatabase();
             }
 
             return xpGain;
