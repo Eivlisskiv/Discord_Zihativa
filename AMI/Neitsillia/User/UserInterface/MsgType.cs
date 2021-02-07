@@ -42,7 +42,7 @@
         //Event
         Event, EventShop,
         //House
-        House, SandboxStorage, HouseFollowers, 
+        Sandbox, SandboxStorage, HouseFollowers, 
 
         //Sandbox
         ComfirmTile, TileControls, TileProductions, TileProduce,

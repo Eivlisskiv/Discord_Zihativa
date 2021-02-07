@@ -20,7 +20,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
             Warehouse, Farm
         }
 
-        private const long XP_PER_TIER = 7179;
+        public const int XP_PER_TIER = 7179;
         public string Name => $"{type} {NumbersM.GetLevelMark(tier)}";
 
         public TileType type;
@@ -50,6 +50,13 @@ namespace AMI.Neitsillia.Areas.Sandbox
                 (HasXP(out long missing) ? "Upgrade Ready" : 
                 $"{Utils.Display(missing)} XP left until next upgrade"), 
                 null, color, ProductionField(), OtherControls()).Build();
+
+        internal void Upgrade(Sandbox sandbox, TileSchematic ts)
+        {
+            ts.Upgrade(sandbox, this);
+            xp -= XP_PER_TIER * (tier + 1);
+            tier++;
+        }
 
         private EmbedFieldBuilder ProductionField()
         {

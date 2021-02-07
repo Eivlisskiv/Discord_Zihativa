@@ -30,7 +30,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
                 Area current = player.Area;
                 await player.NewUI(null, DUtils.BuildEmbed($"Buy a house in {current.name}?",
                     $"Price: {House.HousePrice(current.level)}", null, player.userSettings.Color)
-                    .Build(), chan, MsgType.House, "upgrade");
+                    .Build(), chan, MsgType.Sandbox, "house;confirm");
 
                 throw NeitsilliaError.ReplyError("You must pay a fee to access a house in this area.");
             }
@@ -44,6 +44,28 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             return house;
         }
 
+        internal static async Task Upgrade(Player player, ISocketMessageChannel channel)
+        {
+            House house = await House.Load(player.userid);
+            if (house == null || !house.junctions.Contains(player.AreaInfo.path)) //new house
+            {
+                if (player.KCoins < House.HousePrice(player.Area.level))
+                    await channel.SendMessageAsync("You do not have the funds for this purchase.");
+                else
+                {
+                    house = new House(player);
+                    await house.Save();
+                    await ViewHouseInfo(player, house, channel);
+                }
+            }
+            else //House Upgrade
+            {
+                house.sandbox.Upgrade(Sandbox.MAX_TIER_HOUSE);
+                await house.Save();
+                await ViewHouseInfo(player, house, channel);
+            }
+        }
+
         [Command("House")]
         public async Task HouseInfo()
         {
@@ -54,16 +76,8 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         }
 
         public static async Task ViewHouseInfo(Player player, House house, ISocketMessageChannel chan, bool edit = true)
-        {
-            Sandbox sb = house.sandbox;
-            await player.EnUI(edit, "House options", DUtils.BuildEmbed($"{player.name}'s house, from {player.AreaInfo.name}",
-                $"{EUI.info} Commands" + Environment.NewLine +
-                $"`House Funds {{action}} {{amount}}` {sb.treasury} Kutsyei Coins" + Environment.NewLine +
-                $"{EUI.storage} `House Storage {{action}}` {sb.storage.Count}/{sb.StorageSize}" + Environment.NewLine +
-                $"{EUI.building} `House Build {{building name}}` {sb.tiles.Count}/{sb.tier}"// + Environment.NewLine +
-                ,
-                null, player.userSettings.Color).Build(), chan, MsgType.House);
-        }
+            => await player.EnUI(edit, "House options", house.sandbox.ToEmbed("House", player), chan, MsgType.Sandbox, 
+                $"house;{(house.sandbox.CanUpgrade(Sandbox.MAX_TIER_HOUSE) ? "upgrade" : "none")}");
 
         [Command("House Funds")]
         public async Task HouseFunds([Summary("deposit or withdraw")] string action, long amount)
@@ -137,7 +151,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         {
             House house = await LoadHouse(player, chan);
             Sandbox sb = house.sandbox;
-            sb.Upgrade(sb.tiles[index]);
+            sb.UpgradeTile(sb.tiles[index]);
             await house.Save();
 
             await SandboxActions.InspectTile(player, sb, "house", sb.tiles.Count - 1, chan);

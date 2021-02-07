@@ -45,7 +45,6 @@ namespace AMI.Neitsillia.Areas.Sandbox.Schematics
                 throw NeitsilliaError.ReplyError($"Tiles needs {Utils.Display(missing)} more XP to be upgraded. Increase it's xp by collecting productions.");
             ConsumeFunds(sb);
             ConsumeSchematic(sb.storage);
-            tile.tier++;
         }
 
         internal void ConsumeSchematic(Inventory inventory)

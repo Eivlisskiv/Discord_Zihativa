@@ -45,9 +45,14 @@ namespace Neitsillia.Items.Item
         //
         public int baseTier;
         public int tier;
+        public int rarity;
+
         public Schematic schematic;
         public Perk perk;
 
+        public string Rarity => EUI.ItemRarity(this);
+
+        public string Name => $"{Rarity} {name}";
         #endregion
 
         public enum IType {
@@ -66,30 +71,16 @@ namespace Neitsillia.Items.Item
             {"None", "Small Resource Ration"};
         //
 
-        public override string ToString()
-        {
-            if (CanBeEquip())
-                return name + " |" + (condition > 0 ? ((condition * 100) / durability).ToString() + '%' : "Broken");
-            else
-                return name;
-        }
-        public string TypeToString()
-        {
-            switch (type)
-            {
-                case IType.Chest: return "Cheat Piece";
-                default: return type.ToString();
-            }
-        }
+        public override string ToString() 
+            => CanBeEquip() ? $"{name} |" 
+            + (condition > 0 ? ((condition * 100) / durability).ToString() + '%' : "Broken") : name;
 
-        public static Predicate<Item> FindWithName(Item argItem)
-        {
-            return delegate (Item item) { return item.name == argItem.name; };
-        }
-        public static Predicate<Item> FindWithName(string argItem)
-        {
-            return delegate (Item item) { return item.name == argItem; };
-        }
+        public string TypeToString()
+            =>  type switch
+            {
+                IType.Chest => "Chest Piece",
+                _ => type.ToString(),
+            };
 
         #region Loading
         [JsonConstructor]
@@ -143,6 +134,7 @@ namespace Neitsillia.Items.Item
             }
             if (level != Math.Ceiling(tier / 5.00) * 5)
                 Console.WriteLine($"Inaccurate {originalName} scaling: {t}:{level} => {tier}");
+            rarity = tier / t;
             return 1;
         }
 
@@ -269,8 +261,6 @@ namespace Neitsillia.Items.Item
 
         internal void LoadPerk()
         {
-            Random rng = Program.rng;
-
             if (perk != null)
             {
                 if (perk.name == null || perk.name.Length < 1)
@@ -384,8 +374,8 @@ namespace Neitsillia.Items.Item
 
             if (type < 0) type = Utils.RandomElement(0, 1, 2, 5, 6, 7, 8, 9, 10, 11);
 
-            Item i = null;
-            List<Item> choices = null;
+            Item i;
+            List<Item> choices;
 
             if (type >= 5)
             {
@@ -447,7 +437,7 @@ namespace Neitsillia.Items.Item
             VerifyItem(false);
             bool fullView = !(type == IType.Consumable || type == IType.Healing);
             string stats = null;
-            embed.WithTitle(name);
+            embed.WithTitle(Name);
             if (description == null || description == "")
                 description = "This item's origins are unknown.";
             embed.AddField("Description", $"__{type.ToString()}__" + Environment.NewLine + description);
@@ -558,6 +548,7 @@ namespace Neitsillia.Items.Item
             }
             return l;
         }
+
         internal int CalculateStats(bool rebase = false)
         {
             int oldRank = this.tier;
@@ -600,7 +591,7 @@ namespace Neitsillia.Items.Item
             VerifyItem(false);
             bool fullView = !(type == IType.Consumable || type == IType.Healing);
             string stats = null;
-            embed.WithTitle($"{name}{(cIsEquipped == 0 ? " [Equipped]" : null)} -> {compared.name}{(cIsEquipped == 1 ? " [Equipped]" : null)}");
+            embed.WithTitle($"{Name}{(cIsEquipped == 0 ? " [Equipped]" : null)} -> {compared.Name}{(cIsEquipped == 1 ? " [Equipped]" : null)}");
 
             embed.WithDescription($"__{type.ToString()}__ -> __{compared.type.ToString()}__");
             //

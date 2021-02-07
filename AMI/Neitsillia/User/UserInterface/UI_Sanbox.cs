@@ -13,6 +13,27 @@ namespace AMI.Neitsillia.User.UserInterface
     {
         static void InitO_Sandbox()
         {
+            OptionsLoad.Add(MsgType.Sandbox, ui =>
+            {
+                string[] ds = ui.data.Split(';');
+                if (ds[1] == "confirm")
+                    ui.options = new List<string>() { EUI.ok, EUI.cancel };
+                else
+                {
+                    ui.options = new List<string>() { EUI.storage, EUI.building };
+                    if (ds[1] == "upgrade") ui.options.Add(EUI.greaterthan);
+                    switch (ds[0])
+                    {
+                        case "house":
+
+                            break;
+                        case "stronghold":
+
+                            break;
+                    }
+                }
+            });
+
             OptionsLoad.Add(MsgType.SandboxStorage, ui =>
             {
                 ui.options = new List<string>()
@@ -75,6 +96,28 @@ namespace AMI.Neitsillia.User.UserInterface
                 //"stronghold" => (await Areas.House.House.Load(player.userid))?.sandbox,
                 _ => null,
             };
+        }
+
+        public async Task Sandbox(SocketReaction reaction, IUserMessage _)
+        {
+            string[] ds = data.Split(';');
+            string source = ds[0];
+            Sandbox sandbox = await LoadSource(source);
+
+            switch (reaction.Emote.ToString())
+            {
+                case EUI.ok:
+                    if(source == "house")
+                        await HouseCommands.Upgrade(player, reaction.Channel);
+                    break;
+                case EUI.cancel: await TryDeleteMessage(); break;
+
+                case EUI.storage: await SandboxActions.StorageView(player, sandbox, source, 0, "all", reaction.Channel); break;
+                case EUI.building: await SandboxActions.ViewTiles(player, sandbox, source, reaction.Channel); break;
+                case EUI.greaterthan:
+                    await player.EditUI($"Upgrade {source} for {sandbox.UpgradeCost} Kutsyei Coins?", null, reaction.Channel, MsgType.Sandbox, $"{source};confirm");
+                    break;
+            }
         }
 
         public async Task SandboxStorage(SocketReaction reaction, IUserMessage _)

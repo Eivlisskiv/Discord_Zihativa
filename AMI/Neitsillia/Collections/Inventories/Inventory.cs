@@ -188,7 +188,7 @@ namespace AMI.Neitsillia.Collections
                     if (inv[p] == null) Remove(p, 1);
                     if (filterFcuntion == null || filterFcuntion(inv[p].item, filter))
                     {
-                        itemList += $"{p + 1}| `{inv[p]}` "
+                        itemList += $"{p + 1}| {inv[p]} "
                             + (comparison != null ? inv[p].item.CompareTo(comparison) : null)
                             + EUI.ItemType(inv[p].item.type)
                             + (added < ITEM_PER_PAGE && p < Count ? Environment.NewLine : null);

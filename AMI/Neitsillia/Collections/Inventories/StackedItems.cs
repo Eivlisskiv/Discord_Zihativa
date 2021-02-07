@@ -39,13 +39,8 @@ namespace AMI.Neitsillia.Collections
         }
 
         public override string ToString()
-        {
-            if (item.CanBeEquip() && item.durability > 0)
-                return $"{item.name} |CND: " + ((item.condition * 100) / item.durability) + '%';
-            else if (item.CanBeEquip() && item.durability <= 0)
-                return item.name + " |CND: Broken";
-            else
-                return $"{count}x {item.name}";
-        }
+            => item.CanBeEquip() ? $"{item.Rarity} `{item.name} |CND: " +
+            (item.durability > 0 ? $"{(item.condition * 100) / item.durability}%`" : "Broken`") 
+            : $"`{count}x {item.name}`";
     }
 }
