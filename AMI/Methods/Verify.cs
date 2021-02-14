@@ -60,23 +60,11 @@ namespace AMI.Methods
             return isOption;
         }
         public static int Min(int x, int min = 0)
-        {
-            if (x < min)
-                return min;
-            return x;
-        }
+            => Math.Max(x, min);
         public static double Min(double x, double min = 0)
-        {
-            if (x < min)
-                return min;
-            return x;
-        }
+            => Math.Max(x, min);
         public static long Min(long x, long min = 0)
-        {
-            if (x < min)
-                return min;
-            return x;
-        }
+            => Math.Max(x, min);
         public static int MinMax(int x, int max, int min = 0)
         {
             if (x < min)
@@ -102,23 +90,12 @@ namespace AMI.Methods
             return x;
         }
         internal static long Max(long x, long max)
-        {
-            if (x > max)
-                return max;
-            return x;
-        }
+            => Math.Min(x, max);
         internal static int Max(int x, int max)
-        {
-            if (x > max)
-                return max;
-            return x;
-        }
+            => Math.Min(x, max);
         internal static double Max(double x, double max)
-        {
-            if (x > max)
-                return max;
-            return x;
-        }
+            => Math.Min(x, max);
+
         public static int VerifyInt(string value, int baseValue = 0)
         {
             if (value == null)

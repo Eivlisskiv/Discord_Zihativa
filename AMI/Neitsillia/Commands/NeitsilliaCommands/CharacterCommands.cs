@@ -1,7 +1,8 @@
 ﻿using AMI.Commands;
 using AMI.Methods;
 using AMI.Module;
-using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
+using AMI.Neitsillia.Items.Abilities.Load;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;

@@ -6,7 +6,7 @@ using AMI.Neitsillia;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Encounters;
-using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User;

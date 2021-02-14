@@ -1,14 +1,12 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Areas.Sandbox.Schematics;
 using AMI.Neitsillia.Collections;
-using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
+using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
-using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Areas.Sandbox
 {
@@ -91,8 +89,8 @@ namespace AMI.Neitsillia.Areas.Sandbox
             lastCollect = DateTime.UtcNow;
         }
 
-        public int AmountReady => production == null ? 0 :
-            (int)Math.Floor((DateTime.UtcNow - lastCollect).TotalHours / production.hours);
+        public int AmountReady => production == null ? 0 : Math.Min(amount, 
+            (int)Math.Floor((DateTime.UtcNow - lastCollect).TotalHours / production.hours));
 
         public string Collect(Sandbox sandbox)
         {
@@ -106,8 +104,27 @@ namespace AMI.Neitsillia.Areas.Sandbox
             sandbox.xp += production.xp * ready;
 
             amount -= ready;
+            
+            lastCollect = lastCollect.AddHours(ready * production.hours);
             if(amount <= 0) production = null;
-            return $"Collected {spoils.count * ready}x {spoils.item}";
+            
+            return $"Collected {spoils.count * ready}x {spoils.item} {GainProduction(ready)}";
+        }
+
+        string GainProduction(int chances)
+        {
+            string s = null;
+            while(chances > 0)
+            {
+                if (Program.Chance(chances))
+                {
+                    string newRecipe = ProductionRecipes.AddRandom(this);
+                    if (newRecipe != null)
+                        s += Environment.NewLine + $"New production available: {newRecipe}";
+                }
+                chances -= 100;
+            }
+            return s;
         }
 
         public string Cancel(Sandbox sandbox)

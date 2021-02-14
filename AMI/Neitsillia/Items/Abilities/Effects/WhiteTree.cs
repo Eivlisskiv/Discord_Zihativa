@@ -1,6 +1,6 @@
 ﻿using AMI.Neitsillia.Combat;
 
-namespace AMI.Neitsillia.Items.Abilities
+namespace AMI.Neitsillia.Items.Abilities.Effects
 {
     static partial class AbilityEffect
     {

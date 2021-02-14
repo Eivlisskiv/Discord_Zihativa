@@ -1089,7 +1089,6 @@ namespace AMI.Neitsillia.Items.Quests
 
                             koinsReward = 100 * i,
                             xpReward = 5000 * i,
-                            //itemReward = ItemReward("", 0),
                         };
                     },
                     //301   Scrap x items
@@ -1103,7 +1102,6 @@ namespace AMI.Neitsillia.Items.Quests
 
                             koinsReward = 50 * i,
                             xpReward = 2000 * i,
-                            //itemReward = ItemReward("", 0),
                         };
                     },
                     //302   Upgrade gear x times
@@ -1117,7 +1115,6 @@ namespace AMI.Neitsillia.Items.Quests
 
                             koinsReward = 50 * i,
                             xpReward = 2000 * i,
-                            //itemReward = ItemReward("", 0),
                         };
                     },
                     //303   Clear Dungeons
@@ -1131,7 +1128,6 @@ namespace AMI.Neitsillia.Items.Quests
 
                             koinsReward = 1000 * i,
                             xpReward = 50000 * i,
-                            //itemReward = ItemReward("", 0),
                         };
                     },
                 },

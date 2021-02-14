@@ -88,8 +88,10 @@ namespace AMI.Neitsillia.Shopping
                 "Transaction canceled");
             }
 
+            if (!Guid.TryParse(data, out Guid id)) return null;
+
             PendingTransaction transaction = Database.LoadRecord(null, 
-                MongoDatabase.FilterEqual<PendingTransaction, Guid>("_id", Guid.Parse(data)));
+                MongoDatabase.FilterEqual<PendingTransaction, Guid>("_id", id));
 
             if (transaction == null)
             {

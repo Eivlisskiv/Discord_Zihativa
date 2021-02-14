@@ -1,9 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Combat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AMI.Neitsillia.Items.Abilities;
 
 namespace AMI.Neitsillia.Items
 {

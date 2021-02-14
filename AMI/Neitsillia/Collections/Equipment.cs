@@ -5,7 +5,7 @@ namespace AMI.Neitsillia.Collections
 {
     public class Equipment
     {
-        internal const int gearCount = 9;
+        internal const int gearCount = 10;
         //
         public Item weapon;//0
         public Item secondaryWeapon;//1

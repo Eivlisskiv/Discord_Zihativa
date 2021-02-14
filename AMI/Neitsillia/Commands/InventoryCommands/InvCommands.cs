@@ -455,12 +455,17 @@ namespace AMI.Neitsillia.InventoryCommands
             long mhp = player.Health();
             if (player.health >= mhp) { await ReplyAsync("Health is full"); return; }
 
+            //Get the first healing item in inventory
             int index = player.inventory.inv.FindIndex(si => si.item.type == Item.IType.Healing);
 
             EmbedBuilder embed = DUtils.BuildEmbed(player.name, color: player.userSettings.Color);
-            while (index > -1 && player.health < mhp)
+            while (index > -1 && player.health < mhp)// While has healing item and health not full
             {
-                embed.AddField(Consume(player, player.inventory.GetItem(index), player.inventory.GetCount(index), out _));
+                //Consume and write information
+                embed.AddField(Consume(player, player.inventory.GetItem(index), player.inventory.GetCount(index), out int ate));
+                //Remove what was consumed
+                player.inventory.Remove(index, ate);
+                //Search for next healing item
                 index = player.inventory.inv.FindIndex(si => si.item.type == Item.IType.Healing);
             }
 

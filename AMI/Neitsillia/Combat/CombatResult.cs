@@ -1,5 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
@@ -128,8 +129,7 @@ namespace AMI.Neitsillia.Combat
         }
         internal void Initiate()
         {
-            if (character is Player)
-                target = ((Player)character).duel.target;
+            if (character is Player player) target = player.duel.target;
             PerkLoad.CheckPerks(character, Perk.Trigger.Turn, this);
             CalculateHitChanceModifier();
             CalculateBaseAbilityEffect();
@@ -138,6 +138,7 @@ namespace AMI.Neitsillia.Combat
         internal void ExecuteSendingTurn(CombatResult target)
         {
             character.StaminaE(Collections.Stats.passiveSp * character.stats.GetDEX());
+
             if (abilityUsed != null && action == Action.Cast)
             {
                 PerkLoad.CheckPerks(character, Perk.Trigger.BeforeOffense, this, target);

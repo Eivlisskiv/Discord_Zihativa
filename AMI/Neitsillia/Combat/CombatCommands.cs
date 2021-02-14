@@ -3,6 +3,7 @@ using AMI.Module;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.NeitsilliaCommands;
 using AMI.Neitsillia.NPCSystems;

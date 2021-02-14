@@ -1,6 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Methods.Graphs;
-using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
@@ -109,14 +109,14 @@ namespace AMI.AMIData.OtherCommands
             em.WithDescription(display);
             await ReplyAsync(embed: em.Build());
         }
-        [Command("Ability Level")]
-        public async Task Ability_Level(int level, params string[] arg)
+        [Command("AbilityLevel")]
+        public async Task AbilityLevel(int level, [Remainder] string arg)
         {
-            Ability ability = Ability.Load(StringM.UpperAt(ArrayM.ToString(arg)), level);
+            Ability ability = Ability.Load(StringM.UpperAt(arg), level);
             await ReplyAsync(embed: ability.InfoPage(new EmbedBuilder(), true).Build());
         }
         [Command("Enemy Level")]
-        public async Task Enemy_Level(int level, params string[] args)
+        public async Task EnemyLevel(int level, params string[] args)
         {
             Context.AdminCheck();
 
@@ -148,13 +148,6 @@ namespace AMI.AMIData.OtherCommands
 
             Item rng = Item.RandomItem(tier, type);
             await ReplyAsync(embed: rng.EmdebInfo(new EmbedBuilder()).Build());
-        }
-
-        [Command("AbilityTree")]
-        public async Task AbilityTree()
-        {
-            Context.AdminCheck();
-            await ReplyAsync(Ability.StarterAbilityTree());
         }
 
         [Command("TestGearScale")]

@@ -1,11 +1,14 @@
 ﻿using AMI.Methods;
 using AMI.Methods.Graphs;
+using AMI.Neitsillia.Items.Abilities.Effects;
+using AMI.Neitsillia.Items.Abilities.Load;
 using AMI.Neitsillia.User.UserInterface;
 using Discord;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 
-namespace AMI.Neitsillia.Items
+namespace AMI.Neitsillia.Items.Abilities
 {
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class Ability
@@ -19,6 +22,9 @@ namespace AMI.Neitsillia.Items
          * by user INT;
         //*/
         public enum AType { Martial, Elemental, Enchantment, Defensive, Tactical }
+
+        internal static Ability Load(string name, int level = -1)
+            => LoadAbility.Load(name, level);
 
         //
         public string name;
@@ -42,43 +48,6 @@ namespace AMI.Neitsillia.Items
         public string description;
         public string statusEffect;
 
-        internal static string StarterAbilityTree()
-        {
-            string trees = null;
-            foreach (string s in LoadAbility.Starters)
-                trees += Load(s).AbilityTree("", 1, 0, 1,1) + 
-                    Environment.NewLine + "-------------------------------------------------------------------------------------------------------------------"  + Environment.NewLine;
-            return trees;
-        }
-
-        internal string AbilityTree(string tree, int depth, int tabs, params int[] grid)
-        {
-            tree += "".PadLeft(tabs + ((depth - 1) * 6), '-');
-            tree += name + $"[{depth}] ";
-            if (evolves != null && evolves.Length > 0)
-            {
-                if (grid[0] <= depth)
-                {
-                    grid[0]++;
-                }
-                grid[1] += evolves.Length - 1;
-                depth++;
-                
-                foreach (string s in evolves)
-                {
-                    tree = Load(s).AbilityTree(tree, depth, tabs, grid) + Environment.NewLine;
-                    tabs += name.Length;
-                }
-                depth --;
-                tabs -= name.Length;
-            }
-            return tree;
-        }
-
-        //Loading Abilities
-        internal static Ability Load(string name, int level = -1)
-            => LoadAbility.Load(name, level);
-
         [JsonConstructor]
         public Ability(bool JSON)
         { }
@@ -91,6 +60,11 @@ namespace AMI.Neitsillia.Items
         //
         internal void InvokeEffect(params object[] param)
             => effectCache.Run(name.Replace(" ", ""), param);
+
+        internal bool IsOffense =>
+            type == AType.Martial || type == AType.Enchantment || type == AType.Elemental;
+
+        public bool IsType(params AType[] types) => types.Contains(type);
 
         //XP and Level
         public bool GainXP(long argxp, double xpRate)
@@ -124,8 +98,7 @@ namespace AMI.Neitsillia.Items
             }
             return false;
         }
-        internal long XPRequired()
-        { return Quadratic.AbilityXPRequirement((level + 1) * (tier + 1)); }
+        internal long XPRequired() => Quadratic.AbilityXPRequirement((level + 1) * (tier + 1));
 
         internal string DetailedXP()
         {
@@ -170,8 +143,7 @@ namespace AMI.Neitsillia.Items
                     value +=
                         $"{EUI.GetNum(i)} | **{a.name}**{Environment.NewLine}" +
                         $"*{a.description}*{Environment.NewLine}" +
-                        $"``{a.GetStats()}``{Environment.NewLine}" +
-                        "";
+                        $"`{a.GetStats()}`{Environment.NewLine}";
                 }
                 if (level < maxLevel)
                     value += $"{Environment.NewLine}{Environment.NewLine}{name} is not ready to evolve: {level}/{maxLevel}";
@@ -360,19 +332,8 @@ namespace AMI.Neitsillia.Items
                 desc += $"Level: {level}";
             if(level < maxLevel)
                 desc += $"| {DetailedXP()} XP";
-            desc += $" |__{type.ToString()}__|{Environment.NewLine}{description}";
+            desc += $" |__{type}__|{Environment.NewLine}{description}";
             return desc;
         }
-
-        internal bool IsType(params AType[] types)
-        {
-            foreach (var t in types)
-                if (type == t)
-                    return true;
-            return false;
-        }
-
-        internal bool IsOffense => 
-            type == AType.Martial || type == AType.Enchantment || type == AType.Elemental;
     }
 }

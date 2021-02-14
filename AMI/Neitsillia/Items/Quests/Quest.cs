@@ -1,4 +1,5 @@
-﻿using AMI.Methods;
+﻿using AMI.Handlers;
+using AMI.Methods;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
@@ -9,6 +10,7 @@ using Discord.WebSocket;
 using Neitsillia.Items.Item;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Items.Quests
 {
@@ -188,7 +190,7 @@ namespace AMI.Neitsillia.Items.Quests
             await player.NewUI(await chan.SendMessageAsync(embed: embed.Build()), MsgType.AcceptQuests, data);
         }
 
-        static async System.Threading.Tasks.Task<int> CheckDelivery(Player player, int i, ISocketMessageChannel chan)
+        static async Task<int> CheckDelivery(Player player, int i, ISocketMessageChannel chan)
         {
             Quest q = player.quests[i];
             string[] items = q.objective.Split(';')[1].Split(',');
@@ -221,7 +223,7 @@ namespace AMI.Neitsillia.Items.Quests
             return i;
         }
 
-        internal static async System.Threading.Tasks.Task CheckDeliveries(Player player, ISocketMessageChannel chan)
+        internal static async Task CheckDeliveries(Player player, ISocketMessageChannel chan)
         {
             int deliveries = 0;
             for(int i = 0; i < player.quests.Count;)
@@ -304,6 +306,11 @@ namespace AMI.Neitsillia.Items.Quests
                     "-Random" => Item.RandomItem(tier),
                     _ => Item.LoadItem(itemReward.item),
                 };
+                if (item == null)
+                {
+                    _ = UniqueChannels.Instance.SendMessage("Log", $"Invalid quest reward {itemReward} from {title}");
+                    item = Item.RandomGear(player.level * 5);
+                }
                 player.inventory.Add(item, itemReward.count, -1);
                 rewards += $"{itemReward.count}x {item.name}" + Environment.NewLine;
             }

@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 using static AMI.Neitsillia.User.UserInterface.EUI;
 using AMI.Methods;
 using System;
-using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Collections;
 using AMYPrototype;
 using AMI.Neitsillia.Combat;
 using AMI.Neitsillia.NeitsilliaCommands.Social;
-using AMI.Neitsillia.Areas.Arenas;
 using AMYPrototype.Commands;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NPCSystems.Companions;
@@ -24,7 +22,10 @@ using AMI.AMIData;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.Areas.InteractiveAreas;
-using AMI.Neitsillia.Areas.InteractiveAreas;
+using AMI.Neitsillia.Items.Abilities;
+using AMI.Neitsillia.Items.Abilities.Load;
+using System.Runtime.ExceptionServices;
+using AMI.Handlers;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
@@ -211,7 +212,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
         async Task RemoveReactions(IUserMessage msg)
         {
-            msg = msg ?? message ?? await GetUiMessage();
+            msg ??= message ?? await GetUiMessage();
 
             var bot = Handlers.DiscordBotHandler.Client.CurrentUser;
 
@@ -225,7 +226,7 @@ namespace AMI.Neitsillia.User.UserInterface
             SocketSelfUser bot = null)
         {
             options.Remove(e.ToString());
-            msg = msg ?? await GetUiMessage();
+            msg ??= await GetUiMessage();
             _ = msg.RemoveReactionAsync(e,
                   bot ?? Handlers.DiscordBotHandler.Client.CurrentUser);
         }
@@ -286,23 +287,23 @@ namespace AMI.Neitsillia.User.UserInterface
         }
         public async Task Click2(SocketReaction reaction, IUserMessage msg)
         {
-            string emote = reaction.Emote.ToString();
-            if (type != MsgType.SpecSelection && ArrayM.IsInArray(emote, specs))
+            string emote = reaction.Emote.ToString(); 
+            if (emote == help)  await AllHelp(reaction, msg);
+            else if (type != MsgType.SpecSelection && ArrayM.IsInArray(emote, specs))
                 await player.Specialization.MainMenu(player, reaction.Channel);
-            else if (emote == help)
-                await AllHelp(reaction, msg);
             else if (options.Contains(emote))
             {
                 string function = type.ToString();
                 try
                 {
                     await reflectionCache.Run<Task>(function, this, reaction, msg);
-
-                    //await Utils.RunMethod<Task>(function, this, reaction, msg);
                 }
-                catch (Exception e) { if(!await NeitsilliaError.SpecialExceptions(e, reaction.Channel, player)) Log.LogS(e); }
+                catch (Exception e) 
+                {
+                    if (!await NeitsilliaError.SpecialExceptions(e, reaction.Channel, player))
+                        ReactionHandler.LogReactionError(this, e, reaction.Emote, msg.Channel);
+                }
             }
-            //else await TryMSGDel(msg);
         }
 
         public async Task AllHelp(SocketReaction reaction, IUserMessage msg)

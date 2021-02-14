@@ -1,5 +1,5 @@
 ﻿using AMI.Methods;
-using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;

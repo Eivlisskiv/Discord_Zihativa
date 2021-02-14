@@ -5,6 +5,7 @@ using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Items.Abilities;
+using AMI.Neitsillia.Items.Abilities.Load;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
@@ -112,7 +113,7 @@ namespace AMI.Neitsillia.NPCSystems
                     return 0;
                 else if (percentage < 0 && stamina <= 0)
                     return 0;
-                return StaminaE(NumbersM.NParse<int>(maxSP * percentage));
+                return StaminaE(Math.Max(1, NumbersM.NParse<int>(maxSP * percentage)));
             }
             return 0;
         }

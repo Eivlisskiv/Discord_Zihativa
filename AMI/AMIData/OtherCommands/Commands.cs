@@ -5,7 +5,7 @@ using AMI.Handlers;
 using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia;
-using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using AMYPrototype.Commands;

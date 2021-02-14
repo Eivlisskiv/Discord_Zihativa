@@ -2,6 +2,8 @@
 using AMI.Methods.Graphs;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
+using AMI.Neitsillia.Items.Abilities.Load;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMYPrototype;
 using Discord;
@@ -53,19 +55,7 @@ namespace AMI.Neitsillia.NPCSystems
             }
             return false;
         }
-        public override string ToString()
-        {
-            return $"{displayName} L:{level} R:{Rank()}";
-        }
-
-        public static Predicate<NPC> FindWithName(string argName)
-        {
-            return delegate (NPC item) { return item.name == argName; };
-        }
-        public static Predicate<NPC> FindWithDisName(string argName)
-        {
-            return delegate (NPC item) { return item.displayName == argName; };
-        }
+        public override string ToString() =>  $"{displayName} L:{level} R:{Rank()}";
 
         #region Loading NPC
 
@@ -284,37 +274,33 @@ namespace AMI.Neitsillia.NPCSystems
         #region Inventory
 
         internal bool HasGearSlot(Item.IType t)
-        {
-            switch (t)
+            => t switch
             {
-                case Item.IType.Weapon: return hasweapon;
-                case Item.IType.Helmet: return hashelmet;
-                case Item.IType.Mask: return hasmask;
-                case Item.IType.Chest: return haschestp;
-                case Item.IType.Jewelry: return true;
-                case Item.IType.Trousers: return hastrousers;
-                case Item.IType.Boots: return hasboots;
-                default: return false;
-            }
-        }
+                Item.IType.Weapon => hasweapon,
+                Item.IType.Helmet => hashelmet,
+                Item.IType.Mask => hasmask,
+                Item.IType.Chest => haschestp,
+                Item.IType.Jewelry => true,
+                Item.IType.Trousers => hastrousers,
+                Item.IType.Boots => hasboots,
+                _ => false,
+            };
 
         internal bool HasGearSlot(int t)
-        {
-            switch (t)
+            => t switch
             {
-                case 0: return hasweapon;
-                case 1: return false;
-                case 2: return hashelmet;
-                case 3: return hasmask;
-                case 4: return haschestp;
-                case 5:
-                case 6:
-                case 7: return true;
-                case 8: return hastrousers;
-                case 9: return hasboots;
-                default: return false;
-            }
-        }
+                0 => hasweapon,
+                1 => false,
+                2 => hashelmet,
+                3 => hasmask,
+                4 => haschestp,
+                5 => true,
+                6 => true,
+                7 => true,
+                8 => hastrousers,
+                9 => hasboots,
+                _ => false,
+            };
 
         internal Item SpawnItem(string name)
         {
@@ -405,24 +391,12 @@ namespace AMI.Neitsillia.NPCSystems
             }
             return -1;
         }
-        bool EquipItem(int index, bool ignoreInterest = false)
-        {
-            StackedItems st = inventory.inv[index];
-            if(st.item.CanBeEquip() && 
-                (ignoreInterest || IsInterested(st.item, true) == 1))
-            {
-                EquipItem(st.item);
-                inventory.Remove(index, 1);
-                return true;
-            }
-            return false;
-        }
+
         bool UpgradeGear(Item item)
         {
-            int upgradeCost = 250;
+            const int upgradeCost = 250;
 
-            if (!item.CanBeEquip() || KnowsSchematic(item.originalName, item.name) == -1
-                || KCoins < upgradeCost) return false;
+            if (!item.CanBeEquip() || KCoins < upgradeCost) return false;
 
             if (item.tier < level * 5)
             {
@@ -432,7 +406,8 @@ namespace AMI.Neitsillia.NPCSystems
                 item.Scale(tiers + item.tier);
                 KCoins -= tiers * upgradeCost;
 
-                _ = Handlers.UniqueChannels.Instance.SendMessage("Population", $"{displayName} Upgraded {item.originalName} to {item.name} reaching rank {item.tier}");
+                _ = Handlers.UniqueChannels.Instance.SendMessage("Population", 
+                    $"{displayName} Upgraded {item.originalName} to {item.name} reaching rank {item.tier}");
 
                 return true;
             }
@@ -481,13 +456,11 @@ namespace AMI.Neitsillia.NPCSystems
         internal void SelfGear(int i)
         {
             if (i < 0 || i > Equipment.gearCount
-                || i == 1 
-                )return;
+                || i == 1 )return;
             //skips secondary weapon as it is not yet implemented
 
-            Item gear = null;
             //If the slot is available and the slot is empty 
-            if (HasGearSlot(i) && (gear = equipment.GetGear(i)) == null)
+            if (HasGearSlot(i) && equipment.GetGear(i) == null)
             {
                 //Finds the first item to fit the slot
                 int index = inventory.FindIndex(Equipment.GetItemType(i));

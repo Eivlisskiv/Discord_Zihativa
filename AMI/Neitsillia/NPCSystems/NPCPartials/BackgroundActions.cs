@@ -5,6 +5,7 @@ using AMI.Neitsillia.Areas.AreaExtentions;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Crafting;
+using AMI.Neitsillia.Items.Abilities;
 using AMYPrototype;
 using Neitsillia.Items.Item;
 using Neitsillia.Methods;
@@ -20,8 +21,7 @@ namespace AMI.Neitsillia.NPCSystems
 
         public async Task<bool> Act(Area area, int multiplier)
         {
-            if (health < (Health() * 0.65) || (health < Health()  && Program.Chance(30)))
-                Rest();
+            if (health < (Health() * 0.65) || (health < Health()  && Program.Chance(30)))  Rest();
             else
             {
                 int actionrng = Program.rng.Next(101);
@@ -48,8 +48,8 @@ namespace AMI.Neitsillia.NPCSystems
                 if (actionrng == -1)
                     Work(area, multiplier);
 
-                if ((profession != ReferenceData.Profession.Creature && inventory.Count >= 50)
-                    || (profession == ReferenceData.Profession.Creature && inventory.Count >= 15))
+                if (inventory.Count >= 50 || 
+                    (profession == ReferenceData.Profession.Creature && inventory.Count >= 15))
                     TrimInventory();
 
             }
@@ -427,8 +427,8 @@ namespace AMI.Neitsillia.NPCSystems
             if(abilities.Count > 1)
             {
                 int i = Program.rng.Next(1, abilities.Count);
-                if (abilities[i].type == Items.Ability.AType.Enchantment)
-                    abilities[i] = Items.Ability.Load(abilities[i].name);
+                if (abilities[i].type == Ability.AType.Enchantment)
+                    abilities[i] = Ability.Load(abilities[i].name);
                 if (abilities[i].GainXP((Rank() + level) * 100, 1))
                 {
                     _ = UniqueChannels.Instance.SendMessage("Population", $"**{displayName}** Trained {abilities[i].name} " +

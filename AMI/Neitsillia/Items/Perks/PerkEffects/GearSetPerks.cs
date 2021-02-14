@@ -1,5 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.Combat;
+using AMI.Neitsillia.Items.Abilities;
 using System;
 
 namespace AMI.Neitsillia.Items

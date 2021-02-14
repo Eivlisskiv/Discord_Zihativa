@@ -118,14 +118,15 @@ namespace AMI.Neitsillia.User.UserInterface
 
         internal static string ItemRarity(Item item)
         {
+            if (!item.CanBeEquip()) return null;
             bool perk = item.perk != null;
             //                              Red     Orange
             if (perk) return item.isUnique ? "<:Red:808027517272588378>" 
                     : "<:Orange:808027517058547743>";
             if (item.isUnique) return "<:Purple:808027517063659520>"; //Purple
 
-            return (item.rarity > 2) ? "<:Blue:808027516748431384>" //Blue
-            : (item.baseTier > 1) ? "<:Green:808032848044228630>" //Green
+            return (item.rarity > 3) ? "<:Blue:808027516748431384>" //Blue
+            : (item.baseTier > 2) ? "<:Green:808032848044228630>" //Green
             : "<:White:808032848305061898>";
         }
 

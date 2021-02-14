@@ -36,10 +36,9 @@ namespace AMI.Module
             return allshops;
         }
         [Command("Trade")]
-        public async Task ViewNPCInv(int viewType = 1)
-        {
-            await ViewNPCInv(Context.Player, Context.Channel, viewType, false);
-        }
+        public async Task ViewNPCInv(int viewType = 1) 
+            => await ViewNPCInv(Context.Player, Context.Channel, viewType, false);
+
         internal static async Task ViewNPCInv(Player player, ISocketMessageChannel chan, int page, bool edit)
         {
             if (player.Encounter != null && player.Encounter.IsNPC())
@@ -54,7 +53,7 @@ namespace AMI.Module
                     for (int i = ((page - 1) * 15); i < n.inventory.Count && i < (page*15); i++)
                     {
                         var inst = n.inventory.inv[i];
-                        itemList += $" {i+1}|`{inst}`{inst.item.CompareTo(player.equipment)}| " +
+                        itemList += $"{i+1}|{inst} {inst.item.CompareTo(player.equipment)}| " +
                             $"{GetPrice(inst.item.GetValue(),n.stats.PriceMod(),player.stats.PriceMod(), -1)}" +
                             $"~~K~~" + Environment.NewLine;
                     }

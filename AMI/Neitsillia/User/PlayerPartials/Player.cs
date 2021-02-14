@@ -6,6 +6,7 @@ using AMI.Neitsillia.Areas;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NeitsilliaCommands;

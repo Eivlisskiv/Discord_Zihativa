@@ -15,6 +15,11 @@ namespace AMI.Handlers
 {
     class ReactionHandler
     {
+        public static void LogReactionError(UI ui, Exception e, IEmote emote, IMessageChannel chan)
+        {
+            Log.LogS(e);
+            _ = UniqueChannels.Instance.SendToLog(e, $"ReactionAdded type {ui?.type}, emote: {emote}, data: {ui.data ?? "null"}", chan);
+        }
         public static Task ReactionAddedEvent(Cacheable<IUserMessage, ulong> cachedMessage, 
             ISocketMessageChannel channel, SocketReaction reaction)
         {
@@ -46,7 +51,7 @@ namespace AMI.Handlers
                 catch (Exception e)
                 {
                     Log.LogS(e);
-                    await UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
+                    _ = UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
                 }
             });
             
@@ -60,12 +65,8 @@ namespace AMI.Handlers
 
         readonly GuildSettings guildSettings;
 
-        System.Diagnostics.Stopwatch watch;
-
         public ReactionHandler(IUserMessage message, SocketReaction reaction, GuildSettings gset)
         {
-            watch = System.Diagnostics.Stopwatch.StartNew();
-
             botUser = BotUser.Load(reaction.UserId);
             this.reaction = reaction;
             this.message = message;
@@ -84,14 +85,15 @@ namespace AMI.Handlers
         {
             if (botUser?.ui?.msgId != reaction.MessageId) return false;
 
-            MsgType? uiType = botUser.ui?.type;
-
-            await botUser.ui.Click(reaction, message, null);
-
-            watch.Stop();
-            if (Program.isDev && watch.ElapsedMilliseconds > 500)
-                _ = UniqueChannels.Instance.SendToLog($"{botUser._id} {uiType} {Environment.NewLine} Slow Operation {watch.ElapsedMilliseconds}ms");
-            else Console.WriteLine($"{botUser._id} {uiType} => {watch.ElapsedMilliseconds}ms");
+            try
+            {
+                await botUser.ui.Click(reaction, message, null);
+            }
+            catch(Exception e)
+            {
+                if (!await NeitsilliaError.SpecialExceptions(e, message.Channel, botUser)) LogReactionError(botUser.ui, e, reaction.Emote, message.Channel);
+            }
+            
 
             return true;
         }
@@ -107,29 +109,17 @@ namespace AMI.Handlers
                     MsgType? uiType = player.ui?.type;
                     if (await player.LoadCheck(true, message.Channel, Player.IgnoreException.Transaction, Player.IgnoreException.MiniGames))
                         await player.ui.Click(reaction, message, player);
-
-                    watch.Stop();
-                    if (Program.isDev && watch.ElapsedMilliseconds > 500)
-                        _ = UniqueChannels.Instance.SendToLog($"{player._id} | {uiType} {reaction.Emote} {Environment.NewLine} Slow Operation {watch.ElapsedMilliseconds}ms");
-                    else Console.WriteLine($"{player._id} | {uiType} {reaction.Emote} => {watch.ElapsedMilliseconds}ms");
-
                 }
                 catch (Exception e) //Exception is not missing player
                 {
-                    if (!await NeitsilliaError.SpecialExceptions(e, message.Channel, player)) LogError(e);
+                    if (!await NeitsilliaError.SpecialExceptions(e, message.Channel, player)) LogReactionError(player.ui, e, reaction.Emote, message.Channel);
                 }
             }
             catch (Exception e)
             {
-                if (!NeitsilliaError.Is(e, NeitsilliaError.NeitsilliaErrorType.CharacterDoesNotExist, out NeitsilliaError error))
-                    LogError(e);
+                if (!NeitsilliaError.Is(e, NeitsilliaError.NeitsilliaErrorType.CharacterDoesNotExist, out _))
+                    LogReactionError(botUser.ui, e, reaction.Emote, message.Channel);
             }
-        }
-
-        void LogError(Exception e)
-        {
-            Log.LogS(e);
-            _ = UniqueChannels.Instance.SendToLog(e, null, message.Channel);
         }
     }
 }

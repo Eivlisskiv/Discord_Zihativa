@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace AMI.Neitsillia.Items
+namespace AMI.Neitsillia.Items.Abilities.Load
 {
-    
-    static class LoadAbility
+    static partial class LoadAbility
     {
         private static AMIData.ReflectionCache reflectionCache = new AMIData.ReflectionCache(typeof(LoadAbility));
 
@@ -27,7 +26,7 @@ namespace AMI.Neitsillia.Items
         /* Template
         public static Ability Template(string aname, int alevel = 0)
         {
-            Ability a = new Ability(false)
+            Ability a = new Ability(aname)
             {
                 name = aname,
                 type = Ability.AType,
@@ -167,57 +166,7 @@ namespace AMI.Neitsillia.Items
         #endregion
 
         #region Vivace Tree
-        public static Ability Vivace(string aname, int alevel = -1)
-        {
-            Ability a = new Ability(false)
-            {
-                name = aname,
-                type = Ability.AType.Martial,
-                //
-                critChance = 0,
-                critMult = 1,
-                agility = 1,
-                //
-                staminaDrain = 20,
-                //
-                level = 1,
-                maxLevel = 22,
-                tier = 0,
-                evolves = new[]
-                {
-                    "Spirit Rip",
-                },
-            };
-            Set(a, alevel);
-            a.description = $"Drains {a.level * 3} stamina off the target.";
-            a.damage[0] = 1;
-            return a;
-        }
-        // >>
-        public static Ability SpiritRip(string aname, int alevel = -1)
-        {
-            Ability a = new Ability(false)
-            {
-                name = aname,
-                type = Ability.AType.Martial,
-                //
-                critChance = 0,
-                critMult = 0,
-                agility = 3,
-                //
-                staminaDrain = 30,
-                //
-                level = 0,
-                maxLevel = 12,
-                tier = 1,
-                statusEffect = "Energy Leak",
-            };
-            Set(a, alevel);
-            a.description = $"Has {20 + a.level}% chance to apply Energy Leak on target. " +
-                $"Energy Leak: When hit, attacker has {35 + (a.level * 2)}% chance to drain {a.level * 5} stamina";
-            a.damage[0] = 2;
-            return a;
-        }
+        
         // 2
         // 3
         #endregion
@@ -750,7 +699,7 @@ namespace AMI.Neitsillia.Items
                 statusEffect = "Recovering",
             };
             Set(a, alevel);
-            a.description = $"Heals {a.level * 5}HP for {5 + (a.level / 5)} Turns";
+            a.description = $"Heals {a.level * 5}HP every turn for {5 + (a.level / 5)} Turns";
             return a;
         }
         //--// Heals when max health
@@ -809,7 +758,7 @@ namespace AMI.Neitsillia.Items
                 maxLevel = 10,
             }; //
             Set(a, alevel);
-            a.description = $"+ {0.2 * a.level}% damage for each tier upgraded on equipped gear.";
+            a.description = $"+ {0.4 * a.level}% damage for each tier upgraded on equipped gear.";
             return a;
         }
         #endregion

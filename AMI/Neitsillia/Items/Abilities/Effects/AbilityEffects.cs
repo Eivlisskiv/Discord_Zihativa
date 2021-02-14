@@ -5,7 +5,7 @@ using AMYPrototype;
 using System;
 using System.Collections.Generic;
 
-namespace AMI.Neitsillia.Items
+namespace AMI.Neitsillia.Items.Abilities.Effects
 {
     static partial class AbilityEffects
     {
@@ -392,7 +392,7 @@ namespace AMI.Neitsillia.Items
                         tiers += Math.Max(gear.tier - gear.baseTier, 0);
                 }
             }
-            double bonus = (0.002 * fullImpact.level) * tiers;
+            double bonus = (0.004 * fullImpact.level) * tiers;
             if(bonus > 0)
                 caster.damageMultiplier = ArrayM.AddEach(caster.damageMultiplier, bonus);
             caster.perkProcs.Add($"{bonus * 100}% Impact");

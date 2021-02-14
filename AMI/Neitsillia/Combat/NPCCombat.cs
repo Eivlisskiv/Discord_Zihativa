@@ -1,5 +1,7 @@
-﻿using AMI.Methods.Graphs;
+﻿using AMI.Methods;
+using AMI.Methods.Graphs;
 using AMI.Neitsillia.Items;
+using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.NPCSystems;
 using AMYPrototype;
 using System;
@@ -19,10 +21,8 @@ namespace AMI.Neitsillia.Combat
                 npcA.health = 0;
             return new NPC[] { npcA, npcB };
         }
-        public static Ability MobAI(NPC mob)
-        {
-            return mob.abilities[MobAI(mob, null, null)[0]];
-        }
+        public static Ability MobAI(NPC mob) => mob.abilities[MobAI(mob, null, null)[0]];
+
         public static int[] MobAI(NPC self, CharacterMotherClass[] allies, CharacterMotherClass[] enemies)
         {
             if (self.abilities.Count == 1 || self.stamina < self.abilities[1].staminaDrain)
@@ -79,9 +79,9 @@ namespace AMI.Neitsillia.Combat
         {
             List<int> validTargets = new List<int>();
             for (int i = 0; i < enemies.Length; i++)
-                if (enemies[i].health > 0)
-                    validTargets.Add(i);
-            return new int[] { 0, 0, validTargets[Program.rng.Next(validTargets.Count)]};
+                if (enemies[i].health > 0) validTargets.Add(i);
+
+            return new int[] { 0, 0, validTargets.Count == 0 ? 0 : Utils.RandomElement(validTargets) };
         }
 
         public static long ElementalResistance(long resistance, long damage)

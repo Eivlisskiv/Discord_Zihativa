@@ -6,6 +6,7 @@ using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Gambling.Games;
 using AMI.Methods;
+using AMI.Neitsillia.Items.Abilities;
 
 namespace AMI.Neitsillia.User.UserInterface
 {

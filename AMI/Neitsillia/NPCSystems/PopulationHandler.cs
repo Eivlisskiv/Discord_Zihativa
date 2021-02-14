@@ -175,16 +175,12 @@ namespace AMI.Neitsillia.NPCSystems
             }
         }
 
-        bool IsReturnToArea(NPC n, int currentCount, int level )
-        {
-            switch(type)
+        bool IsReturnToArea(NPC n, int currentCount, int level)
+         =>  type switch
             {
-                case Population.Type.Population: return Program.Chance(population.Count + (30 - currentCount));
-
-                case Population.Type.Bounties: return n.level >= level;
-            }
-
-            return true;
-        }
+                Population.Type.Population => Program.Chance(population.Count + (30 - currentCount)),
+                Population.Type.Bounties => n.level >= level,
+                _ => true,
+            };
     }
 }
