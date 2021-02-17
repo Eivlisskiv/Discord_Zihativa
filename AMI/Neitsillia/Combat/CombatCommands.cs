@@ -190,7 +190,7 @@ namespace AMI.Neitsillia.Combat
         private static async Task EndArenaChallenge(Player player, ISocketMessageChannel chan)
         {
             Encounter enc = new Encounter(Encounter.Names.Loot, player);
-            await player.Area.arena.EndChallenge(enc, player.Area);
+            await player.Area.arena.EndChallenge(enc, player.Area, player.AreaInfo.floor);
             player.NewEncounter(enc, true);
             await chan.SendMessageAsync(embed: enc.GetEmbed(null).Build());
         }

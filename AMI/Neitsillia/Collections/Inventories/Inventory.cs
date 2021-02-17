@@ -59,7 +59,10 @@ namespace AMI.Neitsillia.Collections
             {
                 int index = inv.FindIndex(StackedItems.FindWithName(it));
                 if (index > -1)
-                { inv[index].count += amount; return true; }
+                { 
+                    inv[index].count += amount; 
+                    return true; 
+                }
                 else if (size <= -1 || inv.Count < size)
                 {
                     inv.Add(new StackedItems(it, amount));

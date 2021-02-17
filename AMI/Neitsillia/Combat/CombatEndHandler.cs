@@ -36,6 +36,8 @@ namespace AMI.Neitsillia.Combat
         readonly CombatResult[] playerParty;
         readonly CombatResult[] mobParty;
 
+        double scoreMult = 0;
+
         public CombatEndHandler(Combat combat, Party party, Encounter currentEncounter, 
             Area currentArea)
         {
@@ -174,7 +176,7 @@ namespace AMI.Neitsillia.Combat
             if (currentArea.type == AreaType.Arena && currentArea.arena != null)
             {
                 enc = new Encounter(Encounter.Names.Loot, partyLeader);
-                await currentArea.arena.EndChallenge(enc, currentArea);
+                await currentArea.arena.EndChallenge(enc, currentArea, MainAreaPath.floor);
             }
 
             return enc;
@@ -301,16 +303,22 @@ namespace AMI.Neitsillia.Combat
             long xpToGain = 0;
             string[] kills = new string[mobParty.Length];
             int killsIndex = 0;
-            foreach (var mobcb in mobParty)
+            for (int i = 0; i < mobParty.Length; i++)
             {
-                NPC mob = (NPC)mobcb.character;
+                NPC mob = (NPC)mobParty[i].character;
                 enc.AddLoot(mob.inventory);
-                if (mob.KCoins > 0)
-                    koinsToGain += mob.KCoins;
+
+                for(int k = 0; k < Equipment.gearCount; i++)
+                {
+                    var gear = mob.equipment.GetGear(i);
+                    if (gear != null) enc.AddLoot(gear);
+                }
+
+                if (mob.KCoins > 0)  koinsToGain += mob.KCoins;
                 xpToGain += mob.XPDrop(currentArea.type == AreaType.Nest ? 3 : 0);
 
                 kills[killsIndex] = $"{mob.name};{mob.race};{mob.level}";
-                killsIndex++;
+                scoreMult += mob.xpDropBuff;
             }
 
             return (kills, koinsToGain, xpToGain);
@@ -334,7 +342,7 @@ namespace AMI.Neitsillia.Combat
                 {
                     Log.LogS("CombatEndHandler/OtherLoot: Arena loot");
                     int t = ArrayM.IndexWithRates(currentArea.loot.Length, Rng);
-                    enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Count, Rng)]));
+                    enc.AddLoot(Item.LoadItem(currentArea.loot[t][ArrayM.IndexWithRates(currentArea.loot[t].Length, Rng)]));
                 }
                 else if (Program.Chance(currentArea.eLootRate))
                 {
@@ -346,7 +354,7 @@ namespace AMI.Neitsillia.Combat
             if (currentArea.arena != null)
             {
                 MainAreaPath.floor++;
-                if (currentArea.arena.WaveProgress(MainAreaPath.floor))
+                if (currentArea.arena.WaveProgress(MainAreaPath.floor * scoreMult))
                     currentArea.level++;
 
                 xpGain = NumbersM.CeilParse<long>(xpGain * (float)(currentArea.arena.Modifiers?.xpMult ?? 1));

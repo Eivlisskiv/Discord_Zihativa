@@ -1,4 +1,5 @@
-﻿using AMI.Methods;
+﻿using AMI.AMIData;
+using AMI.Methods;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NPCSystems;
@@ -62,8 +63,8 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             int evolves = player.IsSolo ? 0 : player.Party.members.Count - 1;
             for (int k = 0; k < mob.Length; k++)
             {
-                int rtier = Methods.ArrayM.IndexWithRates(mobs.Length, rng);
-                mob[k] = NPC.GenerateNPC(topLevel, mobs[rtier][Methods.ArrayM.IndexWithRates(mobs[rtier].Count, rng)]);
+                int rtier = ArrayM.IndexWithRates(mobs.Length, rng);
+                mob[k] = NPC.GenerateNPC(topLevel, mobs[rtier][ArrayM.IndexWithRates(mobs[rtier].Count, rng)]);
 
                 if (false && evolves > 0 && Program.Chance((20 * evolves) + (k * 20)))
                 {
@@ -73,8 +74,8 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
                 embed.AddField(
                  mob[k].displayName + $" | m{k}",
-                "Level: " + mob[k].level + Environment.NewLine +
-                "Health: " + mob[k].health + '/' + mob[k].Health() + Environment.NewLine
+                    "Level: " + mob[k].level + Environment.NewLine +
+                    "Health: " + mob[k].health + '/' + mob[k].Health() + Environment.NewLine
                 );
             }
             player.NewEncounter(new Encounter("Mob", player)
@@ -112,7 +113,6 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                     return LocationMob(explore, player);
                 else if (ePassiveRate > 0 && x <= ePassiveRate + (eMobRate + eLootRate) && ((passiveEncounter != null && passiveEncounter.Length != 0) || ValidTable(passives)))
                     return LocationPassive(explore, player);
-
             }
             catch (Exception e)
             {
@@ -160,32 +160,28 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             Encounter encounter = new Encounter("Loot", player);
             explore.Color = player.userSettings.Color;
             explore.Description = "While exploring " + name + " you've discovered loot.";
+
             //Get Loot Count
-            int lootCount = rng.Next(0, Methods.NumbersM.CeilParse<int>(player.stats.GetPER() * Collections.Stats.LootPerPerc)) + 2;
-            //Get Floor Effect
-            var looTable = loot; //ArrayM.FloorEffect(loot, floor, floors);
+            int perBonus = NumbersM.CeilParse<int>(player.stats.GetPER() * Collections.Stats.LootPerPerc);
+
             //Get the level to scale gear to
             int level = GetAreaFloorLevel(rng, player.AreaInfo.floor);
             //Roll through loot table
-            for (int i = 0; i < lootCount; i++)
+            LootTables<string> tb = new LootTables<string>(loot, rng);
+            tb.GetItems(player.AreaInfo.floor/floors, perBonus, (name, t1, t2) =>
             {
-                int t1 = -1;
-                int t2 = -1;
-                Item item = null;
                 try
                 {
-                    //get's the loot tier
-                    t1 = ArrayM.IndexWithRates(looTable.Length - 1, rng);
-                    t2 = ArrayM.IndexWithRates(looTable[t1].Count - 1, rng);
                     //gets the item in that tier, creates a new item and adds it to the loot event collection
-                    item = Item.LoadItem(looTable[t1][t2].Trim());
+                    Item item = Item.LoadItem(name.Trim());
                     item.Scale(level * 5);
                     encounter.AddLoot(item);
                 }catch(Exception e)
                 {
-                    _ = Handlers.UniqueChannels.Instance.SendToLog(e, t1 == -1 || t2 == -1 ? "Loot index array failed" : $"Failed to load loot {looTable[t1][t2]} as item {item}");
+                    _ = Handlers.UniqueChannels.Instance.SendToLog(e, t1 == -1 || t2 == -1 ? "Loot index array failed" : $"Failed to load loot {name} {t1} {t2}");
                 }
-            }
+            });
+
             //Coins
             int minCoins = Verify.Min(level, 2) * 6;
             int coinslooted = rng.Next(NumbersM.CeilParse<int>(minCoins * 0.75), NumbersM.CeilParse<int>(minCoins * 1.25));

@@ -8,8 +8,10 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Fixed auto heal not actually consuming anything while still healing {Environment.NewLine}"
-                + $"Fixed boots being ignored in multiple gear loops {Environment.NewLine}"
+                $"Higher floors now increase the max possible amount of loot drops by up to 100%. {Environment.NewLine}"
+                + $"Lowered dungeons length from 8 floors to 4. {Environment.NewLine}"
+                + $"Dungeon bosses now have a 50% chance to drop an additional jewelry. {Environment.NewLine}"
+                + $"Mobs' equipment now becomes loot when defeated. {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()

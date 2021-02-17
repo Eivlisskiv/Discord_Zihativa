@@ -17,7 +17,7 @@ namespace AMI.Neitsillia.NPCSystems
 {
     partial class NPC
     {
-        private static string GetTime => $"[{DateTime.UtcNow.TimeOfDay.ToString("hh\\:mm")}]";
+        private static string GetTime => $"[{DateTime.UtcNow.TimeOfDay:hh\\:mm}]";
 
         public async Task<bool> Act(Area area, int multiplier)
         {
@@ -75,7 +75,7 @@ namespace AMI.Neitsillia.NPCSystems
                 if (x <= area.eLootRate)
                 {
                     int t = ArrayM.IndexWithRates(area.loot.Length, rng);
-                    AddItemToInv(SpawnItem(area.loot[t][ArrayM.IndexWithRates(area.loot[t].Count, rng)]));
+                    AddItemToInv(SpawnItem(area.loot[t][ArrayM.IndexWithRates(area.loot[t].Length, rng)]));
                     KCoins += rng.Next(1 + Rank());
 
                     _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** found loot in {area.name}");
@@ -296,7 +296,7 @@ namespace AMI.Neitsillia.NPCSystems
                 {
                     NPC child = NewNPC(1, "Child", race);
                     var parentNames = name.Split(' ');
-                    child.name = RandomName.ARandomName() + " " + parentNames[parentNames.Length - 1];
+                    child.name = RandomName.ARandomName() + " " + parentNames[^1];
                     if (area.parent == null)
                     {
                         child.origin = area.AreaId;

@@ -23,7 +23,7 @@ namespace AMI.Neitsillia.Encounters
         public string encounterEvent; //description
         public string footerInfo;
 
-        Player player;
+        private readonly Player player;
         //Encounter Stuff
         public string data;
         //Passive
@@ -266,21 +266,11 @@ namespace AMI.Neitsillia.Encounters
             }
         }
 
-        public bool AddLoot(Item item)
-        {
-            return loot.Add(item, 1, -1);
-        }
-        public bool AddLoot(StackedItems i)
-        {
-            return loot.Add(i.item, i.count, -1);
-        }
-        public bool AddLoot(Inventory inv)
-        {
-            bool result = false;
-            foreach(var st in inv.inv)
-            result = AddLoot(st);
-            return result;
-        }
+        public bool AddLoot(Item item) => loot.Add(item, 1, -1);
+
+        public bool AddLoot(StackedItems i) => loot.Add(i.item, i.count, -1);
+
+        public bool AddLoot(Inventory inv) => loot.Add(inv, -1);
 
         public EmbedBuilder GetEmbed(EmbedBuilder embed = null)
         {

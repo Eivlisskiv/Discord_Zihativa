@@ -105,12 +105,6 @@ namespace AMI.Neitsillia.NPCSystems
         {
             NPC mob = Database.LoadRecord("Creature", AMIData.MongoDatabase.FilterEqual<NPC, string>(
                 "displayName", name));
-            if (mob == null)
-            {
-                string path = FindItemPath(name);
-                if (path != null)
-                    mob = FileReading.LoadJSON<NPC>(path);
-            }
             if(mob != null)
                 return GenerateNPC(level, mob);
             return null;
@@ -218,30 +212,6 @@ namespace AMI.Neitsillia.NPCSystems
         }
         #endregion
 
-        public static string FindItemPath(string aname)
-        {
-            if (File.Exists(aname))
-                return aname;
-            string itempath = ReferenceData.oldmobPath;
-            string pathFound = null;
-            DirectoryInfo[] typesD = new DirectoryInfo(itempath).GetDirectories();
-            bool found = false;
-            for (int t = 0; t < typesD.Length && !found; t++)
-            {
-                DirectoryInfo[] raceD = new DirectoryInfo(itempath + @"\" + typesD[t]).GetDirectories();
-                for (int i = 0; i < raceD.Length && !found; i++)
-                {
-                    FileInfo[] itemD = new DirectoryInfo(raceD[i].FullName).GetFiles();
-                    for (int k = 0; k < itemD.Length && !found; k++)
-                        if (itemD[k].Name == aname)
-                        {
-                            pathFound = itemD[k].FullName;
-                            found = true;
-                        }
-                }
-            }
-            return pathFound;
-        }
         public string[] MobDrops(int lootCount)
         {
             string[] looted = new string[lootCount];
@@ -338,7 +308,7 @@ namespace AMI.Neitsillia.NPCSystems
         {
             if (item == null) return;
 
-            int result = IsInterested(item, true);
+            int result = IsInterested(item);
             if (inventory == null)  inventory = new Inventory();
 
             if (
@@ -359,7 +329,7 @@ namespace AMI.Neitsillia.NPCSystems
         /// <param name="item"> the item of interest</param>
         /// <param name="equip"> if the npc will even consider equipping it</param>
         /// <returns></returns>
-        public int IsInterested(Item item, bool equip)
+        public int IsInterested(Item item)
         {
             if (item.CanBeEquip())
             {
@@ -428,7 +398,7 @@ namespace AMI.Neitsillia.NPCSystems
         }
         internal bool IsPet()
         {
-            string[] d = null;
+            string[] d;
             return profession == Profession.Creature && (faction == Reputation.Faction.Factions.Pet || 
                 (d = origin?.Split('\\'))?.Length > 1 && d != null && ulong.TryParse(d[0], out _));
         }

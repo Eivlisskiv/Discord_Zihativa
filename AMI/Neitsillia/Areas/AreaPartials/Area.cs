@@ -31,7 +31,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         public string description;
         //Encounters Rate
         public int eLootRate;
-        public List<string>[] loot;
+        public string[][] loot;
         public int eMobRate;
         public List<string>[] mobs;
         public int ePassiveRate;

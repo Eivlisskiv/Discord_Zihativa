@@ -1,4 +1,5 @@
-﻿using AMI.Methods;
+﻿using AMI.AMIData;
+using AMI.Methods;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Encounters;
@@ -44,10 +45,8 @@ namespace AMI.Neitsillia.Areas.Arenas
         {
             Array modes = Enum.GetValues(typeof(ArenaMode));
             //Loop index
-            if (i >= modes.Length)
-                i = 0;
-            else if (i < 0)
-                i = modes.Length - 1;
+            if (i >= modes.Length) i = 0;
+            else if (i < 0) i = modes.Length - 1;
             //Create Embed
             EmbedBuilder embed = DUtils.BuildEmbed(
                 "Arena", "Select Challenge", color : player.userSettings.Color,
@@ -116,6 +115,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         {
             long score = Modifiers.CurrentScore;
             Inventory loot = new Inventory();
+            LootTables<string> lt = new LootTables<string>(arena.loot, Program.rng);
             for(; score > 0; score -= 100)
             {
                 if (Program.Chance(score))
@@ -125,10 +125,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                         item = Item.CreateRune(1);
                     else if (arena.ValidTable(arena.loot))
                     {
-                        int t1 = ArrayM.IndexWithRates(arena.loot.Length - 1, Program.rng);
-                        int t2 = ArrayM.IndexWithRates(arena.loot[t1].Count - 1, Program.rng);
-                        //gets the item in that tier, creates a new item and adds it to the loot event collection
-                        item = Item.LoadItem(arena.loot[t1][t2].Trim());
+                        item = Item.LoadItem(lt.GetItem(out _).Trim());
                         item.Scale(level);
                     }
                     else item = Item.RandomGear(level * 5, true);
@@ -188,14 +185,14 @@ namespace AMI.Neitsillia.Areas.Arenas
             return embed;
         }
 
-        public async Task EndChallenge(Encounter enc, Area arena)
+        public async Task EndChallenge(Encounter enc, Area arena, int floor)
         {
             //Game mode specific rewards
             switch (gameMode)
             {
                 default:
                     if(arena.ValidTable(arena.loot))
-                        enc.AddLoot(GetLoot(arena, arena.level));
+                        enc.AddLoot(GetLoot(arena, arena.GetAreaFloorLevel(Program.rng, floor)));
                     break;
             }
 
@@ -207,13 +204,13 @@ namespace AMI.Neitsillia.Areas.Arenas
             enc.xpToGain += NumbersM.NParse<long>((Modifiers.CurrentScore * arena.level) * Modifiers.xpMult);
         }
 
-        internal bool WaveProgress(int floor)
+        internal bool WaveProgress(double score)
         {
-            return Modifiers.WaveProgress(floor * (gameMode switch
+            return Modifiers.WaveProgress(NumbersM.CeilParse<long>(score * (gameMode switch
             {
                 ArenaMode.Survival => 5,
                 _ => 1,
-            }));
+            })));
         }
     }
     //TEST - IGNORE

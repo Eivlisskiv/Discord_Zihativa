@@ -6,11 +6,6 @@ namespace AMI.Neitsillia
 {
     public static class ReferenceData
     {
-        public const string olduserPath = @".\Users\";
-        public const string oldareaPath = @".\Data\Areas\";
-        public const string olditemsPath = @".\Data\Items\";
-        public const string oldskaviPath = @".\Data\Items\Skavi\";
-        public const string oldmobPath = @".\Data\Creatures\";
         public const int maxSkillRoll = 8;
         //
         public const int maxCharacterCount = 3;
@@ -23,18 +18,9 @@ namespace AMI.Neitsillia
         public const int GearLevelRequirement = 10;
 
         internal static string StatsAcronym(int i)
-        {
-            switch (i)
-            {
-                case 0: return "END";
-                case 1: return "INT";
-                case 2: return "STR";
-                case 3: return "CHA";
-                case 4: return "DEX";
-                case 5: return "PER";
-            }
-            return null;
-        }
+            => i switch { 0 => "END", 1 => "INT",
+                2 => "STR", 3 => "CHA", 4 => "DEX",
+                5 => "PER",  _ => null };
 
         public const double xprate = 1;
         public const long strongholdCostperSize = 1000000;
@@ -70,7 +56,7 @@ namespace AMI.Neitsillia
             return $"{versionState} {nums[1]}.{nums[2]} " +
                 $"{versionTitle} {nums[3]}.{nums[4]}";
         }
-        public const string currentVersion = "0.7.0.3.7";
+        public const string currentVersion = "0.7.1.3.7";
         internal const string versionState = "Beta";
         internal const string versionTitle = "Walls of Stone";
 
@@ -94,22 +80,22 @@ namespace AMI.Neitsillia
             {
                     case 0: return EnduranceStat();
                     case 1: return IntelligenceStat();
-                    case 2: return StrengthStat();
-                    case 3: return CharismaStat();
+                    case 2: return StrengthStat;
+                    case 3: return CharismaStat;
                     case 4: return DexterityStat;
                     case 5: return PerceptionStat;
 
             }
-            switch(i)
+            return i switch
             {
-                case 0: return EnduranceInfo();
-                case 1: return IntelligenceInfo();
-                case 2: return StrengthInfo();
-                case 3: return CharismaInfo();
-                case 4: return DexterityInfo();
-                case 5: return PerceptionInfo();
-            }
-            return null;
+                0 => EnduranceInfo(),
+                1 => IntelligenceInfo(),
+                2 => StrengthInfo(),
+                3 => CharismaInfo(),
+                4 => DexterityInfo(),
+                5 => PerceptionInfo(),
+                _ => null,
+            };
         }
         public static string EnduranceStat()
         { return $"Endurance |>" +
@@ -119,14 +105,14 @@ namespace AMI.Neitsillia
         { return $"Intelligence |>" +
                 $"{Environment.NewLine} +{Stats.aEfficiencyPerInt}x Ability Efficiency" +
                 $"{Environment.NewLine} +{Stats.SchemDropRatePerInt}x Schematic gain upon dismantling"; }
-        public static string StrengthStat()
-        { return $"Strength |>" +
+        public static string StrengthStat =>
+            $"Strength |>" +
                 $"{Environment.NewLine}+{Stats.dmgPerStr}x Physical Damage" +
-                $"{Environment.NewLine}+{Stats.invSizePerStr} Inventory size"; }
-        public static string CharismaStat()
-        { return $"Charisma |>" +
+                $"{Environment.NewLine}+{Stats.invSizePerStr} Inventory size";
+        public static string CharismaStat =>
+            $"Charisma |>" +
                 $"{Environment.NewLine}+{Stats.pricePerCha}x Better Trading Prices" +
-                $""; }
+                $"";
         public static string DexterityStat => $"Dexterity |>" +
                 $"{Environment.NewLine}+{Stats.passiveSp}% Passive stamina regenaration during combat{Environment.NewLine}" +
                 $"+{Stats.restSpeed}(Seconds) Resting speed";

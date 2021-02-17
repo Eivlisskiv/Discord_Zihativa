@@ -2,20 +2,22 @@
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.NPCSystems;
 using AMYPrototype;
+using Neitsillia.Items.Item;
 using System.Collections.Generic;
 
 namespace AMI.Neitsillia.Areas
 {
     static class Dungeons
     {
+        const int DUNGEON_FLOORS = 4;
         //
         internal static Area Generate(int floor, Area fromArea, bool auto = true)
         {
-            int f = Verify.Max(floor, fromArea.floors - 8);
+            int f = Verify.Max(floor, fromArea.floors - DUNGEON_FLOORS);
             Area dungeon = new Area(false)
             {
                 level = fromArea.level + Program.rng.Next(6),
-                floors = f + 8,
+                floors = f + DUNGEON_FLOORS,
                 name = $"{fromArea.name} Dungeon",
                 type = AreaType.Dungeon,
                 //
@@ -28,16 +30,17 @@ namespace AMI.Neitsillia.Areas
                 kingdom = fromArea.kingdom,
                 parent = fromArea.name,
             };
-            if (!auto)
-                return dungeon;
+            if (!auto) return dungeon;
             return DungeonType(fromArea, dungeon);
         }
-        public static NPCSystems.NPC GetBoss(Area dungeon)
+        public static NPC GetBoss(Area dungeon)
         {
             NPC boss = Utils.RunMethod<NPC>(dungeon.name.Split(':')[1].Replace(" ", "") + "_Boss", 
                 typeof(Dungeons), dungeon);
             boss.level = dungeon.GetAreaFloorLevel(Program.rng);
             boss.Evolve(2, true, false);
+            if (Program.Chance(50))
+                boss.AddItemToInv(Item.RandomItem(boss.level, 5));
             return boss;
         }
         static Area DungeonType(Area fromArea, Area dungeon)

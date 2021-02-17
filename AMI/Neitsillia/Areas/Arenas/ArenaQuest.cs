@@ -1,7 +1,6 @@
 ﻿using AMI.Methods;
 using AMI.Neitsillia.User.UserInterface;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -13,16 +12,16 @@ namespace AMI.Neitsillia.Areas.Arenas
         static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
         static readonly string[] blacklistedRaces = { "Human", "Christmas", "Thanksgiving" };
 
-        static List<string>[][] dropsByDifficulty = new List<string>[][]
+        static readonly string[][][] dropsByDifficulty = new string[][][]
         {
-            new List<string>[] {
-                new List<string> { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Galea" },
+            new string[][] {
+                new string[] { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Galea" },
             },
-            new List<string>[] {
-                new List<string> { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals",  "Galea", "Galea" },
+            new string[][] {
+                new string[]{ "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals",  "Galea", "Galea" },
             },
-            new List<string>[] {
-                new List<string> { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Galea", "Lorica" },
+            new string[][] {
+                new string[] { "Gladiator Sandals", "Gladiator Sandals", "Gladiator Sandals", "Galea", "Lorica" },
             },
         };
 
@@ -49,7 +48,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         public string enemiesDesc;
 
         public int dropChance = 0;
-        public List<string>[] drops = null;
+        public string[][] drops = null;
 
         public ArenaQuest(int diff, int level)
         {

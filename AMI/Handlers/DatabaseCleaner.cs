@@ -10,7 +10,7 @@ namespace AMI.Handlers
 {
     class DatabaseCleaner
     {
-        MongoDatabase database;
+        readonly MongoDatabase database;
 
         public DatabaseCleaner(MongoDatabase database)
         {
@@ -41,11 +41,6 @@ namespace AMI.Handlers
             Log.LogS("Deleting empty User entries");
             await database.database.GetCollection<Neitsillia.User.BotUser>("User").DeleteManyAsync(
                 "{$and: [ {loaded:null}, {ui:null}, {$or: [{ResourceCrates:null}, {ResourceCrates: [0,0,0,0,0]} ]} ]}");
-        }
-
-        private async Task CleanNests()
-        {
-            await database.database.GetCollection<Neitsillia.Areas.Nests.Nest>("Nests").DeleteManyAsync("{}");
         }
 
         async Task CleanAreas()
@@ -88,7 +83,7 @@ namespace AMI.Handlers
                     {
                         for (int k = 0; k < area.loot.Length; k++)
                         {
-                            for (int j = 0; j < area.loot[k].Count; j++)
+                            for (int j = 0; j < area.loot[k].Length; j++)
                                 area.loot[k][j] = area.loot[k][j].Trim();
                         }
                     }

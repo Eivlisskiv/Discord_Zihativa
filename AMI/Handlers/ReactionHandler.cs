@@ -45,14 +45,16 @@ namespace AMI.Handlers
 
                     if (!CommandHandler.RunUser(reaction.UserId)) return;
 
-                    await new ReactionHandler(message, reaction, gset).ExecuteAsync();
-
+                    ReactionHandler handler = new ReactionHandler(message, reaction, gset);
+                    if (!await handler.IsUserUI()) await handler.PlayerUI();
                 }
                 catch (Exception e)
                 {
                     Log.LogS(e);
                     _ = UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
                 }
+
+                CommandHandler.running.Remove(reaction.UserId);
             });
             
             return Task.CompletedTask;
@@ -71,14 +73,6 @@ namespace AMI.Handlers
             this.reaction = reaction;
             this.message = message;
             guildSettings = gset;
-        }
-
-        async Task ExecuteAsync()
-        {
-            if (!await IsUserUI()) 
-                await PlayerUI();
-
-            CommandHandler.running.Remove(reaction.UserId);
         }
 
         public async Task<bool> IsUserUI()
