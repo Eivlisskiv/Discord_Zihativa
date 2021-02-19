@@ -107,12 +107,15 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
             try
             {
-                if (x <= eLootRate && ValidTable(loot))
-                    return LocationLoot(player, explore);
+                if (x <= eLootRate)
+                    return !ValidTable(loot) || Program.Chance(35) ?
+                        LocationRessource(player, explore)
+                        : LocationLoot(player, explore);
                 else if (x <= eMobRate + (eLootRate) && ValidTable(mobs))
                     return LocationMob(explore, player);
-                else if (ePassiveRate > 0 && x <= ePassiveRate + (eMobRate + eLootRate) && ((passiveEncounter != null && passiveEncounter.Length != 0) || ValidTable(passives)))
-                    return LocationPassive(explore, player);
+                else if (ePassiveRate > 0)
+                    return LocationPassive(explore, player, 
+                        passiveEncounter == null || passiveEncounter.Length == 0 || ValidTable(passives));  
             }
             catch (Exception e)
             {
@@ -153,11 +156,19 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             return explore;
         }
 
+        private EmbedBuilder LocationRessource(Player player, EmbedBuilder explore)
+        {
+            Encounter encounter = new Encounter(Encounter.Names.Ressource, player);
+            player.NewEncounter(encounter);
+            player.SaveFileMongo();
+            return encounter.GetEmbed(explore);
+        }
+
         private EmbedBuilder LocationLoot(Player player, EmbedBuilder explore)
         {
             Random rng = Program.rng;
             //Create Encounter
-            Encounter encounter = new Encounter("Loot", player);
+            Encounter encounter = new Encounter(Encounter.Names.Loot, player);
             explore.Color = player.userSettings.Color;
             explore.Description = "While exploring " + name + " you've discovered loot.";
 
@@ -243,7 +254,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
                 for (int i = 0; i < mob.Length; i++)
                     mob[i] = GetAMob(rng, player.AreaInfo.floor);
-                player.NewEncounter(new Encounter("Mob", player)
+                player.NewEncounter(new Encounter(Encounter.Names.Mob, player)
                 { mobs = mob });
             }
 
@@ -280,9 +291,13 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             return explore;
         }
 
-        private EmbedBuilder LocationPassive(EmbedBuilder explore, Player player)
+        private EmbedBuilder LocationPassive(EmbedBuilder explore, Player player, bool valid)
         {
-            player.NewEncounter(new Encounter(Utils.RandomElement(passiveEncounter ?? Utils.RandomElement(passives)), player));
+            player.NewEncounter(
+                 eMobRate > 0 && ValidTable(mobs) && Program.Chance(eMobRate / 3.5) ? new Encounter(Encounter.Names.Puzzle, player, 
+                 $"~Random;2;{Utils.RandomElement(Utils.RandomElement(mobs))}") :
+                 eLootRate > 0 && (!valid || Program.Chance(eLootRate / 3.5)) ? new Encounter(Encounter.Names.Puzzle, player, "~Random;1;~Random") :
+                new Encounter(Utils.RandomElement(passiveEncounter ?? Utils.RandomElement(passives)), player));
             explore = player.Encounter.GetEmbed(explore);
             return explore;
         }

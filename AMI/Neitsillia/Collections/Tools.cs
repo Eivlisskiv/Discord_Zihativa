@@ -72,33 +72,42 @@ namespace AMI.Neitsillia.Collections
             return $"{GetAllTiers(tool)[tier]} {NumbersM.GetLevelMark(level)}";
         }
 
-        internal string UseTool(string toolName, Player player, Areas.AreaType areaType)
+        public (int tier, int level, string name) CanUse(Player player, string toolName)
         {
             DateTime cooldown = Utils.GetVar<DateTime, Timers>(player.userTimers, $"{toolName}Usage");
             int tier = GetTier(toolName);
             int level = GetLevel(toolName);
             string name = ToolName(toolName, tier, level);
             if (cooldown > DateTime.UtcNow)
-                return $"{player.name}, your {name} is on cooldown for {Timers.CoolDownToString(cooldown)}";
-            else
+                throw NeitsilliaError.ReplyError($"{player.name}, your {name} is on cooldown for {Timers.CoolDownToString(cooldown)}");
+            return (tier, level, name);
+        }
+
+        internal string UseTool(string toolName, Player player, Areas.AreaType areaType)
+        {
+            (int tier, int level, string name) = CanUse(player, toolName);
+
+            string[] options;
+            if ((options = Utils.GetVar<string[], Tools>(this, $"{toolName}{areaType}", true)) == null)
+                options = Utils.GetVar<string[], Tools>(this, $"{toolName}Default");
+
+            level += tier - Verify.Max(tier, options.Length - 1);
+            StackedItems st = new StackedItems(Item.LoadItem(options[Verify.Max(tier, options.Length - 1)]), level + 1);
+
+            if (player.CollectItem(st))
             {
-                string[] options = null;
-                if((options = Utils.GetVar<string[], Tools>(this, $"{toolName}{areaType}", true)) == null)
-                    options = Utils.GetVar<string[], Tools>(this, $"{toolName}Default");
-
-                level += tier - Verify.Max(tier, options.Length - 1);
-                StackedItems st = new StackedItems(Item.LoadItem(options[Verify.Max(tier, options.Length - 1)]), level + 1);
-
-                if (player.CollectItem(st))
-                {
-                    Utils.SetVar(player.userTimers, $"{toolName}Usage", DateTime.UtcNow.AddMinutes(MinutesCoolDown));
-                    long currentXp = Utils.GetVar<long, Tools>(this, $"{toolName}XP");
-                    long newXP = Utils.SetVar(this, $"{toolName}XP", currentXp + player.level);
-                    player.SaveFileMongo();
-                    return $"{player.name} collected {st} using {name}.";
-                }
-                return $"{player.name}'s Inventory may not currently contain {st}.";
+                AfterCollect(player, toolName, player.level);
+                player.SaveFileMongo();
+                return $"{player.name} collected {st} using {name}.";
             }
+            return $"{player.name}'s Inventory may not currently contain {st}.";
+        }
+
+        public void AfterCollect(Player player, string name, long xp)
+        {
+            Utils.SetVar(player.userTimers, $"{name}Usage", DateTime.UtcNow.AddMinutes(MinutesCoolDown));
+            long currentXp = Utils.GetVar<long, Tools>(this, $"{name}XP");
+            Utils.SetVar(this, $"{name}XP", currentXp + xp);
         }
 
         internal string ToolInfo(string toolName)

@@ -753,16 +753,28 @@ namespace AMI.Neitsillia.InventoryCommands
         [Summary("Use the specified tool. Enter tool name: ~UseTool Axe")]
         public async Task UseTool(string toolName)
         {
-            string reply = null;
             Player player = Player.Load(Context.BotUser);
-            if (player.Tools == null)
-                player.Tools = new Tools(player._id);
+            if (player.Tools == null) player.Tools = new Tools(player._id);
+
+            if (player?.Encounter?.Name == Encounter.Names.Ressource)
+            {
+                string[] ds = player.Encounter.data.Split(';');
+                if (ds[0].Equals(toolName, StringComparison.OrdinalIgnoreCase))
+                {
+                    await player.NewUI($"Vein exploited, " +
+                        Resource.Exploit(player, ds[0].ToLower(), ds[1]), player.Encounter.GetEmbed().Build(), 
+                        Context.Channel, MsgType.Loot);
+                    return;
+                }
+            }
+
+            string reply;
             switch (toolName.ToLower())
             {
                 case "sickle":
                 case "pickaxe":
                 case "axe":
-                case "spear":
+                //case "spear":
                     reply = player.Tools.UseTool(toolName.ToLower(), player, player.Area.type);
                     break;
                 default:

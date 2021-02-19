@@ -94,52 +94,6 @@ namespace AMI.Methods
         internal static int Max(int x, int max)
             => Math.Min(x, max);
         internal static double Max(double x, double max)
-            => Math.Min(x, max);
-
-        public static int VerifyInt(string value, int baseValue = 0)
-        {
-            if (value == null)
-                return baseValue;
-            else if (!int.TryParse(value, out int result))
-            {
-                Log.LogS(value + " Could not be int.Parsed()");
-                return baseValue;
-            }
-
-            return int.Parse(value);
-        }
-        public static long VerifyLong(string value, int baseValue = 0)
-        {
-            if (value == null)
-                return baseValue;
-            else if (!long.TryParse(value, out long aresult))
-            {
-                Log.LogS(value + " Could not be long.Parsed()");
-                return baseValue;
-            }
-            return long.Parse(value);
-        }
-        public static double VerifyDouble(string value, double baseValue = 0)
-        {
-            if (value == null)
-                return baseValue;
-            else if (!Double.TryParse(value, out double result))
-            {
-                Log.LogS(value + " Could not be int.Parsed()");
-                return baseValue;
-            }
-
-            return Double.Parse(value);
-        }
-        public static bool VerifyBool(string value, bool bdefault = false)
-        {
-            if (value == null)
-                return bdefault;
-            else if (!bool.TryParse(value, out bool aresult))
-            {
-                Log.LogS(value + " Could not be bool.Parsed()");
-                return bdefault;
-            }
-            return bool.Parse(value);
-        }    }
+            => Math.Min(x, max);  
+    }
 }

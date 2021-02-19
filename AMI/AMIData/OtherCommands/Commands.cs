@@ -26,10 +26,7 @@ namespace AMI.AMIData.OtherCommands
             var guild = DiscordBotHandler.Client.GetGuild(201877884313403392);
             var invs = await guild.GetInvitesAsync();
             var botInvites = invs.Where(inv => inv.Inviter.Id == DiscordBotHandler.Client.CurrentUser.Id);
-            if (botInvites.Any())
-            {
-                return botInvites.First().Url;
-            }
+            if (botInvites.Any()) return botInvites.First().Url;
 
             var gs = GuildSettings.Load(guild);
             var chan = (ITextChannel)guild.GetChannel(gs.mainChannel.id);

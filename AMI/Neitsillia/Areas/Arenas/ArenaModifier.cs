@@ -52,7 +52,7 @@ namespace AMI.Neitsillia.Areas.Arenas
             }
         }
 
-        public bool WaveProgress(int score)
+        public bool WaveProgress(long score)
         {
             CurrentScore += score;
             wave++;

@@ -36,7 +36,7 @@ namespace AMI.AMIData.OtherCommands
             if (await IsGMLevel(3))
             {
                 Player player = Player.Load(user.Id);
-                Area dungeon = null;
+                Area dungeon;
                 if (args.Length > 0)
                     dungeon = Dungeons.ManualDungeon(StringM.UpperAt(ArrayM.ToString(args)), player.AreaInfo.floor, player.Area);
                 else dungeon = Dungeons.Generate(player.AreaInfo.floor, player.Area);

@@ -308,7 +308,7 @@ namespace AMI.Neitsillia.Combat
                 NPC mob = (NPC)mobParty[i].character;
                 enc.AddLoot(mob.inventory);
 
-                for(int k = 0; k < Equipment.gearCount; i++)
+                for(int k = 0; k < Equipment.gearCount; k++)
                 {
                     var gear = mob.equipment.GetGear(i);
                     if (gear != null) enc.AddLoot(gear);

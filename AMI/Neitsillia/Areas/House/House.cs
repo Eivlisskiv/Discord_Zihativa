@@ -10,7 +10,7 @@ namespace AMI.Neitsillia.Areas.House
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class House
     {
-        private const int HOUSE_PRICE = 6544;
+        private const int HOUSE_PRICE = 2149;
         public static long HousePrice(int level) => Math.Max(HOUSE_PRICE, HOUSE_PRICE * level);
 
         static MongoDatabase Database => Program.data.database;

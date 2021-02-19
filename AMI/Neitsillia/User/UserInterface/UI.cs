@@ -46,8 +46,8 @@ namespace AMI.Neitsillia.User.UserInterface
 
         //
         [JsonConstructor]
-        public UI(bool json = true)
-        { }
+        public UI(bool json = true) { }
+
         public UI(IUserMessage argMsg, MsgType argType, Player argplayer, string argData = null, bool loadReaction = true)
         {
             message = argMsg;
@@ -124,7 +124,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     if (player.Encounter != null
                      && (player.Encounter.Name == Encounter.Names.Floor
                      || player.Encounter.Name == Encounter.Names.Dungeon))
-                        options.Add(enterFloor);
+                        options.Insert(0, enterFloor);
                 }
                 if (options.Contains(schem) && (player.schematics == null
                     || player.schematics.Count < 1))
@@ -639,28 +639,6 @@ namespace AMI.Neitsillia.User.UserInterface
             }
         }
         #endregion
-
-        public async Task Puzzle(SocketReaction reaction, IUserMessage msg)
-        {
-            Encounter enc = player.Encounter;
-            if (enc?.Name == Encounter.Names.Puzzle)
-            {
-                Puzzle puz = enc.puzzle;
-                puz.partyName = player.Party?.partyName ?? player.name;
-                bool solved = puz.Solve_Puzzle(reaction.Emote.ToString(), enc.turn, out EmbedBuilder embed);
-                await EditMessage(null, embed.Build(), removeReactions: solved);
-               
-                if(solved)
-                {
-                    player.QuestTrigger(Quest.QuestTrigger.Puzzle, $"{puz.name};{(int)puz.rewardType};{puz.reward}");
-                    puz.Solved_Puzzle(enc);
-                    await reaction.Channel.SendMessageAsync(embed: enc.GetEmbed().Build());
-                }
-                else enc.turn++;
-
-                enc.Save();
-            }
-        }
 
         #region Strongholds
         public async Task AcceptBuilding(SocketReaction reaction, IUserMessage msg)

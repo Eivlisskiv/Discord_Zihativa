@@ -95,14 +95,18 @@ namespace AMI.Neitsillia.Encounters
                 case Reward.Loot:
                     {
                         encounter.Load(Encounter.Names.Loot);
-                        if(reward == "~Random")
+                        if (reward == "~Random")
                         {
-                            if(Program.Chance(1))
+                            if (Program.Chance(1))
                                 encounter.AddLoot(Item.CreateRune(1));
                             else encounter.AddLoot(Item.RandomItem(level));
                         }
                         else
-                            encounter.AddLoot(Item.LoadItem(reward));
+                        {
+                            var item = Item.LoadItem(reward);
+                            item.Scale(level);
+                            encounter.AddLoot(item);
+                        }
 
                     }
                     break;
@@ -111,10 +115,9 @@ namespace AMI.Neitsillia.Encounters
                         if (reward == "~Random") reward = Utils.RandomElement("Odez' Spawn", "Tainted Specter");
                         encounter.turn = 0;
                         encounter.Load(Encounter.Names.Mob);
-                        encounter.mobs = new NPCSystems.NPC[]
-                        {
-                            NPCSystems.NPC.GenerateNPC(level, reward)
-                        };
+                        var mob = NPCSystems.NPC.GenerateNPC(level, reward);
+                        mob.Evolve(5);
+                        encounter.mobs = new NPCSystems.NPC[] { mob };
                     }
                     break;
             }

@@ -45,7 +45,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
         }
 
         public Encounter NewEncounter(Encounter.Names name, bool endOld = false, string data = null)
-            => NewEncounter(new Encounter(name, this, data));
+            => NewEncounter(new Encounter(name, this, data), endOld);
 
         public Encounter NewEncounter(Encounter e, bool endOld = false)
         {

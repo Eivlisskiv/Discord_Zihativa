@@ -47,13 +47,24 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         internal static async Task Upgrade(Player player, ISocketMessageChannel channel)
         {
             House house = await House.Load(player.userid);
-            if (house == null || !house.junctions.Contains(player.AreaInfo.path)) //new house
+            if (house == null) //new house
             {
                 if (player.KCoins < House.HousePrice(player.Area.level))
                     await channel.SendMessageAsync("You do not have the funds for this purchase.");
                 else
                 {
                     house = new House(player);
+                    await house.Save();
+                    await ViewHouseInfo(player, house, channel);
+                }
+            }
+            else if (!house.junctions.Contains(player.AreaInfo.path))
+            {
+                if (player.KCoins < House.HousePrice(player.Area.level))
+                    await channel.SendMessageAsync("You do not have the funds for this purchase.");
+                else
+                {
+                    house.junctions.Add(player.AreaInfo.path);
                     await house.Save();
                     await ViewHouseInfo(player, house, channel);
                 }
@@ -192,6 +203,23 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await channel.SendMessageAsync(sb.tiles[i].Cancel(sb));
             await house.Save();
             await SandboxActions.InspectTile(player, sb, "house", i, channel);
+        }
+
+        [Command("House Travel")]
+        public async Task HouseTravel([Remainder] string area_name)
+        {
+            Player player = Context.Player;
+            House house = await LoadHouse(player, Context.Channel);
+
+            string path = house.junctions.Find(s => s.Split('\\')[^1].Equals(area_name, StringComparison.OrdinalIgnoreCase));
+            if(path == null)
+            {
+                await ReplyAsync($"You do not have a house in {area_name}");
+                return;
+            }
+            var area = Area.LoadArea(path);
+            await player.SetArea(area);
+            await ReplyAsync(embed: area.AreaInfo(0).Build());
         }
     }
 }

@@ -66,7 +66,7 @@ namespace AMI.Neitsillia.Commands
         }
         internal static async Task Enter(Player player, string areaName, ISocketMessageChannel chan)
         {
-            string error = "You may not access that area from your current location or the area entered does not exist.";
+            string error;
             //
             //Player is in combat
             if (player.IsEncounter("Combat"))
@@ -141,7 +141,7 @@ namespace AMI.Neitsillia.Commands
             if (AMIData.Events.OngoingEvent.Ongoing != null)
                 AMIData.Events.OngoingEvent.Ongoing.EventBounty(player.Area, player.AreaInfo.floor);
 
-            if (player.Area.type == AreaType.Dungeon && player.AreaInfo.floor >= player.Area.floors)
+            if (player.Area.type == AreaType.Dungeon && player.AreaInfo.floor + 1 >= player.Area.floors)
             {
                 player.AreaInfo.floor++;
                 NPCSystems.NPC mob = Dungeons.GetBoss(player.Area);
@@ -264,7 +264,7 @@ namespace AMI.Neitsillia.Commands
             if (player.IsEncounter("Combat"))
                 message = "You must complete your current task before exploring.";
             else if (!player.IsLeader) message = $"{player.name} is not party leader";
-            else if (player.Area.type == AreaType.ArenaLobby)
+            else if (player.Area.type == AreaType.ArenaLobby || player.Area.type == AreaType.Tavern)
                 message = $"There is nothing to explore here. " +
                     $"Instead use the ``Service`` command to participate in the arena.";
             else
@@ -311,6 +311,7 @@ namespace AMI.Neitsillia.Commands
                             }
                             break;
                         case Encounter.Names.NPC: menuType = MsgType.NPC; break;
+                        case Encounter.Names.Puzzle: menuType = MsgType.Puzzle; break;
                     }
                 }
                 var msg = await chan.SendMessageAsync(message, embed: embed?.Build());

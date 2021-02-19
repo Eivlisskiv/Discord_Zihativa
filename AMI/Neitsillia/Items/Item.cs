@@ -395,7 +395,7 @@ namespace Neitsillia.Items.Item
                     {
                         choices = Database.LoadRecords("Item",
                             MongoDatabase.FilterEqualAndLtAndGt<Item, int, int>("type", type, "tier",
-                            tier, minT));
+                            maxT, minT));
 
                         if (minT > 0) minT -= 5;
                         else maxT++;

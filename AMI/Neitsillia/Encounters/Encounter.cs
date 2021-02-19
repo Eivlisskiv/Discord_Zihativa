@@ -1,4 +1,5 @@
 ﻿using AMI.AMIData;
+using AMI.Methods;
 using AMI.Neitsillia.Areas.AreaExtentions;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
@@ -44,45 +45,35 @@ namespace AMI.Neitsillia.Encounters
             Exploration,
             Floor, Loot, NPC, Adventure, //Passives
             Mob, Bounty, PVP, Dungeon, FloorJump, //Combat
-            Puzzle,
+            Puzzle, Ressource
         };
 
         public Encounter(Names aname, Player aplayer, string aData = null)
         {
+            this.player = aplayer;
+            Init(aname, aData);
+
+        }
+        [JsonConstructor]
+        public Encounter(bool json) { }
+        public Encounter(string v, Player player, string aData = null)
+        {
+            this.player = player;
+            Init(Enum.Parse<Names>(v, true), aData);
+        }
+
+        private void Init(Names aname, string aData = null)
+        {
             Name = aname;
-            player = aplayer;
             data = aData;
             Load(Name);
             if (player.Party == null) _id = player._id;
             else _id = player.Party.EncounterKey;
         }
-        [JsonConstructor]
-        public Encounter(bool json)
-        {}
-        public Encounter(string v, Player player, string aData = null)
-        {
-            Name = (Names)Enum.Parse(typeof(Names), v, true);
-            this.player = player;
-            data = aData;
-            Load(Name);
-            _id = player.Party?.EncounterKey ?? player._id;
-        }
 
-        internal static Encounter LoadDB(string id)
-        {
-            return Program.data.database.
-                LoadRecord("Encounter", MongoDatabase.FilterEqual<Encounter, string>("_id", id));
-        }
-        internal void Save()
-        {
-            Program.data.database.
+        internal void Save() => Program.data.database.
                 UpdateRecord("Encounter", "_id", _id, this);
-        }
-        internal void Delete()
-        {
-            Program.data.database.
-                DeleteRecord<Encounter>("Encounter", _id).Wait();
-        }
+
         public bool Load(Names name)
         {
             Name = name;
@@ -121,10 +112,7 @@ namespace AMI.Neitsillia.Encounters
                     }
                 case Names.Loot:
                 case Names.Adventure:
-                    {
-                        loot = new Inventory();
                         return true;
-                    }
                 case Names.NPC:
                     {
                         var popu = player.Area.GetPopulation(Areas.AreaExtentions.Population.Type.Population);
@@ -157,19 +145,20 @@ namespace AMI.Neitsillia.Encounters
                     {
                         string[] piz = data?.Split(';') ?? new string[]{ "~Random", "1", "~Random"};
 
-                        if (piz[0] == "~Random")  puzzle = Puzzle.Random();
-                        else puzzle = Puzzle.Load(piz[0]);
+                        puzzle = (piz[0] == "~Random") ?  Puzzle.Random() : Puzzle.Load(piz[0]);
 
-                        if (piz.Length > 1 && int.TryParse(piz[1], out int t))
-                        {
-                            puzzle.rewardType = (Puzzle.Reward)t;
+                        if (piz.Length > 1 && Enum.TryParse(piz[1], out puzzle.rewardType))
                             if(piz.Length > 2) puzzle.reward = piz[2];
-                        }
 
                         encounterEvent = puzzle.description;
-                        puzzle.level = player?.level ?? 0;
+                        puzzle.level = player?.Area.level ?? 5;
+                        return true;
                     }
-                    break;
+                case Names.Ressource:
+                    {
+                        data = Resource.Get(player.Area);
+                        return true;
+                    }
             }
             return false;
         }
@@ -286,6 +275,12 @@ namespace AMI.Neitsillia.Encounters
                         int page = 0;
                         embed = loot.ToEmbed(ref page, "Loot", -1, player?.equipment);
                     }break;
+                case Names.Ressource:
+                    {
+                        string[] d = data.Split(';');
+                        Resource.EmbedBuilder(embed, d[0], d[1]);
+                    }
+                break;
                 default:
                     {
                         embed.Title = Name.ToString();

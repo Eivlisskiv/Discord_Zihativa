@@ -40,7 +40,7 @@ namespace AMI.AMIData
 
                 connected = true;
             }
-            catch (Exception)
+            catch (Exception _)
             {
                 return;
             }

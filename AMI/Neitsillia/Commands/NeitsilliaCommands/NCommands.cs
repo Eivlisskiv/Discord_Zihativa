@@ -35,7 +35,7 @@ namespace AMI.Module
         
         [Command("How To Start")]
         [Alias("start")]
-        async Task HowToStart() => await ReplyAsync("To begin, create a character using the following command ``~Create Character 'Enter Character Name'``");
+        public async Task HowToStart() => await ReplyAsync("To begin, create a character using the following command ``~Create Character 'Enter Character Name'``");
         //Characters Commands
         
         private static string NoCharacterMessage()

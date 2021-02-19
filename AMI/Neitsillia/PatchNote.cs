@@ -8,10 +8,10 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Higher floors now increase the max possible amount of loot drops by up to 100%. {Environment.NewLine}"
-                + $"Lowered dungeons length from 8 floors to 4. {Environment.NewLine}"
-                + $"Dungeon bosses now have a 50% chance to drop an additional jewelry. {Environment.NewLine}"
-                + $"Mobs' equipment now becomes loot when defeated. {Environment.NewLine}"
+                $"Fixed exploring in taverns {Environment.NewLine}"
+                + $"Lowered house price {Environment.NewLine}"
+                + $"Players may now travel from and to any area where they unlocked their house using the `house travel {{area name}}` command {Environment.NewLine}"
+                + $"Fixed arena survival {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -46,10 +46,10 @@ namespace AMI.Neitsillia
         }
         public static string WorldPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
-                + $" {Environment.NewLine}"
+                $"Added Puzzle Encounters {Environment.NewLine}"
+                + $"Added Resource Encounters {Environment.NewLine}"
                 ;
         }
         public static string MobsPatchNotes()

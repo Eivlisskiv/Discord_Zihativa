@@ -284,15 +284,6 @@ namespace AMI.AMIData.OtherCommands
             }
         }
 
-        [Command("SimulateLotteryEnd"), Alias("SimLottery")]
-        public async Task SimulateLotteryEnd()
-        {
-            if(await IsGMLevel(4))
-            {
-                var lottery = Program.data.lottery;
-                await ReplyAsync(lottery.GetWinner(out Player p));
-            }
-        }
         #endregion
 
         #region Server Management
@@ -627,18 +618,7 @@ namespace AMI.AMIData.OtherCommands
                 else await ReplyAsync($"{p.name} already knows {a.name}");
             }
         }
-        [Command("RemoveAbility")]
-        public async Task RemoveAbility(IUser user, int index)
-        {
-            if(await IsGMLevel(4))
-            {
-                Player player = Player.Load(user.Id, Player.IgnoreException.All);
-                if (index < 0 || index > player.abilities.Count)
-                    NeitsilliaError.ReplyError("Invalid index");
-                player.abilities.RemoveAt(index);
-                player.SaveFileMongo();
-            }
-        }
+
         [Command("Grant Ability XP")]
         [Alias("grantax")]
         public async Task Grant_Ability_XP(IUser user, string argName, long xp = 100)

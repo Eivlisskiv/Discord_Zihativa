@@ -446,7 +446,7 @@ namespace AMI.Neitsillia.NPCSystems
         internal string GearList(string start = null)
         {
             string str = null;
-            for (int i = 0; i <= Equipment.gearCount; i++)
+            for (int i = 0; i < Equipment.gearCount; i++)
             {
                 if (i != 1)
                 {
