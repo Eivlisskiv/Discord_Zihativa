@@ -217,8 +217,16 @@ namespace AMI.Neitsillia.Commands.AreaCommands
                 await ReplyAsync($"You do not have a house in {area_name}");
                 return;
             }
+
+            if (!player.IsSolo)
+            {
+                await ReplyAsync($"You may not do this while in a party.");
+                return;
+            }
+
             var area = Area.LoadArea(path);
             await player.SetArea(area);
+            player.SaveFileMongo();
             await ReplyAsync(embed: area.AreaInfo(0).Build());
         }
     }

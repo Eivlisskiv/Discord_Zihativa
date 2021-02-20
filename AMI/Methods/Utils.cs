@@ -135,14 +135,10 @@ namespace AMI.Methods
         }
 
         internal static T RandomElement<T>(IEnumerable<T> list)
-        {
-            return list.ElementAt(Rng.Next(0, list.Count()));
-        }
+            => list == null || list.Count() == 0 ? default : list.ElementAt(Rng.Next(0, list.Count()));
 
-        internal static T RandomElement<T>(params T[] list)
-        {
-            return list[Rng.Next(0, list.Length)];
-        }
+        internal static T RandomElement<T>(params T[] list) 
+            => list == null || list.Length == 0 ? default : list[Rng.Next(0, list.Length)];
 
         internal static T RandomElement<T>() where T : Enum
         {

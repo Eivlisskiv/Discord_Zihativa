@@ -3,6 +3,7 @@ using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.User.PlayerPartials;
 using Newtonsoft.Json;
 using System;
+using System.Threading.Tasks;
 
 namespace NeitsilliaEngine
 {
@@ -36,7 +37,8 @@ namespace NeitsilliaEngine
                 return destination + " |F: " + floorRequirement;
             return destination;
         }
-        internal Area PassJunction(Player player)
+
+        internal async Task<Area> PassJunction(Player player)
         {
             player.EndEncounter();
             Area area = Area.LoadArea(filePath, destination);
@@ -44,7 +46,7 @@ namespace NeitsilliaEngine
                 throw AMI.Module.NeitsilliaError.ReplyError($"Error while loading Area: {filePath} | {destination}; " +
                     $"Please contact an administrator.");
 
-            player.SetArea(area, returnfloor).Wait();
+            await player.SetArea(area, returnfloor);
             return area;
         }
         internal static Predicate<Junction> FindName(string name)

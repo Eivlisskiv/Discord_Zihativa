@@ -449,6 +449,8 @@ namespace AMI.Neitsillia.Combat
                 player.Encounter = enc;
             }
 
+            player.duel.abilityName = null;
+
             player.SaveFileMongo(party == null);
             return lootDisplay;
         }

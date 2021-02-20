@@ -41,5 +41,16 @@ namespace AMI.Neitsillia.User.UserInterface
             }
             player.SaveFileMongo();
         }
+
+        public async Task NPCRepair(SocketReaction reaction, IUserMessage msg)
+        {
+            switch (reaction.Emote.ToString())
+            {
+                case EUI.ok:
+                    await ShopCommands.ConfirmNPCRepair(player, int.Parse(data), reaction.Channel);
+                    break;
+                case EUI.cancel: await TryDeleteMessage(); break;
+            }
+        }
     }
 }

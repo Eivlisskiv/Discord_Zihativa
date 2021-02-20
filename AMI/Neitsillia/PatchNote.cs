@@ -8,10 +8,9 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Fixed exploring in taverns {Environment.NewLine}"
-                + $"Lowered house price {Environment.NewLine}"
-                + $"Players may now travel from and to any area where they unlocked their house using the `house travel {{area name}}` command {Environment.NewLine}"
-                + $"Fixed arena survival {Environment.NewLine}"
+                $"Fixed Keen Eye {Environment.NewLine}"
+                + $"Fixed house travelling {Environment.NewLine}"
+                + $"Fixed the issue where player would be sent back the to area where they joined the party after leaving it. {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -46,10 +45,10 @@ namespace AMI.Neitsillia
         }
         public static string WorldPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Added Puzzle Encounters {Environment.NewLine}"
-                + $"Added Resource Encounters {Environment.NewLine}"
+                $"{Environment.NewLine}"
+                + $"{Environment.NewLine}"
                 ;
         }
         public static string MobsPatchNotes()

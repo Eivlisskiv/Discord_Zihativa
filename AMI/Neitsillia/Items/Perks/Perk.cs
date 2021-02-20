@@ -621,7 +621,7 @@ namespace AMI.Neitsillia.Items
         {
             if (owner.abilityUsed.IsOffense)
             {
-                int buff = (maxRank - rank);
+                int buff = (maxRank - rank) * tier;
                 owner.bonusAdditiveCritChance += buff;
                 owner.bonusAdditiveCritMultiplier += (0.02) * buff;
                 rank = 0;

@@ -104,7 +104,7 @@ namespace AMI.Neitsillia.Items.Quests
         }
 
         internal static async System.Threading.Tasks.Task QuestList(
-            Player player, int page, ISocketMessageChannel channel)
+            Player player, int page, ISocketMessageChannel channel, bool edit = false)
         {
             EmbedBuilder e = DUtils.BuildEmbed($"{player.name}'s Quests", 
                 "__Click on the emotes to view details of a quest__", null, player.userSettings.Color);
@@ -130,8 +130,7 @@ namespace AMI.Neitsillia.Items.Quests
                     e.AddField(q.AsEmbedField(true, EUI.GetNum(n)));
                 }
             }
-            await player.NewUI(await channel.SendMessageAsync(embed: e.Build())
-                , MsgType.QuestList, page.ToString());
+            await player.EnUI(edit, null, e.Build(), channel, MsgType.QuestList, page.ToString());
         }
 
         internal static async System.Threading.Tasks.Task AvailableQuestList(

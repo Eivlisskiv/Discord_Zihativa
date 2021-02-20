@@ -41,7 +41,8 @@
 
         public static readonly string[] coinsLoot =
         {
-            "A found a coins purse! Lucky me!",
+            "A found a coins purse with {0} coins! Lucky me!",
+            "An extra {0} coins for my pockets!",
         };
 
         //Other Encounters

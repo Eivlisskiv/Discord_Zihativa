@@ -205,6 +205,68 @@ namespace AMI.Module
             return final;
         }
 
+        [Command("Npc Repair")]
+        public async Task NPC_Repair(int item_slot)
+        {
+            Player player = Context.Player;
+            if(player.Encounter.Name != Neitsillia.Encounters.Encounter.Names.NPC)
+            {
+                await ReplyAsync("You must be in an encounter with an npc to do this.");
+                return;
+            }
 
+            item_slot--;
+            Item item = player.inventory.GetItem(item_slot);
+            if (!item.CanBeEquip())
+            {
+                await ReplyAsync($"{item} is not gear and may not be repaired.");
+                return;
+            }
+
+            if (item.condition >= item.durability)
+            {
+                await ReplyAsync($"{item} does not need any repairs.");
+                return;
+            }
+
+            NPC npc = player.Encounter.npc;
+            if (npc.profession != ReferenceData.Profession.Blacksmith && !npc.schematics.Exists(s => s.name.Equals(item.originalName)))
+            {
+                await ReplyAsync($"{npc.name} may not repair a {item.originalName}.");
+                return;
+            }
+
+            long price = GetCost(item, player, npc);
+            if (player.KCoins < price)
+            {
+                await ReplyAsync($"You are missing {price - player.KCoins} Kutsyei Coins to have your {item} repaired by {npc.name}");
+                return;
+            }
+
+            await player.NewUI($"Requesting item repair from {npc.name}", DUtils.BuildEmbed(
+                $"Item Repair by {npc.name}", $"Item: {item} (Tier {item.tier})"
+                + Environment.NewLine + $"Cost: {price} Coins", null, player.userSettings.Color
+                ).Build(), Context.Channel, MsgType.NPCRepair, $"{item_slot}");
+
+        }
+
+        private static long GetCost(Item item, Player player, NPC npc) 
+            => (item.tier * (100 - ((item.condition*100) / item.durability))) * Math.Max(1, npc.stats.GetCHA() - player.stats.GetCHA()) / 2;
+
+        public static async Task ConfirmNPCRepair(Player player, int index, ISocketMessageChannel chan)
+        {
+            Item item = player.inventory.GetItem(index);
+            NPC npc = player.Encounter.npc;
+            long price = GetCost(item, player, npc);
+
+            player.KCoins -= price;
+            item.condition = item.durability;
+
+            npc.KCoins += price;
+
+            player.SaveFileMongo();
+
+            await chan.SendMessageAsync($"{npc.name} has repaired your {item} for {price}");
+        }
     }
 }

@@ -230,9 +230,10 @@ namespace AMI.Neitsillia.Adventures
             }
             else if (x <= player.Area.eLootRate + player.Area.ePassiveRate)
             {
-                looted.c += player.Area.level * 10;
+                long nc = player.Area.level * Program.rng.Next(5, 22);
+                looted.c += nc;
                 return string.Format(Utils.RandomElement(AutoEncounters.coinsLoot),
-                    ""
+                    nc
                 );
             }
 
@@ -249,10 +250,9 @@ namespace AMI.Neitsillia.Adventures
             }
             else
             {
-                int dmg = 0;
-                int xpMult = 10;
-                string[] table = null;
-
+                int dmg;
+                int xpMult;
+                string[] table;
                 if (c > 0)//fight won
                 {
                     xpMult = 5;
@@ -279,7 +279,7 @@ namespace AMI.Neitsillia.Adventures
                 player.health -= dmg;
 
                 looted.x += (Math.Max(player.Area.level, 1) * (1 + i + k) * xpMult);
-
+                if (Program.Chance(45)) looted.l++;
                 return string.Format(Utils.RandomElement(table), player.Area.mobs[i][k]) + $" (-{dmg} HP)";
             }
         }

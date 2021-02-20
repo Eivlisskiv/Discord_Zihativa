@@ -154,6 +154,7 @@ namespace Neitsillia.Items.Item
                 if (i.CanBeEquip() && i.tier < 20)
                 {
                     i.durability += 20 - i.tier;
+                    i.condition = i.durability;
                     i.CalculateStats(true);
                 }
                 return i;

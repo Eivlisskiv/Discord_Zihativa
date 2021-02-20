@@ -609,7 +609,7 @@ namespace AMI.AMIData.OtherCommands
                 string abName = StringM.UpperAt(argName);
                 Ability a = Ability.Load(abName);
                 Player p = Player.Load(user.Id, Player.IgnoreException.All);
-                if (p.HasAbility(a.name, out _))
+                if (!p.HasAbility(a.name, out _))
                 {
                     p.abilities.Add(a);
                     p.SaveFileMongo();

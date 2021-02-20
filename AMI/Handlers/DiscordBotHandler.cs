@@ -153,8 +153,8 @@ namespace AMI.Handlers
                     $"{log.Source} {log.Message} {Environment.NewLine}");
             else Log.LogS($"{log.Source}: {log.Message}");
 
-            if(reconnect && log.Message == "Disconnecting")
-                _ = WaitReconnect(5);
+            //if(reconnect && log.Message == "Disconnecting")
+               //_ = WaitReconnect(5);
         }
 
         private async Task OnDisconnect(Exception e) =>  Log.LogS(e);

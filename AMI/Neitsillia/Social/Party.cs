@@ -138,6 +138,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             if(player.GamblingHand != null)
                 await player.GamblingHandKey?.Delete();
             player.PartyKey = null;
+            player.areaPath = areaKey;
         }
 
         internal Area Remove(int i, Area area)

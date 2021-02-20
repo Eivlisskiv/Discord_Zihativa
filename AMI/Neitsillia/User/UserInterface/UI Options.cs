@@ -484,6 +484,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 #endregion
 
                 #region Okay/Cancel Only
+                case MsgType.NPCRepair:
                 case MsgType.ConfirmTransaction:
                 case MsgType.ConfirmSkills:
                 case MsgType.ConfirmCharDel:

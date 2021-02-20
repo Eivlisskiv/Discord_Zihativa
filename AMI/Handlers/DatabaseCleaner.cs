@@ -52,44 +52,36 @@ namespace AMI.Handlers
             {
                 var area = list[i];
 
-                if (area.type == Neitsillia.Areas.AreaType.Nest)
-                {
-                    await database.DeleteRecord<Neitsillia.Areas.AreaPartials.Area>("Area", area.AreaId);
-                    _ = UniqueChannels.Instance.SendToLog($"Cleared nest {area.name}");
-                }
-                else
-                {
-                    //If the area or nest does not exist
-                    area.junctions.RemoveAll(j => 
-                        !list.Exists(a => a.AreaId == j.filePath) &&
-                        database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
-                    );
+                //If the area or nest does not exist
+                area.junctions.RemoveAll(j =>
+                    !list.Exists(a => a.AreaId == j.filePath) &&
+                    database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
+                );
 
-                    if (area.passives != null)
+                if (area.passives != null)
+                {
+
+                    List<string> passives = new List<string>();
+                    for (int k = 0; k < area.passives.Length; k++)
                     {
-
-                        List<string> passives = new List<string>();
-                        for (int k = 0; k < area.passives.Length; k++)
-                        {
-                            for (int j = 0; j < area.passives[k].Length; j++)
-                                passives.Add(area.passives[k][j]);
-                        }
-
-                        area.passiveEncounter = passives.ToArray();
-                        area.passives = null;
+                        for (int j = 0; j < area.passives[k].Length; j++)
+                            passives.Add(area.passives[k][j]);
                     }
 
-                    if (area.loot != null)
-                    {
-                        for (int k = 0; k < area.loot.Length; k++)
-                        {
-                            for (int j = 0; j < area.loot[k].Length; j++)
-                                area.loot[k][j] = area.loot[k][j].Trim();
-                        }
-                    }
-
-                    await database.UpdateRecordAsync("Area", MongoDatabase.FilterEqual<Neitsillia.Areas.AreaPartials.Area, string>("_id", area.AreaId), area);
+                    area.passiveEncounter = passives.ToArray();
+                    area.passives = null;
                 }
+
+                if (area.loot != null)
+                {
+                    for (int k = 0; k < area.loot.Length; k++)
+                    {
+                        for (int j = 0; j < area.loot[k].Length; j++)
+                            area.loot[k][j] = area.loot[k][j].Trim();
+                    }
+                }
+
+                await database.UpdateRecordAsync("Area", MongoDatabase.FilterEqual<Neitsillia.Areas.AreaPartials.Area, string>("_id", area.AreaId), area);
             }
         }
 

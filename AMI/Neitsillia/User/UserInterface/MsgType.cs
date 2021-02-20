@@ -8,7 +8,7 @@
         //Levels
         XP, Skills, Abilities, AbilityLevel,
         //NPC
-        NPC, NPCInv, ConfirmTransaction,
+        NPC, NPCInv, ConfirmTransaction, NPCRepair,
         //Encounter
         Combat, Loot, Puzzle,
         //Character Creation

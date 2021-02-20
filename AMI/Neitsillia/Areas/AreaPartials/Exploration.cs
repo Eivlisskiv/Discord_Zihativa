@@ -59,14 +59,14 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 }
             }
 
-            NPC[] mob = new NPC[4];
-            int evolves = player.IsSolo ? 0 : player.Party.members.Count - 1;
+            NPC[] mob = new NPC[(player.IsSolo ? 1 : player.Party.MemberCount) + 1];
+            int evolves = 0;//player.IsSolo ? 0 : player.Party.MemberCount - 1;
             for (int k = 0; k < mob.Length; k++)
             {
                 int rtier = ArrayM.IndexWithRates(mobs.Length, rng);
                 mob[k] = NPC.GenerateNPC(topLevel, mobs[rtier][ArrayM.IndexWithRates(mobs[rtier].Count, rng)]);
 
-                if (false && evolves > 0 && Program.Chance((20 * evolves) + (k * 20)))
+                if (evolves > 0 && Program.Chance((20 * evolves) + (k * 20)))
                 {
                     mob[k].Evolve(2, skaviCat: name);
                     evolves--;
@@ -254,6 +254,9 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
                 for (int i = 0; i < mob.Length; i++)
                     mob[i] = GetAMob(rng, player.AreaInfo.floor);
+
+                if (Program.Chance(15)) Utils.RandomElement(mob).Evolve();
+
                 player.NewEncounter(new Encounter(Encounter.Names.Mob, player)
                 { mobs = mob });
             }
@@ -297,7 +300,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                  eMobRate > 0 && ValidTable(mobs) && Program.Chance(eMobRate / 3.5) ? new Encounter(Encounter.Names.Puzzle, player, 
                  $"~Random;2;{Utils.RandomElement(Utils.RandomElement(mobs))}") :
                  eLootRate > 0 && (!valid || Program.Chance(eLootRate / 3.5)) ? new Encounter(Encounter.Names.Puzzle, player, "~Random;1;~Random") :
-                new Encounter(Utils.RandomElement(passiveEncounter ?? Utils.RandomElement(passives)), player));
+                new Encounter(Utils.RandomElement(passiveEncounter ?? Utils.RandomElement(passives)) ?? (type == AreaType.Town ? "NPC" : null), player));
             explore = player.Encounter.GetEmbed(explore);
             return explore;
         }

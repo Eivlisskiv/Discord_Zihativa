@@ -1239,10 +1239,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case prev:
-                    await Quest.QuestList(player, page - 1, reaction.Channel);
+                    await Quest.QuestList(player, page - 1, reaction.Channel, true);
                     break;
                 case next:
-                    await Quest.QuestList(player, page + 1, reaction.Channel);
+                    await Quest.QuestList(player, page + 1, reaction.Channel, true);
                     break;
             }
 
