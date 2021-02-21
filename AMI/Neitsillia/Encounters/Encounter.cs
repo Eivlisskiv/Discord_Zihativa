@@ -43,8 +43,8 @@ namespace AMI.Neitsillia.Encounters
         public enum Names
         {
             Exploration,
-            Floor, Loot, NPC, Adventure, //Passives
-            Mob, Bounty, PVP, Dungeon, FloorJump, //Combat
+            Floor, Loot, NPC, Adventure,
+            Mob, Bounty, PVP, Dungeon, FloorJump,
             Puzzle, Ressource
         };
 

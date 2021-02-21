@@ -115,7 +115,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                     return LocationMob(explore, player);
                 else if (ePassiveRate > 0)
                     return LocationPassive(explore, player, 
-                        passiveEncounter == null || passiveEncounter.Length == 0 || ValidTable(passives));  
+                        passiveEncounter != null && passiveEncounter.Length > 0);  
             }
             catch (Exception e)
             {
@@ -232,6 +232,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             explore.WithTitle(name + " Exploration");
             return LocationMob(explore, player, 100);
         }
+
         internal EmbedBuilder LocationMob(EmbedBuilder explore, Player player, int bountychances = 10)
         {
             Random rng = new Random();
@@ -297,10 +298,10 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         private EmbedBuilder LocationPassive(EmbedBuilder explore, Player player, bool valid)
         {
             player.NewEncounter(
-                 eMobRate > 0 && ValidTable(mobs) && Program.Chance(eMobRate / 3.5) ? new Encounter(Encounter.Names.Puzzle, player, 
+                 eMobRate > 0 && ValidTable(mobs) && Program.Chance(8) ? new Encounter(Encounter.Names.Puzzle, player, 
                  $"~Random;2;{Utils.RandomElement(Utils.RandomElement(mobs))}") :
-                 eLootRate > 0 && (!valid || Program.Chance(eLootRate / 3.5)) ? new Encounter(Encounter.Names.Puzzle, player, "~Random;1;~Random") :
-                new Encounter(Utils.RandomElement(passiveEncounter ?? Utils.RandomElement(passives)) ?? (type == AreaType.Town ? "NPC" : null), player));
+                 eLootRate > 0 && (!valid || Program.Chance(8)) ? new Encounter(Encounter.Names.Puzzle, player, "~Random;1;~Random") :
+                new Encounter(Utils.RandomElement(passiveEncounter), player));
             explore = player.Encounter.GetEmbed(explore);
             return explore;
         }

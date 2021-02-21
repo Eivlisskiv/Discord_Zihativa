@@ -11,6 +11,7 @@ namespace AMI.Neitsillia
                 $"Fixed Keen Eye {Environment.NewLine}"
                 + $"Fixed house travelling {Environment.NewLine}"
                 + $"Fixed the issue where player would be sent back the to area where they joined the party after leaving it. {Environment.NewLine}"
+                + $"Fixed Passive Encounters spawn rates. {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -25,7 +26,7 @@ namespace AMI.Neitsillia
         {
             return null;
             return
-                $"{Environment.NewLine}"
+                $"Fixed low base tier random gear drops not receiving bonus durability{Environment.NewLine}"
                 + $"{Environment.NewLine}"
                 ;
         }

@@ -102,6 +102,7 @@ namespace Neitsillia.Items.Item
         {
             if (level < 1 || tier > level || level <= Math.Ceiling(tier / 5.00) * 5) return 1;
             int t = tier;
+
             switch (type)
             {
                 case IType.Weapon:
@@ -152,15 +153,18 @@ namespace Neitsillia.Items.Item
             {
                 i.LoadPerk();
                 if (i.CanBeEquip() && i.tier < 20)
-                {
-                    i.durability += 20 - i.tier;
-                    i.condition = i.durability;
-                    i.CalculateStats(true);
-                }
+                    i.RebaseDurability(20);
                 return i;
             }
             Log.LogS($"Item {name} was not found");
             return null;
+        }
+
+        private void RebaseDurability(int targetTier)
+        {
+            durability += targetTier - tier;
+            condition = durability;
+            CalculateStats(true);
         }
         #endregion
 
@@ -405,6 +409,7 @@ namespace Neitsillia.Items.Item
 
                 i = Utils.RandomElement(choices);
                 i.LoadPerk();
+                if (i.CanBeEquip() && i.tier < 20) i.RebaseDurability(20);
                 i.Scale(tier);
             }
             else

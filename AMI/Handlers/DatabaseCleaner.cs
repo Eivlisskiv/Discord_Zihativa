@@ -58,18 +58,22 @@ namespace AMI.Handlers
                     database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
                 );
 
-                if (area.passives != null)
+                if (area.passiveEncounter == null)
                 {
-
-                    List<string> passives = new List<string>();
-                    for (int k = 0; k < area.passives.Length; k++)
+                    area.passiveEncounter = area.type switch
                     {
-                        for (int j = 0; j < area.passives[k].Length; j++)
-                            passives.Add(area.passives[k][j]);
-                    }
+                        Neitsillia.Areas.AreaType.Stronghold => new[]{ "NPC" },
+                        Neitsillia.Areas.AreaType.Town => new[]{ "NPC" },
+                        Neitsillia.Areas.AreaType.Tavern => new[]{ "NPC" },
 
-                    area.passiveEncounter = passives.ToArray();
-                    area.passives = null;
+                        Neitsillia.Areas.AreaType.Mines => new string[] { "NPC", "Dungeon" },
+                        Neitsillia.Areas.AreaType.Ruins => new string[] { "NPC", "Dungeon" },
+                        Neitsillia.Areas.AreaType.Caves => new string[] { "NPC", "Dungeon" },
+                        Neitsillia.Areas.AreaType.Wilderness => new string[] { "NPC", "Dungeon" },
+                        Neitsillia.Areas.AreaType.Shrine => new string[] { "Puzzle" },
+
+                        _ => null
+                    };
                 }
 
                 if (area.loot != null)

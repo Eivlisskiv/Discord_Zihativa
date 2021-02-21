@@ -35,7 +35,6 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         public int eMobRate;
         public List<string>[] mobs;
         public int ePassiveRate;
-        public string[][] passives;//To deprecate
         public string[] passiveEncounter;
 
         public int eQuestRate;
