@@ -62,7 +62,7 @@ namespace AMI.Neitsillia.Adventures
         public static async Task StartAdventure(Player player, IMessageChannel chan, AdventureType type, Intensity intensity, AdventureQuest quest = null)
         {
             player.Adventure = new Adventure(player._id, type, intensity, quest);
-            await player.Adventure.Display(player, chan);
+            await player.Adventure.Display(player, chan, true);
         }
 
         //Instance
@@ -106,15 +106,13 @@ namespace AMI.Neitsillia.Adventures
             lastCheck = start;
         }
 
-        public async Task Display(Player player, IMessageChannel chan)
+        public async Task Display(Player player, IMessageChannel chan, bool edit)
         {
             this.player = player;
             var looted = SinceLastCheck();
 
             if (player.health > 0)
-            {
-                await player.NewUI(await chan.SendMessageAsync(embed: ToEmbed(looted, true).Build()), MsgType.Adventure);
-            }
+                await player.EnUI(edit, null, ToEmbed(looted, true).Build(), chan, MsgType.Adventure);
             else await End(player, chan);
         }
 

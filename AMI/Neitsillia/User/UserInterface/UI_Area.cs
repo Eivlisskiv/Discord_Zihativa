@@ -76,37 +76,6 @@ namespace AMI.Neitsillia.User.UserInterface
             }
         }
 
-        public async Task Adventure(SocketReaction reaction, IUserMessage msg)
-        {
-            string e = reaction.Emote.ToString();
-            int i = EUI.GetNum(e);
-            if(i > -1)
-            {
-                if (data[0] == 'D') //Select difficulty
-                {
-                    await Adventures.Adventure.StartAdventure(player, Channel, 
-                        Adventures.Adventure.AdventureType.FreeRoam,
-                        ((Adventures.Adventure.Intensity[])Enum.GetValues(typeof(Adventures.Adventure.Intensity)))[i - 1], 
-                        null);
-                }
-                else //Select a quest
-                {
-
-                }
-                return;
-            }
-            switch(e)
-            {
-                case EUI.ok:
-                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel);
-                    break;
-                case EUI.cancel:
-                    if (player.IsInAdventure) await player.Adventure.End(player, reaction.Channel);
-                    else await GameCommands.StatsDisplay(player, reaction.Channel);
-                    break;
-            }
-        }
-
         public async Task ArenaService(SocketReaction reaction, IUserMessage msg)
         {
             switch (reaction.Emote.ToString())

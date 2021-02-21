@@ -1,13 +1,34 @@
-﻿using AMI.Neitsillia.Encounters;
+﻿using AMI.Module;
+using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items.Quests;
 using Discord;
 using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
     partial class UI
     {
+        static void InitO_Encounter()
+        {
+            OptionsLoad.Add(MsgType.Adventure, ui => { 
+                if (ui.player.IsInAdventure)
+                    ui.options = new List<string>(new[] { EUI.cycle, EUI.cancel });
+                else if (ui.data == null) ui.options = new List<string>(new[] { EUI.ok });
+                else if (ui.data[0] == 'D') //Select difficulty
+                {
+                    ui.options = new List<string>();
+                    for (int i = 0; i < 4; i++) ui.options.Add(EUI.GetNum(i + 1));
+                }
+                else //Select a quest
+                {
+
+                } 
+            });
+        }
+
         public async Task Puzzle(SocketReaction reaction, IUserMessage msg)
         {
             Encounter enc = player.Encounter;
@@ -27,6 +48,40 @@ namespace AMI.Neitsillia.User.UserInterface
                 else enc.turn++;
 
                 enc.Save();
+            }
+        }
+
+        public async Task Adventure(SocketReaction reaction, IUserMessage msg)
+        {
+            string e = reaction.Emote.ToString();
+            int i = EUI.GetNum(e);
+            if (i > -1)
+            {
+                if (data[0] == 'D') //Select difficulty
+                {
+                    await Adventures.Adventure.StartAdventure(player, Channel,
+                        Adventures.Adventure.AdventureType.FreeRoam,
+                        ((Adventures.Adventure.Intensity[])Enum.GetValues(typeof(Adventures.Adventure.Intensity)))[i - 1],
+                        null);
+                }
+                else //Select a quest
+                {
+
+                }
+                return;
+            }
+            switch (e)
+            {
+                case EUI.ok:
+                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel);
+                    break;
+                case EUI.cycle:
+                    await player.Adventure.Display(player, reaction.Channel, true);
+                    break;
+                case EUI.cancel:
+                    if (player.IsInAdventure) await player.Adventure.End(player, reaction.Channel);
+                    else await GameCommands.StatsDisplay(player, reaction.Channel);
+                    break;
             }
         }
     }

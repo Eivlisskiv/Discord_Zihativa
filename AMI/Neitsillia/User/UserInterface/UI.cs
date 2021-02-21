@@ -24,7 +24,6 @@ using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.Areas.InteractiveAreas;
 using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Abilities.Load;
-using System.Runtime.ExceptionServices;
 using AMI.Handlers;
 
 namespace AMI.Neitsillia.User.UserInterface
@@ -320,15 +319,11 @@ namespace AMI.Neitsillia.User.UserInterface
                 }
             }
 
-            string helpType = null;
-            switch (type)
+            string helpType = type switch
             {
                 //Same name as type
-                default:
-                    helpType = AMIData.HelpPages.Help.GetName(type.ToString());
-                    break;
-            }
-
+                _ => AMIData.HelpPages.Help.GetName(type.ToString()),
+            };
             reactionsInfo += (helpType == null ? "This interface does not have any help page from the `Help` command. " +
                 Environment.NewLine + "Request one via the support server or the `suggest` command in the bot's DM." :
                 $"Use the `Help {helpType}` command for related commands.");
@@ -637,33 +632,6 @@ namespace AMI.Neitsillia.User.UserInterface
                 }
                 
             }
-        }
-        #endregion
-
-        #region Strongholds
-        public async Task AcceptBuilding(SocketReaction reaction, IUserMessage msg)
-        {
-            switch (reaction.Emote.ToString())
-            {
-                case EUI.ok:
-                    string[] bdata = data.Split(';');
-                    await Commands.Areas.BuildBuilding(player.Area, bdata[0],
-                        int.Parse(bdata[1]), reaction.Channel);
-                    break;
-            }
-            await TryMSGDel(msg);
-        }
-        public async Task AcceptBuildingUpgrade(SocketReaction reaction, IUserMessage msg)
-        {
-            switch (reaction.Emote.ToString())
-            {
-                case EUI.ok:
-                    string[] bdata = data.Split(';');
-                    await Commands.Areas.UpgradeBuilding(player.Area, int.Parse(bdata[0]),
-                        int.Parse(bdata[1]), reaction.Channel);
-                    break;
-            }
-            await TryMSGDel(msg);
         }
         #endregion
 
@@ -1191,7 +1159,6 @@ namespace AMI.Neitsillia.User.UserInterface
         {
             string[] args = data.Split(';');
             int page = int.Parse(args[0]);
-            int total = int.Parse(args[1]);
 
             string[] juncIds = JsonConvert.DeserializeObject<string[]>(args[2]);
             switch (reaction.Emote.ToString())

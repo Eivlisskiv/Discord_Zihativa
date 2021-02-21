@@ -202,98 +202,42 @@ namespace AMI.Neitsillia.User.UserInterface
             return ReferenceData.DamageType.Physical;
         }
 
-        internal static int GetNum(string i)
-        {
-            switch (i)
-            {
-                case zero: return 0;
-                case one: return 1;
-                case two: return 2;
-                case three: return 3;
-                case four: return 4;
-                case five: return 5;
-                case six: return 6;
-                case seven: return 7;
-                case eight: return 8;
-                case nine: return 9;
-                default: return -1;
-            }
-        }
+        internal static int GetNum(string i) 
+            => i switch { zero => 0, one => 1,
+                two => 2, three => 3, four => 4,
+                five => 5, six => 6, seven => 7,
+                eight => 8, nine => 9, _ => -1,
+            };
 
         internal static string GetLetter(int i)
-        {
-            switch (i)
-            {
-                case 0: return "🇦"; //U+1F1E6
-                case 1: return "🇧";
-                case 2: return "🇨";
-                case 3: return "🇩";
-                case 4: return "🇪";
-                case 5: return "🇫";
-                case 6: return "🇬";
-                case 7: return "🇭";
-                case 8: return "🇮";
-                case 9: return "🇯";
-                case 10: return "🇰";
-                case 11: return "🇱";
-                case 12: return "🇲";
-                case 13: return "🇳";
-                case 14: return "🇴";
-                case 15: return "🇵";
-                case 16: return "🇶";
-                case 17: return "🇷";
-                case 18: return "🇸";
-                case 19: return "🇹";
-                case 20: return "🇺";
-                case 21: return "🇻";
-                case 22: return "🇼";
-                case 23: return "🇽";
-                case 24: return "🇾";
-                case 25: return "🇿"; // 	U+1F1FF
-            }
-            return null;
-        }
+            => i switch { 0 => "🇦", 1 => "🇧",
+                2 => "🇨", 3 => "🇩", 4 => "🇪",
+                5 => "🇫", 6 => "🇬", 7 => "🇭",
+                8 => "🇮", 9 => "🇯", 10 => "🇰",
+                11 => "🇱", 12 => "🇲", 13 => "🇳",
+                14 => "🇴", 15 => "🇵", 16 => "🇶",
+                17 => "🇷", 18 => "🇸",  19 => "🇹",
+                20 => "🇺", 21 => "🇻", 22 => "🇼",
+                23 => "🇽", 24 => "🇾", 25 => "🇿",
+                _ => null,
+            };
 
         internal static int GetLetter(string i)
-        {
-            switch (i)
-            {
-                case "🇦": return 0; //U+1F1E6
-                case "🇧": return 1;
-                case "🇨": return 2;
-                case "🇩": return 3;
-                case "🇪": return 4;
-                case "🇫": return 5;
-                case "🇬": return 6;
-                case "🇭": return 7;
-                case "🇮": return 8;
-                case "🇯": return 9;
-                case "🇰": return 10;
-                case "🇱": return 11;
-                case "🇲": return 12;
-                case "🇳": return 13;
-                case "🇴": return 14;
-                case "🇵": return 15;
-                case "🇶": return 16;
-                case "🇷": return 17;
-                case "🇸": return 18;
-                case "🇹": return 19;
-                case "🇺": return 20;
-                case "🇻": return 21;
-                case "🇼": return 22;
-                case "🇽": return 23;
-                case "🇾": return 24;
-                case "🇿": return 25; // 	U+1F1FF
-            }
-            return -1;
-        }
+            => i switch { "🇦" => 0, "🇧" => 1,
+                "🇨" => 2, "🇩" => 3, "🇪" => 4,
+                "🇫" => 5, "🇬" => 6, "🇭" => 7,
+                "🇮" => 8, "🇯" => 9, "🇰" => 10,
+                "🇱" => 11, "🇲" => 12, "🇳" => 13,
+                "🇴" => 14, "🇵" => 15, "🇶" => 16,
+                "🇷" => 17, "🇸" => 18, "🇹" => 19,
+                "🇺" => 20, "🇻" => 21, "🇼" => 22,
+                "🇽" => 23, "🇾" => 24, "🇿" => 25,
+                _ => -1,
+            };
 
         internal static string SpecIcon(int i)
-        {
-            if (i < 0 || i > specs.Length - 1)
-                return "";
-            return specs[i];
-        }
+            => (i < 0 || i > specs.Length - 1)
+            ? "" : specs[i];
         #endregion
 
         internal static string GetReactionDescription(string s, MsgType type)
@@ -322,6 +266,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 cycle => type switch
                 {
                     MsgType.Inventory => "Cycle filter type [all > gear > consumable]",
+                    MsgType.Adventure => "Refresh",
                     _ => "Cycle"
                 },
                 stats => "View short stats sheet (use ``~ls`` to view full stats)",

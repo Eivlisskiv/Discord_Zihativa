@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using static AMI.Neitsillia.User.UserInterface.EUI;
 using AMI.Neitsillia.Encounters;
-using AMI.Neitsillia.Items;
 using AMI.Neitsillia.Gambling.Games;
 using AMI.Methods;
 using AMI.Neitsillia.Items.Abilities;
@@ -13,7 +12,9 @@ namespace AMI.Neitsillia.User.UserInterface
     partial class UI
     {
         static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, 
-            InitO_Inventory, InitO_Strongholds, InitO_Dynasty, InitO_Sandbox };
+            InitO_Inventory, InitO_Strongholds, InitO_Dynasty, InitO_Sandbox,
+            InitO_Encounter
+        };
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 
         public static void InitialiseOptionLoaderDict()
@@ -279,22 +280,6 @@ namespace AMI.Neitsillia.User.UserInterface
                 #endregion
 
                 #region Area
-                case MsgType.Adventure:
-                    {
-                        if (player.IsInAdventure)
-                            options = new List<string>(new[] { cancel });
-                        else if (data == null) options = new List<string>(new[] { ok });
-                        else if (data[0] == 'D') //Select difficulty
-                        {
-                            options = new List<string>();
-                            for (int i = 0; i < 4; i++) options.Add(EUI.GetNum(i + 1));
-                        }
-                        else //Select a quest
-                        {
-
-                        }
-                    }
-                    break;
                 case MsgType.PetShop:
                     {
 
