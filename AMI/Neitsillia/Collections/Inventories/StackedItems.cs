@@ -12,13 +12,13 @@ namespace AMI.Neitsillia.Collections
 
         public StackedItems(string it, int count1)
         {
-            this.item = Item.LoadItem(it);
-            this.count = count1;
+            item = Item.LoadItem(it);
+            count = count1;
         }
         public StackedItems(Item it, int count1)
         {
-            this.item = it;
-            this.count = count1;
+            item = it;
+            count = count1;
         }
         public static Predicate<StackedItems> FindWithRank(int rank)
         {

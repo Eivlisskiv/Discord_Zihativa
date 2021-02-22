@@ -91,6 +91,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
                 $"house;{(house.sandbox.CanUpgrade(Sandbox.MAX_TIER_HOUSE) ? "upgrade" : "none")}");
 
         [Command("House Funds")]
+        [Alias("hf")]
         public async Task HouseFunds([Summary("deposit or withdraw")] string action, long amount)
         {
             Player player = Context.Player;
@@ -108,6 +109,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         }
 
         [Command("House Storage")]
+        [Alias("hs")]
         public async Task HouseStock([Summary("view, withdraw or deposit")] string action = "view",
         [Summary("withdraw or deposit: Item {slot}x{amount} \n" +
             "view: filter")] string argument = null)
@@ -127,6 +129,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
         }
 
         [Command("House Build")]
+        [Alias("hb")]
         public async Task HouseBuild([Remainder] string build_name = null)
         {
             Player player = Context.Player;

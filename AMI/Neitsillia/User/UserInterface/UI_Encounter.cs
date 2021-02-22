@@ -16,16 +16,18 @@ namespace AMI.Neitsillia.User.UserInterface
             OptionsLoad.Add(MsgType.Adventure, ui => { 
                 if (ui.player.IsInAdventure)
                     ui.options = new List<string>(new[] { EUI.cycle, EUI.cancel });
-                else if (ui.data == null) ui.options = new List<string>(new[] { EUI.ok });
-                else if (ui.data[0] == 'D') //Select difficulty
+                else if (ui.data == null) ui.options = new List<string>(new[] { EUI.ok, EUI.sideQuest });
+                else if (ui.data[0] == 'Q')
+                {
+                    ui.options = new List<string>();
+                    for (int i = 0; i < 6; i++) ui.options.Add(EUI.GetNum(i + 1));
+                }
+                else
                 {
                     ui.options = new List<string>();
                     for (int i = 0; i < 4; i++) ui.options.Add(EUI.GetNum(i + 1));
                 }
-                else //Select a quest
-                {
-
-                } 
+                 
             });
         }
 
@@ -57,23 +59,26 @@ namespace AMI.Neitsillia.User.UserInterface
             int i = EUI.GetNum(e);
             if (i > -1)
             {
-                if (data[0] == 'D') //Select difficulty
+                if (data[0] == 'Q') //Select a quest
                 {
-                    await Adventures.Adventure.StartAdventure(player, Channel,
-                        Adventures.Adventure.AdventureType.FreeRoam,
-                        ((Adventures.Adventure.Intensity[])Enum.GetValues(typeof(Adventures.Adventure.Intensity)))[i - 1],
-                        null);
+                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel, i);
                 }
-                else //Select a quest
+                else //Select difficulty
                 {
-
+                    int.TryParse(data, out int quest);
+                    await Adventures.Adventure.StartAdventure(player, Channel,
+                        ((Adventures.Adventure.Intensity[])Enum.GetValues(typeof(Adventures.Adventure.Intensity)))[i - 1],
+                        quest > 0 ? Adventures.Adventure.currentQuests[quest - 1] : null);
                 }
                 return;
             }
             switch (e)
             {
                 case EUI.ok:
-                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel);
+                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel, 0);
+                    break;
+                case EUI.sideQuest:
+                    await Adventures.Adventure.SelectQuest(player, reaction.Channel);
                     break;
                 case EUI.cycle:
                     await player.Adventure.Display(player, reaction.Channel, true);

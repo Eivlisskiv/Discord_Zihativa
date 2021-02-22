@@ -30,6 +30,10 @@ namespace AMI.Handlers
                 Add("Nests", 15, Neitsillia.Areas.Nests.Nest.NestChecks);
 
             Add("ArenaFights", 60 * 48, Neitsillia.Areas.Arenas.ArenaGlobalData.RefreshAllQuests);
+
+            Add("AdventureQuests", 720, async () => {
+                Neitsillia.Adventures.Adventure.currentQuests = Neitsillia.Adventures.Adventure.GenerateNewQuests();
+            });
         }
 
         public string name;

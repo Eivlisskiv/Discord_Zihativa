@@ -425,7 +425,7 @@ namespace AMI.Neitsillia.Commands
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not freely Adventure in this {player.Area.type}."));
             else if (player.Area.IsNonHostileArea())
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"There are no Adventures in this {player.Area.type}."));
-            else if (player.IsInAdventure) await player.Adventure.Display(player, chan);
+            else if (player.IsInAdventure) await player.Adventure.Display(player, chan, false);
             else await Adventures.Adventure.SelectType(player, chan);
         }
 
