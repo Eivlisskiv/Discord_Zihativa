@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AMI.Neitsillia.Items.Quests;
-using AMI.Neitsillia.NeitsilliaCommands;
 using AMI.Neitsillia.Campaigns;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
@@ -27,7 +26,7 @@ using AMI.Neitsillia.Areas.InteractiveAreas;
 
 namespace AMI.Neitsillia.Commands
 {
-    public class Areas : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public partial class Areas : ModuleBase<AMI.Commands.CustomSocketCommandContext>
     {
         public static string LocationRestriction(string locationTarget, string userLocation)
         {
@@ -429,147 +428,7 @@ namespace AMI.Neitsillia.Commands
             else await Adventures.Adventure.SelectType(player, chan);
         }
 
-        [Command("Rest")][Alias("Sleep")]
-        [Summary("Rest to regain health and stamina over time. You may not rest while in a party.")]
-        public async Task Rest()
-        {
-            await DUtils.DeleteContextMessageAsync(Context);
-            await RestStat(Player.Load(Context.User.Id, Player.IgnoreException.Resting), Context.Channel);
-        }
-        internal static async Task RestStat(Player player, IMessageChannel chan)
-        {
-            if (player.IsEncounter("Combat"))
-                DUtils.DeleteMessage(await chan.SendMessageAsync("You may not rest while in combat"));
-            else if (player.Party != null && player.Party.GetLeaderID() != player.userid)
-                DUtils.DeleteMessage(await chan.SendMessageAsync("Only the leader can initiate or end party rests."));
-            else
-            {
-                EmbedBuilder rest = new EmbedBuilder();
-                if (player.IsResting)
-                {
-                    DateTime restDateTime = player.userTimers.restTime;
-                    if ((player.ui != null && (player.ui.type == MsgType.Rest || player.ui.type == MsgType.EndRest)
-                        && player.ui.data != null && player.ui.data != ""))
-                    {
-                        string jsonTime = player.ui.data;
-                        restDateTime = JsonConvert.DeserializeObject<DateTime>(jsonTime);
-                    }
-                    TimeSpan restTime = (DateTime.UtcNow - restDateTime);
-                    rest.Title = $"{player.Party?.partyName ?? player.name} Resting in {player.Area.name}";
-                    rest.WithDescription($"Rest Time: {restTime.Hours}:{restTime.Minutes}:{restTime.Seconds} {Environment.NewLine}" +
-                        $"End Rest?");
-                    await player.NewUI(await chan.SendMessageAsync(embed: rest.Build()), MsgType.EndRest);
-                }
-                else
-                {
-                    if(player.Area.type == AreaType.Arena)
-                    {
-                        await chan.SendMessageAsync("You may not rest in this location type: " + player.Area.type);
-                        return;
-                    }
-
-                    rest.Title = $"{player.Party?.partyName ?? player.name} Started Resting in {player.Area.name}";
-                    
-                    rest.WithFooter("Attempting to use actions commands with this character will result in requesting to stop resting");
-
-                    long? lhp = null;
-                    int? lsp = null;
-
-                    int dex = player.stats.GetDEX();
-
-                    if (player.Party != null)
-                    {
-                        foreach (PartyMember m in player.Party.members)
-                        {
-                            Player p = m.LoadPlayer();
-
-                            long h = (p.Health() - p.health);
-                            int s = p.Stamina() - p.stamina;
-
-                            lhp = lhp == null || h > lhp ? h : lhp;
-                            lsp = lsp == null || h > lsp ? s : lsp;
-
-                            p.userTimers.restTime = DateTime.UtcNow;
-
-                            p.SaveFileMongo();
-
-                            //dex += p.stats.GetDEX();
-                        }
-                    }
-                    else
-                    {
-                        lhp = player.Health() - player.health;
-                        lsp = player.Stamina() - player.stamina;
-                    }
-
-                    player.userTimers.restTime = DateTime.UtcNow;
-
-                    double secPerHeath = Verify.Min(200.00 - (dex * Neitsillia.Collections.Stats.restSpeed), 30.00);
-                    double secPerStam = Verify.Min(20.00 - (dex * Neitsillia.Collections.Stats.restSpeed), 5.00);
-
-                    rest.WithDescription($"Full health in: {Math.Round((lhp ?? 0) * (secPerHeath / 60), 2)} Minutes{Environment.NewLine}" +
-                        $"Full Stamina in: {Math.Round((lsp ?? 0) * (secPerStam / 60), 2)} Minutes");
-
-                    player.ui = new UI(await chan.SendMessageAsync(embed: rest.Build()), MsgType.Rest, player);
-                }
-                player.SaveFileMongo();
-            }
-        }
-        internal static async Task EndRest(Player player, ISocketMessageChannel chan)
-        {
-            if (player.IsResting)
-            {
-                EmbedBuilder rest = new EmbedBuilder();
-                DateTime restDateTime = player.userTimers.restTime;
-                if ((player.ui != null && (player.ui.type == MsgType.Rest || player.ui.type == MsgType.EndRest)
-                && player.ui.data != null && player.ui.data != ""))
-                {
-                    string jsonTime = player.ui.data;
-                    restDateTime = JsonConvert.DeserializeObject<DateTime>(jsonTime);
-                }
-                TimeSpan restTime = (DateTime.UtcNow - restDateTime);
-
-                double secPerHeath = Verify.Min(200.00 - (player.stats.dexterity * Neitsillia.Collections.Stats.restSpeed), 30.00);
-                double secPerStam = Verify.Min(20.00 - (player.stats.dexterity * Neitsillia.Collections.Stats.restSpeed), 5.00);
-
-                long hpRecovered = Convert.ToInt64(Math.Floor(restTime.TotalSeconds / secPerHeath));
-                int stamRecovered = Convert.ToInt32(Math.Floor(restTime.TotalSeconds / secPerStam));
-                //
-                rest.Title = $"{player.Party?.partyName ?? player.name} Ended Their Rest in {player.Area.name}";
-                rest.WithDescription($"Regained {Math.Min(hpRecovered, player.Health())} Health and {Math.Min(stamRecovered, player.Stamina())} Stamina");
-
-                if(player.Party != null)
-                {
-                    foreach(PartyMember m in player.Party.members)
-                    {
-                        Player p = m.id == player.userid ? player : m.LoadPlayer();
-                        p.Healing(hpRecovered);
-                        p.StaminaE(stamRecovered);
-
-                        p.userTimers.EndRest();
-                        p.SaveFileMongo();
-                    }
-                    foreach(Neitsillia.NPCSystems.NPC n in player.Party.NPCMembers)
-                    {
-                        n.Healing(hpRecovered);
-                        n.StaminaE(stamRecovered);
-                    }
-
-                    await player.Party.SaveData();
-                }
-                else
-                {
-                    player.Healing(hpRecovered);
-                    player.StaminaE(stamRecovered);
-
-                    player.userTimers.EndRest();
-                }
-                
-                await player.NewUI(await chan.SendMessageAsync(embed: rest.Build()), MsgType.Main);
-            }
-            else await GameCommands.ShortStatsDisplay(player, chan);
-
-        }
+        
         //
         [Command("Area Info")][Alias("areainfo")]
         [Summary("View basic information on your current area.")]

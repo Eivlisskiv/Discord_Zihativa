@@ -56,7 +56,7 @@ namespace AMI.Neitsillia
             return $"{versionState} {nums[1]}.{nums[2]} " +
                 $"{versionTitle} {nums[3]}.{nums[4]}";
         }
-        public const string currentVersion = "0.7.3.4.0";
+        public const string currentVersion = "0.7.4.4.0";
         internal const string versionState = "Beta";
         internal const string versionTitle = "Walls of Stone";
 

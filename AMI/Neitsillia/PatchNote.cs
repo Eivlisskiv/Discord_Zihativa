@@ -8,9 +8,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Added refresh button for adventure {Environment.NewLine}"
-                + $"Added House commands aliases {Environment.NewLine}"
-                + $"Added Adventure Quests {Environment.NewLine}"
+                $"Resting now heals a percentage of max health and stamina instead over time. Dexterity points increase percentage {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
@@ -23,9 +22,9 @@ namespace AMI.Neitsillia
         }
         public static string ItemsPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Fixed low base tier random gear drops not receiving bonus durability{Environment.NewLine}"
+                $" {Environment.NewLine}"
                 + $"{Environment.NewLine}"
                 ;
         }

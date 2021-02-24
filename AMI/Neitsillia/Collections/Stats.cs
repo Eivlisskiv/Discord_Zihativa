@@ -18,8 +18,8 @@ namespace AMI.Neitsillia.Collections
         public const double recruitPricePerCha = 0.01; //% modification to price in their favor
         public const double koinsGainPerCha = 0.20; //% coins gained from quests/bounties/jobs
         //
-        public const int restSpeed = 1; //Seconds of less required to regain health and stamina
-        public const double passiveSp = 0.005; // * DEX = % of passive sp in combat
+        public const double restSpeed = 0.001; //Of max points restored per x seconds
+        public const double passiveSp = 0.05; // * DEX = % of passive sp in combat
         //
         public const double critcPerPerc = 1.20; //Raw addition (cc + x%)
         public const double LootPerPerc = 0.25; //max items looted

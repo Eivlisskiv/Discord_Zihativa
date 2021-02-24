@@ -224,7 +224,7 @@ namespace AMI.Neitsillia.Adventures
                     Encounter enc = player.NewEncounter(Encounter.Names.Loot, true);
 
                     int level = player.Area.level;
-                    enc.loot.Add(quest.Loot(level), -1);
+                    if(quest != null) enc.loot.Add(quest.Loot(level), -1);
                     for (int i = 0; i < loot; i++)
                     {
                         Item item = Item.RandomItem(level * 5);
