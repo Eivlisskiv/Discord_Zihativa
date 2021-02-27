@@ -47,6 +47,8 @@ namespace AMI.Neitsillia.Adventures
             Load();
         }
 
+        public string Action => $" Questing {title}";
+
         private void Load()
         {
             hoursTime = (0.5 * difficulty) + (Program.rng.Next(1, 3) + 
