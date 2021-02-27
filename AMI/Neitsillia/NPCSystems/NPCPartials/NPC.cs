@@ -367,19 +367,21 @@ namespace AMI.Neitsillia.NPCSystems
             const int upgradeCost = 250;
 
             if (!item.CanBeEquip() || KCoins < upgradeCost) return false;
-
+            
             if (item.tier < level * 5)
             {
-                int tiers = (item.tier - (level * 5)) * upgradeCost > KCoins ?
-                    (int)(KCoins / upgradeCost) : item.tier - (level * 5);
+                int tiers = item.tier - (level * 5);
+                long cost = tiers * upgradeCost;
+                if (KCoins >= cost)
+                {
+                    item.Scale(tiers + item.tier);
+                    KCoins -= cost;
 
-                item.Scale(tiers + item.tier);
-                KCoins -= tiers * upgradeCost;
+                    _ = Handlers.UniqueChannels.Instance.SendMessage("Population", 
+                        $"{displayName} Upgraded {item.originalName} to {item.name} reaching rank {item.tier}");
 
-                _ = Handlers.UniqueChannels.Instance.SendMessage("Population", 
-                    $"{displayName} Upgraded {item.originalName} to {item.name} reaching rank {item.tier}");
-
-                return true;
+                    return true;
+                }
             }
             return false;
         }
