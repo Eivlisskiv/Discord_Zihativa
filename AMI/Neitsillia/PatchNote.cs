@@ -9,7 +9,7 @@ namespace AMI.Neitsillia
             //return null;
             return
                 $"Resting now heals a percentage of max health and stamina instead over time. Dexterity points increase percentage {Environment.NewLine}"
-                + $" {Environment.NewLine}"
+                + $"Bug Fixes {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()

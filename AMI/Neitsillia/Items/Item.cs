@@ -426,17 +426,12 @@ namespace Neitsillia.Items.Item
             return i;
         }
 
-        public bool CanBeEquip()
-        {
-            return ((int)type <= 11 && (int)type >= 5);
-        }
-        public long GetValue()
-        {
-            long newPrice = baseValue;
-            if (CanBeEquip())
-                newPrice = Convert.ToInt32(baseValue * Exponential.ItemValue(condition, durability));
-            return newPrice;
-        }
+        public bool CanBeEquip() 
+            => ((int)type <= 11 && (int)type >= 5);
+
+        public long GetValue() => CanBeEquip() ?
+                Convert.ToInt32(baseValue * Exponential.ItemValue(condition, durability))
+                : baseValue;
 
         #region Stats and info
         public EmbedBuilder EmdebInfo(EmbedBuilder embed)
@@ -496,7 +491,7 @@ namespace Neitsillia.Items.Item
                 itemrecipe = schematic.GetRecipe();
             embed.AddField("Crafting", itemrecipe ?? "This item cannot be crafted", true);
             if (perk != null)
-                embed.AddField(perk.name, perk.desc, true);
+                embed.AddField(perk.name ?? "No perk", perk.desc ?? "No description", true);
             return embed;
         }
         public string StatsInfo()
