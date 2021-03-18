@@ -64,12 +64,13 @@ namespace AMI.AMIData
             database = client.GetDatabase(name);
         }
 
-        string TableName<T>(string given) => given ?? typeof(T).Name + "s";
+        string TableName<T>(string given) => given ?? TableName<T>();
         string TableName<T>() => typeof(T).Name + "s";
 
         //Save
         internal async Task SaveRecordAsync<T>(string tableKey, T record)
           => await database.GetCollection<T>(TableName<T>(tableKey)).InsertOneAsync(record);
+
         internal void SaveRecord<T>(string tableKey, T record)
           => database.GetCollection<T>(TableName<T>(tableKey)).InsertOne(record);
         internal async Task SaveRecord<T>(string tableKey, params T[] records)
@@ -111,12 +112,12 @@ namespace AMI.AMIData
         //Delete
         internal async Task DeleteRecord<T>(string tableKey, string targetId, string idVariableName = "_id")
         {
-            var result = await database.GetCollection<T>(TableName<T>(tableKey)).DeleteOneAsync
+            await database.GetCollection<T>(TableName<T>(tableKey)).DeleteOneAsync
                 (Builders<T>.Filter.Eq(idVariableName, targetId));
         }
         internal async Task DeleteRecord<T, U>(string tableKey, U targetId, string idVariableName = "_id")
         {
-            var result = await database.GetCollection<T>(TableName<T>(tableKey)).DeleteOneAsync
+            await database.GetCollection<T>(TableName<T>(tableKey)).DeleteOneAsync
                 (Builders<T>.Filter.Eq(idVariableName, targetId));
         }
 

@@ -23,7 +23,7 @@
         //Social
         PartyInvite, DuelOffer, 
         //Trading
-        OfferList, ConfirmOffer, InspectOffer,
+        OfferList, ConfirmOffer, InspectOffer, Inbox,
         //Speciality
         SpecSelection, SpecMain,
         SpecPerks, SpecAbility,

@@ -2,6 +2,8 @@
 using AMI.Module;
 using AMI.Neitsillia.Combat;
 using AMI.Neitsillia.NeitsilliaCommands.Social;
+using AMI.Neitsillia.Social.Mail;
+using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype.Commands;
@@ -19,6 +21,41 @@ namespace AMI.Neitsillia.NeitsilliaCommands
 {
     public class SocialCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
     {
+        [Command("mail")] [Alias("inbox")]
+        public async Task Viewinbox(int page = 0)
+            => await ViewInbox(Context.BotUser, page - 1, Context.Channel, false);
+
+        public static async Task ViewInbox(BotUser user, int page, IMessageChannel chan, bool edit)
+        {
+            Mail[] mails = await Mail.Load(user._id);
+            if (mails.Length == 0) 
+            { 
+                await chan.SendMessageAsync("Your inbox is empty");
+                return;
+            }
+
+            EmbedBuilder embed = DUtils.BuildEmbed("Inbox", $"**Rewards will be given to the currently loaded character: {user.loaded}**");
+            page = page < 0 ? 0 : Math.Min(page, (mails.Length - 1) / 5);
+
+            int n = 1;
+            int i = page * 5; 
+            int l = Math.Min(i + 5, mails.Length);
+            string ids = $"{page};";
+            for(; i < l; i++, n++)
+            {
+                Mail mail = mails[i];
+                string rewards = mail.GetRewards();
+                embed.AddField($"{EUI.GetNum(n)} {mail.subject}",
+                    mail.body + (rewards != null ? Environment.NewLine + Environment.NewLine + rewards : null));
+                ids += $"{mail._id}";
+                if (i + 1 < l) ids += ",";
+            }
+
+            if (!edit) user.NewUI(await chan.SendMessageAsync(embed: embed.Build()),
+                MsgType.Inbox, ids);
+            else await user.EditUI(null, embed.Build(), MsgType.Inbox, ids);
+        }
+
         //Party Commands
 
         [Command("Party Info")]

@@ -4,7 +4,6 @@ using AMI.Neitsillia;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.Shopping;
-using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype.Commands;
@@ -13,7 +12,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Neitsillia.Items.Item;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AMI.Module

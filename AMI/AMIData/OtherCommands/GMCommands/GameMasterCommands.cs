@@ -4,11 +4,13 @@ using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia;
 using AMI.Neitsillia.Areas.AreaPartials;
+using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.NPCSystems;
+using AMI.Neitsillia.Social.Mail;
 using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
@@ -750,7 +752,39 @@ namespace AMI.AMIData.OtherCommands
             await DUtils.DeleteContextMessageAsync(Context);
         }
 
-      
+        [Command("Send Mail")]
+        public async Task SendMail(IUser user, string subject, string body, int kuts = 0, params string[] items)
+        {
+            Mail mail = new Mail(user.Id, subject, body, kuts);
+
+            if(items != null && items.Length > 0)
+            {
+                mail.content = new Inventory();
+                for (int i = 0; i < items.Length; i++)
+                {
+                    string[] data = items[i].Split('x', 'X', '*');
+                    string[] itemd;
+                    if (!int.TryParse(data[0], out int count))
+                    {
+                        count = 1;
+                        itemd = data[0].Split(';');
+                    }
+                    else itemd = data[1].Split(';');
+
+                     
+                    Item item = Item.LoadItem(itemd[0].Replace('_', ' '));
+                    if (item != null) 
+                    {
+                        if (items.Length > 1 && int.TryParse(itemd[1], out int tier))
+                            item.Scale(tier);
+
+                        mail.content.Add(item, count, -1);
+                    }
+                }
+            }
+
+            await mail.Save();
+        }
 
         #region Message Manipulation
         [Command("Send Message")]

@@ -13,7 +13,7 @@ namespace AMI.Neitsillia.User.UserInterface
     {
         static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, 
             InitO_Inventory, InitO_Strongholds, InitO_Dynasty, InitO_Sandbox,
-            InitO_Encounter
+            InitO_Encounter, InitO_Social
         };
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 

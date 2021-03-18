@@ -710,7 +710,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
                 IMessageChannel chan = reaction.Channel is IGuildChannel gChan
                     && (await gChan.Guild.GetUserAsync(target.userid)) != null ? reaction.Channel :
-                    (IMessageChannel)(await Handlers.DiscordBotHandler.Client.GetUser(target.userid).GetOrCreateDMChannelAsync());
+                    (IMessageChannel)(await DiscordBotHandler.Client.GetUser(target.userid).GetOrCreateDMChannelAsync());
 
                 await chan.SendMessageAsync($"<@{target.userid}>, You've received a new offer. View all offers using " +
                     $"`Received Offers`");

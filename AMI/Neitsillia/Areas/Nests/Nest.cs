@@ -14,10 +14,12 @@ using Neitsillia.Items.Item;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.Areas.AreaPartials;
+using AMI.Neitsillia.Social.Mail;
+using AMI.Module;
 
 namespace AMI.Neitsillia.Areas.Nests
 {
-    class Nest
+    public class Nest
     {
         public const bool DISABLED = false;
 
@@ -265,7 +267,7 @@ namespace AMI.Neitsillia.Areas.Nests
         {
             if(healthpoints <= 0)
             {
-                //Send All Rewards;
+                await SendRewards();
 
                 EmbedBuilder embed = DUtils.BuildEmbed($"The {name} in {parentName} was exterminated.",
                     "Good job, Hunters, the nest was successfully exterminated.",
@@ -296,6 +298,35 @@ namespace AMI.Neitsillia.Areas.Nests
             }
 
             return true;
+        }
+
+        async Task SendRewards()
+        {
+            Area nest = Area.LoadArea(_id);
+            string name = nest?.name ?? this.name;
+            int level = nest?.level ?? 5;
+
+            var sorted = scores.ToList();
+            sorted.Sort((x, y) => y.Value.CompareTo(x.Value));
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                KeyValuePair<string, int> pair = sorted[i];
+                await SendReward(pair, name, level, i);
+            }
+        }
+
+        async Task SendReward(KeyValuePair<string, int> pair, string nest, int level, int position)
+        {
+            string[] ds = pair.Key.Split('\\');
+            if (!ulong.TryParse(ds[0], out ulong id)) return;
+
+            Player player = null;
+            try {  player = Player.Load(pair.Key, Player.IgnoreException.All); }
+            catch(Exception e) { if (e is NeitsilliaError) return; }
+            if (player == null) return;
+
+            await Mail.NestReward(id, ds[1], nest, level, pair.Value, position);
         }
 
         string GetTop(int t)

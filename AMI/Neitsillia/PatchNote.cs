@@ -8,8 +8,8 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Resting now heals a percentage of max health and stamina instead over time. Dexterity points increase percentage {Environment.NewLine}"
-                + $"Bug Fixes {Environment.NewLine}"
+                $"Added an inbox system to thread safely send rewards. {Environment.NewLine}"
+                + $"Nest scores now grant extra rewards once/if the nest is defeated. {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()
