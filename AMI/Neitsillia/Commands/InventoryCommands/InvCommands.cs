@@ -13,7 +13,7 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -535,7 +535,7 @@ namespace AMI.Neitsillia.InventoryCommands
             Item item = player.inventory.GetItem(index);
             if (item == null) throw NeitsilliaError.ReplyError($"{player.name}, selection invalid.");
 
-            (string message, EmbedBuilder embed) data = (null, null);
+            (string message, EmbedBuilder embed) data;
             switch(item.type)
             {
                 case Item.IType.Mysterybox:
@@ -589,13 +589,11 @@ namespace AMI.Neitsillia.InventoryCommands
             string message = null;
             bool end = false;
             Random rng = new Random();
-            int itemType = -1;
             Item item = player.inventory.GetItem(slot);
-            if (Verify.IsInArray(item.name, Item.resourcerations))
-                itemType = 0;
+
             for (int i = 0; i < amount && !end; i++)
             {
-                Item it = Item.RandomItem(rng.Next(item.tier - 3, item.tier + 4), itemType);
+                Item it = Item.RandomItem(rng.Next(item.tier - 3, item.tier + 4));
                 if (player.CollectItem(it, 1))
                     message += $"{it.name} Collected" + Environment.NewLine;
                 else

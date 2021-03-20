@@ -1,5 +1,5 @@
 ﻿using AMI.Methods;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 

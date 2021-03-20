@@ -8,7 +8,7 @@ using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 
 namespace AMI.Neitsillia.NPCSystems.Companions.Pets
 {

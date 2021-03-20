@@ -8,7 +8,7 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using NeitsilliaEngine;
 using Newtonsoft.Json;
 using System;
@@ -740,21 +740,6 @@ namespace AMI.Neitsillia.Commands
             else if (player.inventory.GetCount(slot) < amount)
                 return $"Missing {amount - player.inventory.GetCount(slot)} {it.name} in player's inventory" +
                     $" for this transaction.";
-            else if (it.type == Item.IType.BuildingBlueprint && !sb.buildingBlueprints.Contains(it.name.Split(':')[1].Trim()))
-            {
-                string newBBPName = it.name.Split(':')[1].Trim();
-                if (TileSchematic.GetSchem(newBBPName, 0) != null && Building.Load(newBBPName, 0) != null)
-                {
-                    sb.buildingBlueprints.Add(newBBPName);
-                    player.inventory.Remove(slot, amount);
-                    player.SaveFileMongo();
-                    await player.Area.UploadToDatabase();
-                    return $"{newBBPName} blueprint was added to {player.Area.name}'s available blueprints.";
-                }
-                player.inventory.Remove(slot, amount);
-                player.SaveFileMongo();
-                return $"{newBBPName} blueprint was scrapped as it is invalid.";
-            }
             else if (!sb.stock.CanContain(it, amount, sb.stats.StorageSpace))
                 return $"{player.Area.name}'s storage cannot contain {amount}x {it.name}";
             sb.stock.Add(it, amount, sb.stats.StorageSpace);

@@ -404,5 +404,29 @@ namespace AMI.AMIData.OtherCommands
 
             await msg.ModifyAsync(m => { m.Content = reply; });
         }
+
+        [Command("reference", true)]
+        public async Task SetReferrer(IUser user)
+        {
+            if(user.Id == Context.User.Id)
+            {
+                await ReplyAsync("You may not set yourself as a reference.");
+                return;
+            }
+
+            if (user.IsBot)
+            {
+                await ReplyAsync("You may not set a bot as a reference.");
+                return;
+            }
+
+            var u = Context.BotUser;
+            u.referrer = user.Id;
+            u.Save();
+
+            await Neitsillia.Social.Mail.Mail.ReferenceSetReward(u._id);
+
+            await ReplyAsync("Reference set! Thank you.");
+        }
     }
 }

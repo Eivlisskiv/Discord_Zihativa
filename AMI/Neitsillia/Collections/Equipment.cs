@@ -1,4 +1,4 @@
-﻿using Neitsillia.Items.Item;
+﻿using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.Neitsillia.Collections

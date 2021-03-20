@@ -9,8 +9,8 @@ namespace AMI.Neitsillia
             //return null;
             return
                 $"Added an inbox system to thread safely send rewards. {Environment.NewLine}"
-                + $"Nest scores now grant extra rewards once/if the nest is defeated. {Environment.NewLine}"
-                ;
+                + $"Users may use the `friendcode` command to set another user as they reference to the bot and both gain rewards. {Environment.NewLine}"
+                + $"Nest scores now grant extra rewards once/if the nest is defeated. {Environment.NewLine}";
         }
         public static string StatsPatchNotes()
         {
@@ -66,9 +66,9 @@ namespace AMI.Neitsillia
         }
         public static string NPCPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
+                $"NPC's coins are now visible while interacting with them. {Environment.NewLine}"
                 + $" {Environment.NewLine}"
                 ;
         }

@@ -6,7 +6,7 @@ using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Threading.Tasks;
 

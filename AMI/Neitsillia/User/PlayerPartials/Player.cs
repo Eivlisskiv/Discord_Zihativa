@@ -17,7 +17,7 @@ using AMI.Neitsillia.User.UserInterface;
 using Discord;
 using Discord.WebSocket;
 using MongoDB.Bson.Serialization.Attributes;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Neitsillia.Methods;
 using Newtonsoft.Json;
 using System;
@@ -30,8 +30,6 @@ namespace AMI.Neitsillia.User.PlayerPartials
     [BsonIgnoreExtraElements]
     public partial class Player : CharacterMotherClass
     {
-        #region Class Variables
-
         public string _id;
         public string version;
         public ulong userid;
@@ -42,14 +40,12 @@ namespace AMI.Neitsillia.User.PlayerPartials
         public Specialization.Specialization Specialization;
         public List<Quest> quests;
 
-        
-
         public Sheet userSheet;
         public USettings userSettings;
         public Timers userTimers;
         public DuelData duel;
 
-        #endregion
+        private BotUser user;
 
         public enum IgnoreException {
             All, None, SetUp, Adventuring, Resting,
@@ -65,13 +61,17 @@ namespace AMI.Neitsillia.User.PlayerPartials
         /// <returns></returns>
         public static Player Load(ulong userID, IgnoreException ignore = IgnoreException.None)
         {
-            User.BotUser u = User.BotUser.Load(userID);
+            BotUser u = BotUser.Load(userID);
             string characterId = $"{userID}\\{u.loaded}";
-            return Load(characterId, ignore);
+            return Load(u, ignore);
         }
 
         internal static Player Load(User.BotUser u, IgnoreException ignore = IgnoreException.None)
-            => Load($"{u._id}\\{u.loaded}", ignore);
+        {
+            Player player = Load($"{u._id}\\{u.loaded}", ignore);
+            player.user = u;
+            return player;
+        }
 
         public static Player Load(string charPath, IgnoreException ignore = IgnoreException.None)
         {
@@ -363,7 +363,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
             while(experience >= reqXPToLVL)
             {
                 level++;
-                LevelNotifications().Wait();
+                LevelNotifications();
                 if (Specialization != null)
                     Specialization.specPoints++;
                 experience -= reqXPToLVL;
@@ -374,13 +374,19 @@ namespace AMI.Neitsillia.User.PlayerPartials
             SaveFileMongo();
             return gain;
         }
-        async Task LevelNotifications()
+        void LevelNotifications()
         {
             if (level == 20)
-                await SendMessageToDM($"{name} has reached level 20 and unlocked " +
+            {
+                _ = SendMessageToDM($"{name} has reached level 20 and unlocked " +
                     $"Specializations. To select a specialization, do ``~xp`` " +
                     $"and react with {EUI.pickSpec}. You may only select one " +
                     $"specialization and it may not be changed later.");
+            }
+
+            if(user == null) user = BotUser.Load(userid);
+            if(user.referrer != 0)
+                _ = Social.Mail.Mail.ReferenceReward(this, user.referrer);
         }
         #endregion
 

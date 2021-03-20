@@ -6,7 +6,7 @@ using AMYPrototype;
 using Discord;
 using Discord.WebSocket;
 using MongoDB.Bson.Serialization.Attributes;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -32,6 +32,8 @@ namespace AMI.Neitsillia.User
         public DateTime LastVote;
         public int voteStreak;
         public int[] ResourceCrates;
+
+        public ulong referrer;
 
         [JsonConstructor]
         public BotUser(bool json = false)

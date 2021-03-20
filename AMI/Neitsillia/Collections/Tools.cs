@@ -3,7 +3,7 @@ using AMI.Methods.Graphs;
 using AMI.Module;
 using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.Neitsillia.Collections

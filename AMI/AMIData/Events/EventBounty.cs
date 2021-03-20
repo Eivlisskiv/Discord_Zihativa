@@ -3,7 +3,7 @@ using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.NPCSystems;
 using AMYPrototype;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.AMIData.Events

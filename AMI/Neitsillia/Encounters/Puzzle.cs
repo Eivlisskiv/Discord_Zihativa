@@ -3,7 +3,7 @@ using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.Neitsillia.Encounters

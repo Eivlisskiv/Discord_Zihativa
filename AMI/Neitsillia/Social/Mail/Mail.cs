@@ -5,7 +5,7 @@ using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype.Commands;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -31,10 +31,21 @@ namespace AMI.Neitsillia.Social.Mail
 
         public static async Task ReferenceReward(Player player, ulong referer)
         {
-            Mail mail = new Mail(referer, "A player you've refered has leveled up!",
+            Mail mail = new Mail(referer, "A player you've referred has leveled up!",
                 $"<@{player.userid}> 's character {player.name} has reached level {player.level}. " + Environment.NewLine +
                 $"As thanks for helping the community grow with active players, please accept these rewards.", 
                 player.level * 100, new StackedItems(Item.RandomGear(player.level * 5, true), 1));
+            await mail.Save();
+        }
+
+        public static async Task ReferenceSetReward(ulong self)
+        {
+            Mail mail = new Mail(self, "Reference set!",
+                "You've set your reference." + Environment.NewLine +
+                "This will grant rewards to the person who refered you" +
+                " to this bot every time one of your characters level up." + Environment.NewLine +
+                "Invite your friends to play and ask them to use the same command for the same rewards!",
+                5000);
             await mail.Save();
         }
 
@@ -143,6 +154,7 @@ namespace AMI.Neitsillia.Social.Mail
                     return;
                 }
 
+                player.SaveFileMongo();
                 await channel.SendMessageAsync("Mail collected and deleted successfully.");
             }
 

@@ -8,7 +8,7 @@ using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

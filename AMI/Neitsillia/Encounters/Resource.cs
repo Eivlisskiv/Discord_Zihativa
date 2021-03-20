@@ -5,7 +5,7 @@ using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.Neitsillia.Encounters

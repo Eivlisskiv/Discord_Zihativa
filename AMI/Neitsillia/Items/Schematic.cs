@@ -2,7 +2,7 @@
 using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.Neitsillia.Crafting

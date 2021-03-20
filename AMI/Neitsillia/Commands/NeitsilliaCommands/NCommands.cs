@@ -17,7 +17,7 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 using System.Linq;

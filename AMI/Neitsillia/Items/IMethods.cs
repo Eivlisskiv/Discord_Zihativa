@@ -2,7 +2,7 @@
 using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.NPCSystems;
 using AMYPrototype;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 

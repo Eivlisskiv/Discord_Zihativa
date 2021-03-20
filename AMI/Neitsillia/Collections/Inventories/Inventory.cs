@@ -2,7 +2,7 @@
 using AMI.Module;
 using AMI.Neitsillia.User.UserInterface;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections;
 using System.Collections.Generic;

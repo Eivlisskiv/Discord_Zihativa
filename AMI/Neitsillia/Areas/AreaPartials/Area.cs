@@ -1,11 +1,9 @@
 ﻿using AMI.AMIData;
 using AMI.Methods;
-using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.NPCSystems;
-using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using Discord;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using NeitsilliaEngine;
 using System;
 using System.Collections.Generic;
@@ -46,7 +44,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         public List<Junction> junctions;
 
         #region Gets
-        public EmbedBuilder AreaInfo(int floor, bool dispopu = false, int popuPage = 0)
+        public EmbedBuilder AreaInfo(int floor/*, bool dispopu = false, int popuPage = 0*/)
         {
             EmbedBuilder areainfo = new EmbedBuilder();
             areainfo.WithTitle(name);

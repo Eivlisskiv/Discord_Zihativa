@@ -13,7 +13,7 @@ using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 using System.IO;

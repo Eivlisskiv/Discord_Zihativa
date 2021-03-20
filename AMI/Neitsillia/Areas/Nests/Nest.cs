@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using AMI.Neitsillia.NPCSystems.Companions;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using AMI.Neitsillia.Items;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.Areas.AreaPartials;
@@ -109,7 +109,7 @@ namespace AMI.Neitsillia.Areas.Nests
             }
         }
 
-        internal static async Task LoadNests(bool verify = false)
+        internal static async Task LoadNests()
         {
             List<Nest> nests = await Database.LoadRecordsAsync<Nest>(null);
             for (int i = 0; i < nests.Count; i++)
@@ -224,7 +224,7 @@ namespace AMI.Neitsillia.Areas.Nests
                 }
                 else if (Program.Chance(60)) //Item drop
                 {
-                    Item drop = null;
+                    Item drop;
                     int amount = 1;
 
                     //

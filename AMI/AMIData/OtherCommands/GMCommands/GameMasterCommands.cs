@@ -19,7 +19,7 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
 using Discord.Rest;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,8 +64,8 @@ namespace AMI.AMIData.OtherCommands
                 SaveGMFile();
             }
         }
-        internal GM GetGM(ulong id)
-        { return GMs.Find(GM.FindWithID(201875246091993088)); }
+        internal GM GetGM(ulong id) => GMs.Find(GM.FindWithID(id));
+
         internal async Task<bool> IsGMLevel(int level, ulong id = 0)
         {
             LoadGMs();
@@ -143,7 +143,7 @@ namespace AMI.AMIData.OtherCommands
                     await DUtils.Replydb(Context, "You may not change your own GM level");
                 else if (IsGMLevel(level + 1, id).Result && IsGMLevel(currentLevel + 1, id).Result)
                 {
-                    string message = "No Changes were made, unwanted result;";
+                    string message;
                     if (target == null)
                     {
                         GMs.Add(new GM(user, level));
@@ -338,7 +338,7 @@ namespace AMI.AMIData.OtherCommands
                 if (guildset.enabledChannels.Count < 1) return true;
                 if (guildset.enabledChannels.FindIndex(c => c.id == context.Channel.Id) > -1)  return true;
 
-                string content = context.Message.Content.ToLower().Substring((guildset.prefix ?? "~").Length);
+                string content = context.Message.Content.ToLower()[(guildset.prefix ?? "~").Length..];
                 if (content.StartsWith("setchannel")) return true;
                 try
                 {
@@ -416,7 +416,7 @@ namespace AMI.AMIData.OtherCommands
         #endregion
 
         [Command("SuggestionResponse", true)][Alias("Suggestres")]
-        public async Task SuggestionResponse(ulong msgid)
+        public async Task SuggestionResponse(ulong msgid, [Remainder] string message)
         {
             GuildSettings gset = null;
             if (Context.Guild == null && await IsGMLevel(3))
@@ -426,22 +426,17 @@ namespace AMI.AMIData.OtherCommands
 
             if(gset != null)
             {
-                string content = Context.Message.Content;
                 await ReplyAsync(
                 await Program.data.UpdateSuggestion(gset,
-                    msgid, content.Substring(content.IndexOf(' ', content.IndexOf(' ') + 1) + 1) 
-                    ));
+                    msgid, message));
             }
         }
         [Command("BugResponse", true)] [Alias("bugres")]
-        public async Task BugReportResponse(ulong msgid)
+        public async Task BugReportResponse(ulong msgid, [Remainder] string message)
         {
             Context.AdminCheck();
-            string content = Context.Message.Content;
             await ReplyAsync(
-                await Program.data.UpdateBugReport(msgid, 
-                    content.Substring(content.IndexOf(' ', content.IndexOf(' ') + 1) + 1)
-                    ));
+                await Program.data.UpdateBugReport(msgid, message));
         }
 
         #region Cheats
@@ -681,19 +676,7 @@ namespace AMI.AMIData.OtherCommands
                 }
             }
         }
-        [Command("Grant Building Schem")]
-        [Alias("grantbs")]
-        public async Task GrantBuildingSchem(IUser user, params string[] args)
-        {
-            if (await IsGMLevel(4))
-            {
-                Player player = Player.Load(user.Id, Player.IgnoreException.All);
-                Item item = Item.BuildingSchematic(ArrayM.ToUpString(args));
-                player.inventory.Add(item, 1, -1);
-                player.SaveFileMongo();
-                await DUtils.DeleteContextMessageAsync(Context);
-            }
-        }
+
         [Command("GrantEgg")][Alias("grante")]
         public async Task Grant_Egg(IUser user, int tier = 0)
         {
@@ -795,7 +778,7 @@ namespace AMI.AMIData.OtherCommands
             await DUtils.DeleteContextMessageAsync(Context);
         }
         [Command("Notify", true)]
-        public async Task Notify(string notification)
+        public async Task Notify(string notification, [Remainder] string message)
         {
             if (IsGMLevel(4).Result)
             {
@@ -812,14 +795,8 @@ namespace AMI.AMIData.OtherCommands
                         break;
 
                     default:
-                        string content = Context.Message.Content.Substring(Context.Prefix.Length + "Notify".Length);
-                        int i1 = content.IndexOf('"');
-                        int i2 = content.IndexOf('"', i1 + 1);
-                        content = content.Substring( notification.Length +
-                            (i1 == 0 && i2 == notification.Length + 1 ? 2 : 0));
-
-                        if (content.Length == 0) throw NeitsilliaError.ReplyError("There is no content to write in this notification");
-                        noti = DUtils.BuildEmbed(notification, content); 
+                        if (message.Length == 0) throw NeitsilliaError.ReplyError("There is no content to write in this notification");
+                        noti = DUtils.BuildEmbed(notification, message); 
                         break;
                 }
                 //
@@ -883,9 +860,10 @@ namespace AMI.AMIData.OtherCommands
         {
             if(await IsGMLevel(4))
             {
-                ulong guildID = Context.Channel.Id;
                 string[] copms = messageURL.Replace("https://discordapp.com/channels/", "").Split('/');
-                ulong.TryParse(copms[0], out guildID);
+
+                if(!ulong.TryParse(copms[0], out ulong guildID)) guildID = Context.Channel.Id;
+
                 ulong chanID = ulong.Parse(copms[1]);
                 ulong msgID = ulong.Parse(copms[2]);
                 var m = await Program.clientCopy.GetGuild(guildID).GetTextChannel(chanID).GetMessageAsync(msgID);

@@ -1,6 +1,5 @@
-﻿using Discord;
-using Neitsillia.Items.Item;
-using System;
+﻿using AMI.Neitsillia.Items.ItemPartials;
+using Discord;
 using System.Collections.Generic;
 
 namespace AMI.Neitsillia.User.UserInterface

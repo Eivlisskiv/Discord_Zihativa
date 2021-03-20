@@ -10,7 +10,7 @@ using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

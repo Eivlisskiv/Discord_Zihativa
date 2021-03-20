@@ -7,7 +7,7 @@ using AMI.Neitsillia.Collections;
 using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Items.Abilities;
 using AMYPrototype;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Neitsillia.Methods;
 using System;
 using System.Collections.Generic;

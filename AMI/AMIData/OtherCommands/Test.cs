@@ -7,7 +7,7 @@ using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Neitsillia.Methods;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("TestTable")]
         [Alias("testt")]
-        public async Task TestAreaFloorTest(string tables, int floor, int maxfloor = 100)
+        public async Task TestAreaFloorTest(string tables)
         {
             var l = tables.Split(';');
             List<string>[] table = new List<string>[l.Length];

@@ -3,7 +3,7 @@ using AMI.Methods;
 using AMI.Neitsillia.Collections;
 using Discord;
 using Discord.WebSocket;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Threading.Tasks;
 

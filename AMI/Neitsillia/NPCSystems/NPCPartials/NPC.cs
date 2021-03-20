@@ -8,12 +8,11 @@ using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMYPrototype;
 using Discord;
 using MongoDB.Bson.Serialization.Attributes;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Neitsillia.Methods;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using static AMI.Neitsillia.ReferenceData;
 
 namespace AMI.Neitsillia.NPCSystems
@@ -608,15 +607,15 @@ namespace AMI.Neitsillia.NPCSystems
             info += "|Level: " + level + Environment.NewLine
                     + "|Profession: " + profession + Environment.NewLine
                     + "|Combat Role: " + role.ToString() + Environment.NewLine
-                    + "|Rank: " + Rank() + Environment.NewLine;
+                    + "|Rank: " + Rank() + Environment.NewLine
+                    + $"|Kutsyei Coins: {Utils.Display(KCoins)} {Environment.NewLine}";
             if (basicStats)
             {
                 info += $"|HP: {health}/{Health()} {Environment.NewLine}"
                     + $"|SP: {stamina}/{Stamina()} {Environment.NewLine}"
-                    + $"|Experience: {experience}/{Quadratic.XPCalc(level + 1)} {Environment.NewLine}"
-                    + $"|Kutsyei Coins: {KCoins} {Environment.NewLine}";
+                    + $"|Experience: {experience}/{Quadratic.XPCalc(level + 1)} {Environment.NewLine}";
             }
-            info += base.CharacterInfo(getStats, getInv, 
+            info += CharacterInfo(getStats, getInv, 
                 getEq,
                 getschems, getAbility, getPerks);
             return info;

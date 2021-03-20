@@ -1,7 +1,7 @@
 ﻿using AMI.Methods;
 using AMI.Module;
 using AMI.Neitsillia.Collections;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Reflection;
 

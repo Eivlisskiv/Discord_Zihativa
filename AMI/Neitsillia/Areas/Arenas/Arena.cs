@@ -10,7 +10,7 @@ using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.WebSocket;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -104,7 +104,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         public ArenaMode gameMode;
         public ArenaModifier Modifiers;
 
-        public Arena(bool json) { }
+        public Arena(bool _) { }
         public Arena(ArenaMode mode, string[] boolArray = null)
         {
             gameMode = mode;

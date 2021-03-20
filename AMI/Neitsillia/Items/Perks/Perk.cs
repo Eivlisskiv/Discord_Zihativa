@@ -6,7 +6,7 @@ using AMI.Neitsillia.Items.Perks.PerkLoad;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
-using Neitsillia.Items.Item;
+using AMI.Neitsillia.Items.ItemPartials;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
