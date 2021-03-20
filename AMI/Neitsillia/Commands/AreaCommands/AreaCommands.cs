@@ -393,9 +393,9 @@ namespace AMI.Neitsillia.Commands
             params (int a, int b, int c)[] questGiven)
         {
             int availableQuests = 0;
-            foreach (var i in questGiven)
+            foreach (var (a, b, c) in questGiven)
             {
-                int[] id = { i.a, i.b, i.c };
+                int[] id = { a, b, c };
                 if (player.IsQuestAvailable(id))
                 {
                     availableQuests++;
@@ -530,8 +530,8 @@ namespace AMI.Neitsillia.Commands
                                 break;
                             case "item":
                                 {
-                                    var ia = Verify.IndexXAmount(argument);
-                                    message = await SHDepositItem(player, ia.index-1, ia.amount);
+                                    var (index, amount) = Verify.IndexXAmount(argument);
+                                    message = await SHDepositItem(player, index-1, amount);
                                 }
                                 break;
                             //case "schematic":
@@ -561,8 +561,8 @@ namespace AMI.Neitsillia.Commands
                                 break;
                             case "item":
                                 {
-                                    var ia = Verify.IndexXAmount(argument);
-                                    message = await SHWithdrawItem(player, ia.index-1, ia.amount);
+                                    var (index, amount) = Verify.IndexXAmount(argument);
+                                    message = await SHWithdrawItem(player, index-1, amount);
                                 }
                                 break;
                             default:
@@ -652,21 +652,14 @@ namespace AMI.Neitsillia.Commands
                             }
                         break;
                     case "destroy":
-                        switch (target.ToLower())
+                        message = (target.ToLower()) switch
                         {
-                            case "building":
-                                message = "Feature unavailable";
-                                break;
-                            case "stronghold":
-                                message = "Feature unavailable";
-                                break;
-                            default:
-                                message = "Action target unrecognized." + Environment.NewLine
-                           + "~sh destroy building slot#" + Environment.NewLine
-                           + "~sh destroy stronghold" + Environment.NewLine
-                           ; break;
-
-                        }
+                            "building" => "Feature unavailable",
+                            "stronghold" => "Feature unavailable",
+                            _ => "Action target unrecognized." + Environment.NewLine
+                                + "~sh destroy building slot#" + Environment.NewLine
+                                + "~sh destroy stronghold" + Environment.NewLine,
+                        };
                         break;
                     case "collect":
                         {
@@ -734,7 +727,7 @@ namespace AMI.Neitsillia.Commands
         async Task<string> SHDepositItem(Player player, int slot, int amount)
         {
             OldSandBox sb = player.Area.sandbox;
-            Item it = null;
+            Item it;
             if ((it = player.inventory.GetItem(slot)) == null)
                 return $"No item binded to slot {slot}, please verify your inventory.";
             else if (player.inventory.GetCount(slot) < amount)
@@ -751,7 +744,7 @@ namespace AMI.Neitsillia.Commands
         async Task<string> SHWithdrawItem(Player player, int slot, int amount)
         {
             OldSandBox sb = player.Area.sandbox;
-            Item it = null;
+            Item it;
             if ((it = sb.stock.GetItem(slot)) == null)
                 return $"No item binded to slot {slot}, please verify area stock.";
             else if (sb.stock.GetCount(slot) < amount)

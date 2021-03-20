@@ -50,7 +50,7 @@ namespace AMI.Neitsillia.Combat
 
             partyLeader = ((Player)playerParty[0].character);
 
-            endDungeon = (currentArea.type == AreaType.Dungeon || currentArea.type == AreaType.Arena) && TopFloor;
+            endDungeon = currentArea.IsDungeon && TopFloor;
             allPlayersDead = Combat.ArePlayersDead(playerParty);
             allMobsDead = Combat.IsMobDead(mobParty);
         }
@@ -96,7 +96,8 @@ namespace AMI.Neitsillia.Combat
             NPC mob = (NPC)Utils.RandomElement(mobParty).character;
             string lostInfo = allMobsDead ? "No one is left standing to claim victory." : "You have been defeated." + Environment.NewLine;
 
-            await Database.DeleteRecord<Area>("Dungeons", currentArea.AreaId, "AreaId");
+            if(currentArea.IsDungeon)
+                await Database.DeleteRecord<Area>("Dungeons", MainAreaPath.path, "AreaId");
 
             MsgType msgType = MsgType.Main;
             Encounter encounter = await ChallengeEnd();
@@ -241,10 +242,7 @@ namespace AMI.Neitsillia.Combat
         private async Task<MsgType> HandleAllMobsDead(EmbedBuilder result)
         {
             if (endDungeon)
-            {
-                await Database.DeleteRecord<Area>("Area", MainAreaPath.path, "AreaId");
                 await Database.DeleteRecord<Area>("Dungeons", MainAreaPath.path, "AreaId");
-            }
 
             //Get Loot into Encounter
             Encounter enc = new Encounter("Loot", partyLeader);

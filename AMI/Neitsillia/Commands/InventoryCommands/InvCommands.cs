@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AMI.Neitsillia.Items.Scrolls;
 
 namespace AMI.Neitsillia.InventoryCommands
 {
@@ -557,6 +558,9 @@ namespace AMI.Neitsillia.InventoryCommands
                     if (inCombat) throw NeitsilliaError.ReplyError($"{player.name}, you may not use essence vials during combat.");
                     data = UseEssenceVial(player, index);
                     break;
+                case Item.IType.Scroll:
+                    await ScrollsManager.Use(player, index, item, Context.Channel);
+                    return;
                 
                 default:
                     await DUtils.Replydb(Context, 

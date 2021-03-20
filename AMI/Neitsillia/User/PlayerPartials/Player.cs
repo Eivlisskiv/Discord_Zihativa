@@ -474,7 +474,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
             if(leaveParty && Party != null) await Party.Remove(this);
 
             if (respawnArea == null)
-                respawnArea =  "Neitsillia\\Casdam Ilse\\Central Casdam\\Atsauka\\Atsauka";
+                respawnArea = "Neitsillia\\Casdam Ilse\\Central Casdam\\Atsauka\\Atsauka";
             if(setArea)
                 SetArea(Areas.AreaPartials.Area.LoadArea(respawnArea, "Atsauka")).Wait();
             return respawnArea;

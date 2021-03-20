@@ -34,19 +34,17 @@ namespace AMI.Neitsillia.Collections
             return null;
         }
         internal Item GetGear(Item.IType t, int i = 0)
-        {
-            switch(t)
+            => t switch
             {
-                case Item.IType.Weapon: return weapon;
-                case Item.IType.Helmet: return helmet;
-                case Item.IType.Mask: return mask;
-                case Item.IType.Chest: return chestp;
-                case Item.IType.Jewelry: return jewelry[i];
-                case Item.IType.Trousers: return trousers;
-                case Item.IType.Boots: return boots;
-            }
-            return null;
-        }
+                Item.IType.Weapon => weapon,
+                Item.IType.Helmet => helmet,
+                Item.IType.Mask => mask,
+                Item.IType.Chest => chestp,
+                Item.IType.Jewelry => jewelry[i],
+                Item.IType.Trousers => trousers,
+                Item.IType.Boots => boots,
+                _ => null,
+            };
 
         internal static object SlotName(int i)
         {
@@ -63,8 +61,8 @@ namespace AMI.Neitsillia.Collections
                     return $"Jewelry {i - 5}";
                 case 8: return "Trousers";
                 case 9: return "Boots";
+                default: return null;
             }
-            return null;
         }
 
         internal static Item.IType GetItemType(int i)

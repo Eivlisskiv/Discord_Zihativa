@@ -183,21 +183,15 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                        return ""  
-                        + $"{10*level} Wood" + Environment.NewLine
-                        + $"{5*level} String" + Environment.NewLine
-                        ;
-                case 1:
-                        return ""
-                        + $"{1*level} Tsuu Bone" + Environment.NewLine
-                        + $"{20} Wood" + Environment.NewLine
-                        + $"{10} String" + Environment.NewLine
-                        ;
-            }
-            return "No upgrades available.";
+                0 => $"{10 * level} Wood" + Environment.NewLine
+                     + $"{5 * level} String" + Environment.NewLine,
+                1 => $"{1 * level} Tsuu Bone" + Environment.NewLine
+                     + $"{20} Wood" + Environment.NewLine
+                     + $"{10} String" + Environment.NewLine,
+                _ => "No upgrades available.",
+            };
         }
         public Inventory SickleUpgrade(int level, int tier)
         {
@@ -205,21 +199,17 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 10),
-                        new StackedItems("String", level * 5)
-                        );
-                case 1:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 20),
-                        new StackedItems("Tsuu Bone", level),
-                        new StackedItems("String", level * 10)
-                        );
-            }
-            return null;
+                0 => new Inventory(
+                     new StackedItems("Wood", level * 10),
+                     new StackedItems("String", level * 5)),
+                1 => new Inventory(
+                     new StackedItems("Wood", level * 20),
+                     new StackedItems("Tsuu Bone", level),
+                     new StackedItems("String", level * 10)),
+                _ => null,
+            };
         }
         //
         public string AxeUpgradeInfo(int level, int tier)
@@ -228,21 +218,15 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return ""
-                    + $"{10 * level} Wood" + Environment.NewLine
-                    + $"{5 * level} String" + Environment.NewLine
-                    ;
-                case 1:
-                    return ""
-                    + $"{1 * level} Tsuu Bone" + Environment.NewLine
-                    + $"{10} Wood" + Environment.NewLine
-                    + $"{10} String" + Environment.NewLine
-                    ;
-            }
-            return "No upgrades available.";
+                0 => $"{10 * level} Wood" + Environment.NewLine
+                     + $"{5 * level} String" + Environment.NewLine,
+                1 => $"{1 * level} Tsuu Bone" + Environment.NewLine
+                     + $"{10} Wood" + Environment.NewLine
+                     + $"{10} String" + Environment.NewLine,
+                _ => "No upgrades available.",
+            };
         }
         public Inventory AxeUpgrade(int level, int tier)
         {
@@ -250,21 +234,17 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 10),
-                        new StackedItems("String", level * 5)
-                        );
-                case 1:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 20),
-                        new StackedItems("Tsuu Bone", level),
-                        new StackedItems("String", level * 10)
-                        );
-            }
-            return null;
+                0 => new Inventory(
+                     new StackedItems("Wood", level * 10),
+                     new StackedItems("String", level * 5)),
+                1 => new Inventory(
+                     new StackedItems("Wood", level * 20),
+                     new StackedItems("Tsuu Bone", level),
+                     new StackedItems("String", level * 10)),
+                _ => null,
+            };
         }
         //
         public string PickaxeUpgradeInfo(int level, int tier)
@@ -273,21 +253,15 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return ""
-                    + $"{10 * level} Wood" + Environment.NewLine
-                    + $"{5 * level} String" + Environment.NewLine
-                    ;
-                case 1:
-                    return ""
-                    + $"{1 * level} Tsuu Bone" + Environment.NewLine
-                    + $"{10} Wood" + Environment.NewLine
-                    + $"{10} String" + Environment.NewLine
-                    ;
-            }
-            return "No upgrades available.";
+                0 => $"{10 * level} Wood" + Environment.NewLine
+                     + $"{5 * level} String" + Environment.NewLine,
+                1 => $"{1 * level} Tsuu Bone" + Environment.NewLine
+                     + $"{10} Wood" + Environment.NewLine
+                     + $"{10} String" + Environment.NewLine,
+                _ => "No upgrades available.",
+            };
         }
         public Inventory PickaxeUpgrade(int level, int tier)
         {
@@ -295,21 +269,17 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 10),
-                        new StackedItems("String", level * 5)
-                        );
-                case 1:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 20),
-                        new StackedItems("Tsuu Bone", level),
-                        new StackedItems("String", level * 10)
-                        );
-            }
-            return null;
+                0 => new Inventory(
+                     new StackedItems("Wood", level * 10),
+                     new StackedItems("String", level * 5)),
+                1 => new Inventory(
+                     new StackedItems("Wood", level * 20),
+                     new StackedItems("Tsuu Bone", level),
+                     new StackedItems("String", level * 10)),
+                _ => null,
+            };
         }
         //
         public string SpearUpgradeInfo(int level, int tier)
@@ -318,21 +288,15 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return ""
-                    + $"{10 * level} Wood" + Environment.NewLine
-                    + $"{5 * level} String" + Environment.NewLine
-                    ;
-                case 1:
-                    return ""
-                    + $"{1 * level} Tsuu Bone" + Environment.NewLine
-                    + $"{10} Wood" + Environment.NewLine
-                    + $"{10} String" + Environment.NewLine
-                    ;
-            }
-            return "No upgrades available.";
+                0 => $"{10 * level} Wood" + Environment.NewLine
+                     + $"{5 * level} String" + Environment.NewLine,
+                1 => $"{1 * level} Tsuu Bone" + Environment.NewLine
+                     + $"{10} Wood" + Environment.NewLine
+                     + $"{10} String" + Environment.NewLine,
+                _ => "No upgrades available.",
+            };
         }
         public Inventory SpearUpgrade(int level, int tier)
         {
@@ -340,21 +304,17 @@ namespace AMI.Neitsillia.Collections
                 tier++;
             else
                 level++;
-            switch (tier)
+            return tier switch
             {
-                case 0:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 10),
-                        new StackedItems("String", level * 5)
-                        );
-                case 1:
-                    return new Inventory(
-                        new StackedItems("Wood", level * 20),
-                        new StackedItems("Tsuu Bone", level),
-                        new StackedItems("String", level * 10)
-                        );
-            }
-            return null;
+                0 => new Inventory(
+                     new StackedItems("Wood", level * 10),
+                     new StackedItems("String", level * 5)),
+                1 => new Inventory(
+                     new StackedItems("Wood", level * 20),
+                     new StackedItems("Tsuu Bone", level),
+                     new StackedItems("String", level * 10)),
+                _ => null,
+            };
         }
     }
 }

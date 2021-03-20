@@ -36,7 +36,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             if (itemToCraft.Length == 1 && int.TryParse(itemToCraft[0], out int err))
                 throw NeitsilliaError.ReplyError($"If you are trying to craft an item using a schematic in your inventory, use ``~use {err}``.");
 
-            int countIndex = int.TryParse(itemToCraft[0], out int amount) ? 0 : int.TryParse(itemToCraft[itemToCraft.Length - 1], out amount) ? itemToCraft.Length - 1 : -1;
+            int countIndex = int.TryParse(itemToCraft[0], out int amount) ? 0 : int.TryParse(itemToCraft[^1], out amount) ? itemToCraft.Length - 1 : -1;
             string itemname = StringM.UpperAt(ArrayM.ToKString(itemToCraft, " ", countIndex));
             Player player = Context.Player;
             if (itemname == null)

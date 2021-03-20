@@ -28,14 +28,10 @@ namespace AMI.Neitsillia.Combat
         [Command("Cast", true)]
         [Summary("Cast and ability on a target. Examples: \n"
             + "`cast` : uses brawl on the first live enemy \n"
-            + "`cast {ability name}` : uses attack ability on the first live enemy and defense ability on self \n"
+            + "`cast {ability name}` : use ability with default target (first enemy for attacks, self for defense) \n"
             + "`cast {ability name} {target}` : uses attack ability on the target \n"
             )]
-        public async Task Attack(
-            [Summary("Name of the ability to use.")]
-            string abilityname = null,
-            [Summary("id of target: m0-m3 for enemies, p0-p3 for allies")]
-            string target = null)
+        public async Task Attack([Remainder] string arguments)
         {
             Player player = Context.Player;
             if (!player.IsEncounter("Combat") && !player.IsEncounter("NPC"))
@@ -44,13 +40,12 @@ namespace AMI.Neitsillia.Combat
                 await DUtils.Replydb(Context, "There are no targets available.");
             else
             {
-                string[] temp = GetAbilityAndTarget(player, Context.Content?.Split(' ') ?? new string[0]);
-                bool sneakAttack = false;
+                string[] temp = GetAbilityAndTarget(player, arguments.Split(' ') ?? new string[0]);
                 if (player.duel != null && player.duel.abilityName != null
                     && player.duel.abilityName.StartsWith("~"))
-                    throw NeitsilliaError.ReplyError($"{player.name} may not change their turn action from {player.duel.abilityName.Substring(1)}");
+                    throw NeitsilliaError.ReplyError($"{player.name} may not change their turn action from {player.duel.abilityName[1..]}");
 
-                player.duel = player.duel ?? new DuelData(null);
+                player.duel ??= new DuelData(null);
                 player.duel.target = temp[1];
                 player.duel.abilityName = temp[0];
 
@@ -65,12 +60,11 @@ namespace AMI.Neitsillia.Combat
                     player.Encounter.Name = Encounter.Names.Mob;
                     player.Encounter.mobs = new NPC[1];
                     player.Encounter.mobs[0] = player.Encounter.npc;
-                    sneakAttack = true;
                 }
                 if (player.Encounter.Name == Encounter.Names.PVP)
                     await PVPTurn(player, temp[0], Context.Channel);
                 else
-                    await TurnCombat(player, temp[0], Context.Channel, sneakAttack);
+                    await TurnCombat(player, temp[0], Context.Channel);
                 await DUtils.DeleteContextMessageAsync(Context);
             }
         }
@@ -92,11 +86,11 @@ namespace AMI.Neitsillia.Combat
                     }break;
                 default:
                     {
-                        if(args[args.Length - 1].Length > 2)
+                        if(args[^1].Length > 2)
                             results = ParseAbility(player, ArrayM.ToString(args), results);
                         else
                         results = ParseAbility(player, ArrayM.ToKString(args, skipIndex: args.Length - 1), 
-                            ParseTarget(args[args.Length - 1], results));
+                            ParseTarget(args[^1], results));
                         
                     }
                     break;
@@ -108,7 +102,7 @@ namespace AMI.Neitsillia.Combat
         static string[] ParseAbility(Player player, string name, string[] results)
         {
             name = name.Trim();
-            if (player.HasAbility(name, out int index))
+            if (player.HasAbility(name, out _))
             { results[0] = name; return results; }
             throw NeitsilliaError.ReplyError($"{player.name} does not have ability {name}. To view character's abilities, type `~abilities`.");
         }
@@ -183,7 +177,7 @@ namespace AMI.Neitsillia.Combat
                     player.SaveFileMongo();
                 }
                 else
-                    await TurnCombat(player, "~Run", chan, false, edit);
+                    await TurnCombat(player, "~Run", chan, edit);
             }
         }
 
@@ -206,18 +200,15 @@ namespace AMI.Neitsillia.Combat
                 };
             }
 
-            if (player.duel.abilityName == null || !player.HasAbility(player.duel.abilityName, out int i))
+            if (player.duel.abilityName == null || !player.HasAbility(player.duel.abilityName, out _))
                 player.duel.abilityName = player.abilities[0].name;
-            await TurnCombat(player, player.duel.abilityName, chan, false, true);
+            await TurnCombat(player, player.duel.abilityName, chan, true);
         }
-        internal static async Task TurnCombat(Player player, string abilityName, ISocketMessageChannel chan, bool sneakAttack = false, bool editMessage = false)
+        internal static async Task TurnCombat(Player player, string abilityName, ISocketMessageChannel chan, bool editMessage = false)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
             NPC[] mob = player.Encounter.mobs;
-            double sneakMult = 0;
-            if (sneakAttack)
-                sneakMult = SneakattackMultiplier(player.Agility(), mob[0].Agility());
             Ability ability = null;
             if (abilityName != null)
             {
@@ -404,7 +395,7 @@ namespace AMI.Neitsillia.Combat
             }
             else
             {
-                if (abilityName.StartsWith("~") || player.HasAbility(abilityName, out int index))
+                if (abilityName.StartsWith("~") || player.HasAbility(abilityName, out _))
                 { 
                     player.duel.abilityName = abilityName;
                     player.duel.replyToChannel = chan.Id;

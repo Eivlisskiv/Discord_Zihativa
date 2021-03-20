@@ -49,24 +49,20 @@ namespace AMI.Commands
 
         public bool WIPCheck()
         {
-            switch(User.Id)
+            return User.Id switch
             {
-                case 201875246091993088:
-                    return true;
-                default:
-                    throw NeitsilliaError.ReplyError("Feature is work in progress");
-            }
+                201875246091993088 => true,
+                _ => throw NeitsilliaError.ReplyError("Feature is work in progress"),
+            };
         }
 
         public bool AdminCheck()
         {
-            switch (User.Id)
+            return User.Id switch
             {
-                case 201875246091993088:
-                    return true;
-                default:
-                    throw NeitsilliaError.ReplyError("You may not use this command");
-            }
+                201875246091993088 => true,
+                _ => throw NeitsilliaError.ReplyError("You may not use this command"),
+            };
         }
     }
 }

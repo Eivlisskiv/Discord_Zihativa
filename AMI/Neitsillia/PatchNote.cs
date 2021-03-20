@@ -22,10 +22,11 @@ namespace AMI.Neitsillia
         }
         public static string ItemsPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
-                + $"{Environment.NewLine}"
+                $"Scrolls introdcutions: scrolls are `useable` items with specific effects. {Environment.NewLine}"
+                + $" New Scroll: Scroll Of Homecoming: allows players to teleport to the last safe area they visited. " +
+                $"(Currently no drops while testing) {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()
