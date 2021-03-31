@@ -8,9 +8,9 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Added an inbox system to thread safely send rewards. {Environment.NewLine}"
-                + $"Users may use the `friendcode` command to set another user as they reference to the bot and both gain rewards. {Environment.NewLine}"
-                + $"Nest scores now grant extra rewards once/if the nest is defeated. {Environment.NewLine}";
+                $"Combat encounter is now shown when trying to explore while in combat instead of a useless message. {Environment.NewLine}"
+                + $"Only gear schematics may now be gained from scarpping. (Other items will become products from house buildings) {Environment.NewLine}"
+                + $"Added house building: Mine {Environment.NewLine}";
         }
         public static string StatsPatchNotes()
         {
@@ -24,7 +24,7 @@ namespace AMI.Neitsillia
         {
             //return null;
             return
-                $"Scrolls introdcutions: scrolls are `useable` items with specific effects. {Environment.NewLine}"
+                $"new Scroll: Dungeon Scroll: Allows players to spawn a dungeon. {Environment.NewLine}"
                 + $" New Scroll: Scroll Of Homecoming: allows players to teleport to the last safe area they visited. " +
                 $"(Currently no drops while testing) {Environment.NewLine}"
                 ;
@@ -38,9 +38,9 @@ namespace AMI.Neitsillia
         }
         public static string AbilitiesPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}" 
+                $"Added Reflect ability in Counter Prep Tree. {Environment.NewLine}" 
                  ;
         }
         public static string WorldPatchNotes()
@@ -67,9 +67,9 @@ namespace AMI.Neitsillia
         }
         public static string NPCPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"NPC's coins are now visible while interacting with them. {Environment.NewLine}"
+                $"{Environment.NewLine}"
                 + $" {Environment.NewLine}"
                 ;
         }

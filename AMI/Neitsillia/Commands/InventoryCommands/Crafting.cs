@@ -87,7 +87,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
 
         [Command("Scrap")]
         [Alias("scrap")]
-        [Summary("Scrap gear or consumables to get some of the materials used to craft the item and a small chance to learn its schematic."
+        [Summary("Scrap items to get some of the materials used to craft the item."
             + "\n Example: `~scrap 1x5` will scrap 5 of the items in slot 1 of your inventory.")]
         public async Task IScrap(string indexXamount)
         {
@@ -106,8 +106,9 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
                 int count = Verify.MinMax(ia.amount, player.inventory.GetCount(index), 1);
                 await DismantlingLoot(player, player.inventory.GetItem(index), count);
                 player.inventory.Remove(index, count);
-                if (player.ui != null && player.ui.type == MsgType.ConfirmUpgrade)
-                    await player.ui.TryDeleteMessage();
+
+                if (player.ui != null && player.ui.type == MsgType.ConfirmUpgrade) await player.ui.TryDeleteMessage();
+
                 await Neitsillia.InventoryCommands.Inventory.UpdateinventoryUI(player, Context.Channel);
             }
         }
@@ -157,36 +158,34 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
         }
         async Task<bool> CheckSchemGain(Player player, Item i, Random r, double extraSchemChance = 0)
         {
-            double cnd = 50;
-            if (i.CanBeEquip())
-                cnd = ((i.condition * 100.00) / i.durability);
+            if (i.CanBeEquip()) return false;
+            double cnd = ((i.condition * 100.00) / i.durability);
             double schemChance = r.Next(101) - (player.stats.GetINT() * Stats.SchemDropRatePerInt) - extraSchemChance -
                 (player.schematics.Count < 3 ? 10 : 0);
             if (player.schematics == null)
                 player.schematics = new List<Schematic>();
-            if ((cnd / 20) >= schemChance)
+            if ((cnd / 20) < schemChance) return false;
+
+            if (player.schematics.Find(Schematic.FindWithName(i.originalName)) == null)
             {
-                if (player.schematics.Find(Schematic.FindWithName(i.originalName)) == null)
-                {
-                    player.schematics.Add(i.schematic);
-                    await DUtils.Replydb(Context, $" {player.name} has discovered how to craft {i.name}");
-                }
+                player.schematics.Add(i.schematic);
+                await DUtils.Replydb(Context, $" {player.name} has discovered how to craft {i.name}");
+            }
+            else
+            {
+                Item sc = Item.NewTemporarySchematic(i);
+                if (player.CollectItem(sc, 1, true))
+                    await DUtils.Replydb(Context, $" {player.name} collected {sc.name}");
                 else
                 {
-                    Item sc = Item.NewTemporarySchematic(i);
-                    if (player.CollectItem(sc, 1, true))
-                        await DUtils.Replydb(Context, $" {player.name} collected {sc.name}");
-                    else
-                    {
-                        if (player.Encounter == null)
-                            player.NewEncounter(new Encounter(Encounter.Names.Loot, player));
-                        player.Encounter.AddLoot(sc);
-                        await DUtils.Replydb(Context, $" {player.name} inventory full, {sc.name} added to loot instance.");
-                    }
+                    if (player.Encounter == null)
+                        player.NewEncounter(new Encounter(Encounter.Names.Loot, player));
+                    player.Encounter.AddLoot(sc);
+                    await DUtils.Replydb(Context, $" {player.name} inventory full, {sc.name} added to loot instance.");
                 }
-                return true;
             }
-            return false;
+            return true;
+
         }
         async Task MoreDismantlingMethod(Player player, Inventory list, bool canCollect)
         {
@@ -217,7 +216,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
         }
 
         [Command("BulkScrap"), Alias("bscrap")]
-        [Summary("Scrap gear or consumables to get some of the materials used to craft the item and a small chance to learn its schematic."
+        [Summary("Scrap items to get some of the materials used to craft the itemc."
             + "\n Example: `~scrap 1x5 2x3 ...` will scrap 5 of the items in slot 1 of your inventory and so on.")]
         public async Task Bulk_Scrap(params string[] slots)
         {

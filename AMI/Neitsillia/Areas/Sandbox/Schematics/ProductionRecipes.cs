@@ -72,6 +72,17 @@ namespace AMI.Neitsillia.Areas.Sandbox.Schematics
         {
              { "General Work", new ProductionRecipe(("General Work", 0), 100, 100, 1) },
         };
-     
+
+        public static readonly string[][] Mine =
+        {
+             new string[] { "Mine Metal", "Polish Metal" }
+        };
+
+        public static readonly Dictionary<string, ProductionRecipe> Mine_Recipes = new Dictionary<string, ProductionRecipe>()
+        {
+             { "Mine Metal", new ProductionRecipe(("Metal Scrap", 1), 10, 100, 12) },
+             { "Polish Metal", new ProductionRecipe(("Polished Metal", 1), 100, 500, 60, ("Metal Scrap", 5)) },
+        };
+
     }
 }

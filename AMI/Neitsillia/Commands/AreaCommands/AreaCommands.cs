@@ -190,7 +190,7 @@ namespace AMI.Neitsillia.Commands
             await player.NewUI(await chan.SendMessageAsync("You've entered " + player.Area.name, embed: areaInfo.Build())
             , MsgType.Main);
         }
-        internal static async Task EnterDungeon(Player player, ISocketMessageChannel chan)
+        internal static async Task EnterDungeon(Player player, IMessageChannel chan)
         {
             player.EndEncounter();
             Area dungeon = Dungeons.Generate(player.AreaInfo.floor, player.Area);
@@ -198,7 +198,7 @@ namespace AMI.Neitsillia.Commands
 
             player.QuestTrigger(Quest.QuestTrigger.Enter, "Dungeon");
 
-            player.EggPocketTrigger(Neitsillia.NPCSystems.Companions.Egg.EggChallenge.Exploration);
+            player.EggPocketTrigger(NPCSystems.Companions.Egg.EggChallenge.Exploration);
 
             EmbedBuilder areaInfo = player.UserEmbedColor(player.Area.AreaInfo(player.AreaInfo.floor));
             await player.NewUI(await chan.SendMessageAsync("You've entered " + player.Area.name,
@@ -261,31 +261,40 @@ namespace AMI.Neitsillia.Commands
             EmbedBuilder embed = null;
 
             if (player.IsEncounter("Combat"))
-                message = "You must complete your current task before exploring.";
-            else if (!player.IsLeader) message = $"{player.name} is not party leader";
-            else if (player.Area.type == AreaType.ArenaLobby || player.Area.type == AreaType.Tavern)
-                message = $"There is nothing to explore here. " +
-                    $"Instead use the ``Service`` command to participate in the arena.";
-            else
             {
-                Area area = player.Area;
-
-                if (area.IsExplorable)
-                {
-                    try
-                    {
-                        embed = await area.ExploreArea(player);
-                        message = $"{player.name} exploring {area.name}";
-                    }
-                    catch (Exception exploring)
-                    {
-                        await Handlers.UniqueChannels.Instance.SendToLog(exploring, $"{player.userid} Exploring floor {player.AreaInfo.floor} of {player.Area.name}", chan);
-                        throw NeitsilliaError.ReplyError("Apologies, but we've encountered an error. It has been logged and sent to the support channel.");
-                    }
-
-                    player.QuestTrigger(Quest.QuestTrigger.QuestLine, "TIII");
-                }
+                await chan.SendMessageAsync(embed: player.Encounter.GetEmbed().Build());
+                return;
             }
+            else if (!player.IsLeader)
+            {
+                await chan.SendMessageAsync($"{player.name} is not party leader");
+                return;
+            }
+            else if (player.Area.type == AreaType.ArenaLobby || player.Area.type == AreaType.Tavern)
+            {
+                await chan.SendMessageAsync($"There is nothing to explore here. " +
+                   $"Instead use the ``Service`` command to participate in the arena.");
+                return;
+            }
+
+            Area area = player.Area;
+
+            if (area.IsExplorable)
+            {
+                try
+                {
+                    embed = await area.ExploreArea(player);
+                    message = $"{player.name} exploring {area.name}";
+                }
+                catch (Exception exploring)
+                {
+                    await Handlers.UniqueChannels.Instance.SendToLog(exploring, $"{player.userid} Exploring floor {player.AreaInfo.floor} of {player.Area.name}", chan);
+                    throw NeitsilliaError.ReplyError("Apologies, but we've encountered an error. It has been logged and sent to the support channel.");
+                }
+
+                player.QuestTrigger(Quest.QuestTrigger.QuestLine, "TIII");
+            }
+
             if (embed != null)
             {
                 embed.WithColor(player.userSettings.Color);

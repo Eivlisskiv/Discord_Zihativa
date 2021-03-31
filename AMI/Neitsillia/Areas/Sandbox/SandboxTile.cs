@@ -15,7 +15,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
     {
         public enum TileType
         {
-            Warehouse, Farm
+            Warehouse, Farm, Mine
         }
 
         public const int XP_PER_TIER = 7179;

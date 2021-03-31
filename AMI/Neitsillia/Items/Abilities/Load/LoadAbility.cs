@@ -6,6 +6,13 @@ namespace AMI.Neitsillia.Items.Abilities.Load
     {
         private static AMIData.ReflectionCache reflectionCache = new AMIData.ReflectionCache(typeof(LoadAbility));
 
+        public static readonly string[,] Starters = new string[,]
+        {
+            { "Strike", "Shelter",      "Snake Oil" },
+            { "Sunder", "Counter Prep", "White Bite" },
+            { "Vivace", "Bold Stance",  "Sabotage" }
+        };
+
         internal static Ability Load(string name, int level = -1)
             => reflectionCache.Run<Ability>(name.Replace(" ", ""), name, level);
 
@@ -13,16 +20,10 @@ namespace AMI.Neitsillia.Items.Abilities.Load
         {
             l -= a.level;
             //l++;
-            while (l > a.level && a.level < a.maxLevel)
-                a.LevelUp(true);
+            while (l > a.level && a.level < a.maxLevel) a.LevelUp(true);
             return a;
         }
-        internal static string[,] Starters = new string[,]
-        {
-            {"Strike", "Shelter", "Snake Oil" },
-            { "Sunder", "Counter Prep",  "White Bite" },
-            { "Vivace", "Bold Stance", "Sabotage" }
-        };
+
         /* Template
         public static Ability Template(string aname, int alevel = 0)
         {
@@ -165,11 +166,6 @@ namespace AMI.Neitsillia.Items.Abilities.Load
         //3
         #endregion
 
-        #region Vivace Tree
-        
-        // 2
-        // 3
-        #endregion
 
         #region Sunder Tree
         public static Ability Sunder(string aname, int alevel = -1)
@@ -298,54 +294,6 @@ namespace AMI.Neitsillia.Items.Abilities.Load
         //3
         #endregion
 
-        #region Counter Prep
-        public static Ability CounterPrep(string aname, int alevel = 0)
-        {
-            Ability a = new Ability(aname)
-            {
-                type = Ability.AType.Defensive,
-                //
-                agility = 70,
-                //
-                staminaDrain = 30,
-                //
-                level = 1,
-                maxLevel = 10,
-                statusEffect = "Patient Requite",
-                evolves = new string[] { "Keen Eye", }
-            };
-            //
-            Set(a, alevel);
-            a.description = $"Charges {a.level*2} physical damage for each turn target is not attacked, damage is released" +
-            $" on attacker once a hit is taken.";
-            return a;
-        }
-        // >>
-        public static Ability KeenEye(string aname, int alevel = 0)
-        {
-            Ability a = new Ability(aname)
-            {
-                type = Ability.AType.Defensive,
-                //
-                agility = 0,
-                //
-                staminaDrain = 80,
-                //
-                level = 0,
-                maxLevel = 50,
-                tier = 1,
-                statusEffect = "Keen Evaluation",
-                evolves = new string[] { "Counter Prep",  }
-            };
-            //
-            Set(a, alevel);
-            a.description = $"+{5 + (a.level / 10)} Critical Chance and +{(5 + (a.level/10)) * 2} Critical Damage per turn for {5 + (a.level/10)} turns." +
-            $"Effect wears off after casting an offense ability";
-            return a;
-        }
-        //2
-        //3
-        #endregion
 
         #region BoldStance
         public static Ability BoldStance(string aname, int alevel = 0)

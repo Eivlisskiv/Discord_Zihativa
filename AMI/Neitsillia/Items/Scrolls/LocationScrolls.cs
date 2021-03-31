@@ -49,5 +49,20 @@ namespace AMI.Neitsillia.Items.Scrolls
 
             await player.NewUI(null, area.AreaInfo(0).Build(), channel, User.UserInterface.MsgType.Main);
         }
+
+        public static async Task Dungeon_Scroll(Player player, int slot, IMessageChannel channel)
+        {
+            if (await InCombat(player, channel)) return;
+
+            Area current = player.Area;
+
+            if(current.eMobRate <= 0 || current.IsDungeon)
+            {
+                await channel.SendMessageAsync("You may not summon a dungeon here.");
+                return;
+            }
+            player.inventory.Remove(slot, 1);
+            await Commands.Areas.EnterDungeon(player, channel);
+        }
     }
 }

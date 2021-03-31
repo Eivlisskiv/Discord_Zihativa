@@ -16,7 +16,8 @@ namespace AMI.Neitsillia.Items.Scrolls
         {
             new Dictionary<string, string>()
             {
-                { "Scroll Of Homecoming", "Teleports you back to the last safe area you visited." }
+                { "Scroll Of Homecoming", "Teleports you back to the last safe area you visited." },
+                { "Dungeon Scroll", "Spawns a dungeon." },
             }
         };
 
@@ -90,7 +91,7 @@ namespace AMI.Neitsillia.Items.Scrolls
             if(!VerifyFunction(scroll.name, out Func<Player, int, IMessageChannel, Task> func))
             {
                 _ = UniqueChannels.Instance.SendToLog($"{scroll.name} is missing loaded method");
-                await channel.SendMessageAsync("The scroll failed to produce any effect. (Scroll effect coiuld not be found or was disabled)");
+                await channel.SendMessageAsync("The scroll failed to produce any effect. (Scroll effect could not be found or was disabled)");
                 return;
             }
 

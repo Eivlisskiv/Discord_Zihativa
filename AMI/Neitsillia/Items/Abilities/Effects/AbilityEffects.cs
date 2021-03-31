@@ -111,29 +111,6 @@ namespace AMI.Neitsillia.Items.Abilities.Effects
         }
         #endregion
 
-        #region Counter Prep Tree
-        public static void CounterPrep(CombatResult caster, CombatResult target)
-        {
-            if (caster.SentHit)
-            {
-                Ability counterPrep = caster.abilityUsed;
-                target.character.Status(counterPrep.statusEffect ?? "Patient Requite", counterPrep.level,
-                    counterPrep.level);
-                caster.perkProcs.Add($"Applied Patient Requite to {target.Name}");
-            }
-        }
-        public static void KeenEye(CombatResult caster, CombatResult target)
-        {
-            if (caster.SentHit)
-            {
-                Ability counterPrep = caster.abilityUsed;
-                target.character.Status(counterPrep.statusEffect, 5 + (counterPrep.level / 10),
-                    5 + (counterPrep.level / 10));
-                caster.perkProcs.Add($"Applied Keen Evaluation to {target.Name}");
-            }
-        }
-        #endregion
-
         #region Bold Stance Tree
         public static void BoldStance(CombatResult caster, CombatResult target)
         {

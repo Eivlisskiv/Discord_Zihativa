@@ -10,9 +10,9 @@ namespace AMI.AMIData.HelpPages
     {
         public Embed H_inventory => Embed(Inventory, Equipment, Inventory_Icons);
 
-        public Embed H_crafting => Embed(Crafting, Inventory_Icons);
+        public Embed H_crafting => Embed(Crafting, GeneralSchematics, Inventory_Icons);
 
-        public Embed H_schematic => Embed(PermaSchematics, TempoSchematics);
+        public Embed H_schematic => Embed(GeneralSchematics, PermaSchematics, TempoSchematics);
 
         EmbedFieldBuilder Inventory => DUtils.NewField("Inventory",
             $"`{prefix}inv` **open and view your inventory**" + Environment.NewLine
@@ -37,6 +37,10 @@ namespace AMI.AMIData.HelpPages
              + $"`{prefix}craft` **Craft an item from your 'Schematics' list**" + Environment.NewLine
              + $"`{prefix}use` **Use a temporary schematic from your inventory to craft from inventory slot**" + Environment.NewLine
         );
+
+        EmbedFieldBuilder GeneralSchematics => DUtils.NewField("Schematics Informations",
+            "**Only gear schematics can be obtained from scraping**." + Environment.NewLine +
+            "Some items can only be obtained from **Consumable Schematics**.");
 
         EmbedFieldBuilder PermaSchematics => DUtils.NewField("Permanent Schematics",
             $"Your character's Permanent Schematics are located in `{prefix}schems`" + Environment.NewLine

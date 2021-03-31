@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace AMI.Neitsillia.Items.Perks.PerkLoad
+﻿namespace AMI.Neitsillia.Items.Perks.PerkLoad
 {
     public partial class PerkLoad
     {
