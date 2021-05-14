@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.InventoryCommands
 {
-    public class Daily : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class Daily : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         [Command("Claim Crate")] [Alias("claimcrate", "claim vote")]
         [Summary("Due to the automatic vote rewarding system breaking, using this command every 12h will check if you've voted in the last 12 hours.")]

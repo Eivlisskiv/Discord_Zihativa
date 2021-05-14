@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Combat
 {
-    public class CombatCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class CombatCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         static Random Rng => Program.rng;
 
@@ -31,7 +31,7 @@ namespace AMI.Neitsillia.Combat
             + "`cast {ability name}` : use ability with default target (first enemy for attacks, self for defense) \n"
             + "`cast {ability name} {target}` : uses attack ability on the target \n"
             )]
-        public async Task Attack([Remainder] string arguments)
+        public async Task Attack([Remainder] string arguments = null)
         {
             Player player = Context.Player;
             if (!player.IsEncounter("Combat") && !player.IsEncounter("NPC"))
@@ -40,7 +40,7 @@ namespace AMI.Neitsillia.Combat
                 await DUtils.Replydb(Context, "There are no targets available.");
             else
             {
-                string[] temp = GetAbilityAndTarget(player, arguments.Split(' ') ?? new string[0]);
+                string[] temp = GetAbilityAndTarget(player, arguments?.Split(' ') ?? new string[0]);
                 if (player.duel != null && player.duel.abilityName != null
                     && player.duel.abilityName.StartsWith("~"))
                     throw NeitsilliaError.ReplyError($"{player.name} may not change their turn action from {player.duel.abilityName[1..]}");
@@ -57,9 +57,12 @@ namespace AMI.Neitsillia.Combat
                 player.SaveFileMongo();
                 if (player.Encounter.IsNPC())
                 {
-                    player.Encounter.Name = Encounter.Names.Mob;
-                    player.Encounter.mobs = new NPC[1];
-                    player.Encounter.mobs[0] = player.Encounter.npc;
+                    await DUtils.Replydb(Context, "There are no targets available.");
+                    return;
+
+                    //player.Encounter.Name = Encounter.Names.Mob;
+                    //player.Encounter.mobs = new NPC[1];
+                    //player.Encounter.mobs[0] = player.Encounter.npc;
                 }
                 if (player.Encounter.Name == Encounter.Names.PVP)
                     await PVPTurn(player, temp[0], Context.Channel);
@@ -133,7 +136,7 @@ namespace AMI.Neitsillia.Combat
             }
         }
 
-        [Command("Run")]
+        [Command("Run", true)]
         public async Task Run()
             => await Run(Context.Player, Context.Channel, false);
 
@@ -166,13 +169,17 @@ namespace AMI.Neitsillia.Combat
 
                     PerkLoad.CheckPerks(player, Perk.Trigger.EndFight, player);
 
-                    if (player.Area.IsDungeon && player.AreaInfo.floor >= player.Area.floors)
+                    if (player.Area.IsDungeon && 
+                        (player.Area.arena != null || player.AreaInfo.floor >= player.Area.floors))
                     {
                         if(player.Area.arena != null)
                             await EndArenaChallenge(player, chan);
 
-                        await Program.data.database.DeleteRecord<Area>("Area", player.Area.AreaId, "AreaId");
-                        await player.SetArea(Area.LoadArea(player.Area.GeneratePath(false) + player.Area.parent, null), player.AreaInfo.floor);
+                        await Program.data.database.DeleteRecord<Area>(
+                            player.AreaInfo.table.ToString(), player.Area.AreaId, "AreaId");
+                        await player.SetArea(Area.LoadArea(
+                            player.Area.GeneratePath(false) + player.Area.parent, null),
+                            player.AreaInfo.floor);
                     }
                     player.SaveFileMongo();
                 }
@@ -181,7 +188,7 @@ namespace AMI.Neitsillia.Combat
             }
         }
 
-        private static async Task EndArenaChallenge(Player player, ISocketMessageChannel chan)
+        private static async Task EndArenaChallenge(Player player, IMessageChannel chan)
         {
             Encounter enc = new Encounter(Encounter.Names.Loot, player);
             await player.Area.arena.EndChallenge(enc, player.Area, player.AreaInfo.floor);
@@ -218,118 +225,128 @@ namespace AMI.Neitsillia.Combat
                 player.duel.abilityName = abilityName;
             }
             //
-            Combat combat;
-            if (player.Party != null)
+            Combat combat = player.Party != null ? 
+                await PartyCombat(player, mob, chan) 
+                : new Combat(mob, new Player[] { player });
+
+            if (combat == null) return;
+
+            combat.InitiateAll();
+            combat.Turn();
+            if (!player.IsSolo)
             {
-                CharacterMotherClass[] ps = new CharacterMotherClass[player.Party.MemberCount];
-                List<Player> escaping = new List<Player>();
+                foreach (var cb in combat.playerParty)
+                    if (cb.character is Player pplayer)
+                        pplayer.duel.abilityName = null;
 
-                int? lowestAGI = null;
-
-                int i = 0;
-                for (; i < player.Party.members.Count; i++)
-                {
-                    PartyMember m = player.Party.members[i];
-                    Player p = m.id == player.userid ? player : m.LoadPlayer();
-                    ps[i] = p;
-
-                    if (p.duel?.abilityName == "~Run")
-                        escaping.Add(p);
-
-                    if ((p.duel == null || p.duel.abilityName == null || p.duel.target == null) && !p.IsDead())
-                    {
-                        player.SaveFileMongo();
-                        throw NeitsilliaError.ReplyError("Awaiting other Party member(s) action");
-                    }
-
-                    int agi = player.Agility();
-                    lowestAGI = Math.Min(lowestAGI ?? agi, agi);
-                }
-                for (int j = 0; i + j < ps.Length; j++)
-                    ps[i + j] = player.Party.NPCMembers[j];
-
-                if(escaping.Count > 0)
-                {
-                    if(escaping.Count == player.Party.members.Count)
-                    {
-                        int accuracyMod = Verify.MinMax((lowestAGI ?? 0) - mob[Program.rng.Next(mob.Length)].Agility()
-                            , ReferenceData.maximumAgilityDifference, ReferenceData.maximumAgilityDifference * -1);
-
-                        int runchance = Rng.Next(0, 101) + accuracyMod;
-                        if (runchance >= (110 - ReferenceData.hitChance))
-                        {
-                            EmbedBuilder fight = new EmbedBuilder
-                            {
-                                Title = "Combat Escape"
-                            };
-                            fight.AddField("Escape Successful", "You ran away from combat");
-                            await chan.SendMessageAsync(embed: fight.Build());
-                            await PartyEscape(player); 
-
-                            if(player.Area.arena != null)
-                                await EndArenaChallenge(player, chan);
-
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        //TODO
-                        //When some, but not all, players can escape
-                        //For now, ignore this. No one is left behind
-                    }
-                }
-                combat = new Combat(player.Encounter.mobs, ps);
             }
-            else
-                combat = new Combat(mob, new Player[] { player });
-            if (combat != null)
-            {
-                //
-                combat.InitiateAll();
-                combat.Turn();
-                if (!player.IsSolo)
-                {
-                    foreach (var cb in combat.playerParty)
-                        if (cb.character is Player pplayer)
-                            pplayer.duel.abilityName = null;
+            else if (player.duel.abilityName.StartsWith("~")) player.duel.abilityName = null;
 
-                }else if (player.duel.abilityName.StartsWith("~")) player.duel.abilityName = null;
-
-                if (player.Party != null)
+            if (player.Party != null)
                 await player.PartyKey.SaveAsync();
-                //
-                string p = combat.GetResultInfo(combat.playerParty, "p");
-                string m = combat.GetResultInfo(combat.mobParty, "m");
-                //
-                EmbedBuilder fight = DUtils.BuildEmbed(
-                    (player.Party?.partyName ?? player.name) + " VS " + (mob.Length == 1 ? mob[0].displayName : "Creatures"),
-                    "Turn " + (player.Encounter.turn++),
-                    ((player.Party == null || player.Party.members.Count == 1) ? $"{EUI.brawl} : {abilityName}" : null)
-                    + $"           [{watch.ElapsedMilliseconds}ms]",
-                    player.userSettings.Color,
-                    DUtils.NewField("__Player Party__", p, true),
-                    DUtils.NewField("__Creature Party__", m, true)
-                    );
+            //
+            string p = combat.GetResultInfo(combat.playerParty, "p");
+            string m = combat.GetResultInfo(combat.mobParty, "m");
+            //
+            EmbedBuilder fight = DUtils.BuildEmbed(
+                (player.Party?.partyName ?? player.name) + " VS " + (mob.Length == 1 ? mob[0].displayName : "Creatures"),
+                "Turn " + (player.Encounter.turn++),
+                ((player.Party == null || player.Party.members.Count == 1) ? $"{EUI.brawl} : {abilityName}" : null)
+                + $"           [{watch.ElapsedMilliseconds}ms]",
+                player.userSettings.Color,
+                DUtils.NewField("__Player Party__", p, true),
+                DUtils.NewField("__Creature Party__", m, true)
+                );
 
 
-                CombatEndHandler ceh = new CombatEndHandler(combat, player.Party, player.Encounter, player.Area);
-                MsgType resultType = await ceh.Handle(fight);
+            CombatEndHandler ceh = new CombatEndHandler(combat, player.Party, player.Encounter, player.Area);
+            MsgType resultType = await ceh.Handle(fight);
 
-                if (ability == null && player.ui != null &&
-                    player.ui.type == MsgType.Combat && player.ui.data != null)
-                    abilityName = player.ui.data;
+            if (ability == null && player.ui != null &&
+                player.ui.type == MsgType.Combat && player.ui.data != null)
+                abilityName = player.ui.data;
 
-                if (editMessage && player.IsSolo)
-                    await player.EditUI(null, fight.Build(), chan, resultType, abilityName);
-                else
-                {
-                    IUserMessage reply = await chan.SendMessageAsync(embed: fight.Build());
-                    if (player.IsSolo) await player.NewUI(reply, resultType, abilityName);
-                    else player.Party.UpdateUI(player, reply, resultType, abilityName);
-                }
+
+            IUserMessage reply;
+
+            if (editMessage)
+                reply = await player.EditUI(null, fight.Build(), chan, resultType, abilityName);
+            else
+            {
+                reply = await chan.SendMessageAsync(embed: fight.Build());
+                await player.NewUI(reply, resultType, abilityName);
+            }
+
+            if (!player.IsSolo)
+            {
+                player.Party.UpdateUI(player, reply,
+                    resultType, abilityName);
             }
         }
+
+        private static async Task<Combat> PartyCombat(Player player, NPC[] mob, IMessageChannel chan)
+        {
+            CharacterMotherClass[] ps = new CharacterMotherClass[player.Party.MemberCount];
+            List<Player> escaping = new List<Player>();
+
+            int? lowestAGI = null;
+
+            int i = 0;
+            for (; i < player.Party.members.Count; i++)
+            {
+                PartyMember m = player.Party.members[i];
+                Player p = m.id == player.userid ? player : m.LoadPlayer();
+                ps[i] = p;
+
+                if (p.duel?.abilityName == "~Run")
+                    escaping.Add(p);
+
+                if ((p.duel == null || p.duel.abilityName == null || p.duel.target == null) && !p.IsDead())
+                {
+                    player.SaveFileMongo();
+                    throw NeitsilliaError.ReplyError("Awaiting other Party member(s) action");
+                }
+
+                int agi = player.Agility();
+                lowestAGI = Math.Min(lowestAGI ?? agi, agi);
+            }
+            for (int j = 0; i + j < ps.Length; j++)
+                ps[i + j] = player.Party.NPCMembers[j];
+
+            if (escaping.Count > 0)
+            {
+                if (escaping.Count == player.Party.members.Count)
+                {
+                    int accuracyMod = Verify.MinMax((lowestAGI ?? 0) - mob[Program.rng.Next(mob.Length)].Agility()
+                        , ReferenceData.maximumAgilityDifference, ReferenceData.maximumAgilityDifference * -1);
+
+                    int runchance = Rng.Next(0, 101) + accuracyMod;
+                    if (runchance >= (110 - ReferenceData.hitChance))
+                    {
+                        EmbedBuilder fight = new EmbedBuilder
+                        {
+                            Title = "Combat Escape"
+                        };
+                        fight.AddField("Escape Successful", "You ran away from combat");
+                        await chan.SendMessageAsync(embed: fight.Build());
+                        await PartyEscape(player);
+
+                        if (player.Area.arena != null)
+                            await EndArenaChallenge(player, chan);
+
+                        return null;
+                    }
+                }
+                else
+                {
+                    //TODO
+                    //When some, but not all, players can escape
+                    //For now, ignore this. No one is left behind
+                }
+            }
+            return new Combat(player.Encounter.mobs, ps);
+        }
+
         static double SneakattackMultiplier(int attackerAgi, int defenderAgi)
         {
             double crit = ((defenderAgi - attackerAgi) / 100) + 1;
@@ -337,6 +354,7 @@ namespace AMI.Neitsillia.Combat
                 return 1.5;
             return crit;
         }
+
         static async Task PartyEscape(Player player)
         {
             if (player.Party == null)
@@ -351,12 +369,15 @@ namespace AMI.Neitsillia.Combat
                     Player p = m.id == player.userid ? player : m.LoadPlayer();
 
                     PerkLoad.CheckPerks(p, Perk.Trigger.EndFight, p);
+                    if(player.duel != null) player.duel.abilityName = null;
                     p.SaveFileMongo();
                 }
+
                 foreach (var n in player.Party.NPCMembers)
                 {
                     PerkLoad.CheckPerks(n, Perk.Trigger.EndFight, n);
                 }
+
                 await player.Party.SaveData();
             }
             player.EndEncounter();
@@ -448,11 +469,7 @@ namespace AMI.Neitsillia.Combat
             fight.AddField(player.name, results[0], true);
             fight.AddField(enemy.name, results[1], true);
             //
-            {
-                string playerEquipmentCondition = player.equipment.VerifyCND();
-                if (playerEquipmentCondition != null && playerEquipmentCondition != "")
-                    fight.AddField("Items Broken", $"`{playerEquipmentCondition}`", true);
-            }
+
             string abilityName = player.duel.abilityName;
             player.duel.abilityName = null;
             bool end = false;

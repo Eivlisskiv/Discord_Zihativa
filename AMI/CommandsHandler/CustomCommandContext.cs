@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace AMI.Commands
 {
-    public class CustomSocketCommandContext : SocketCommandContext
+    public class CustomCommandContext : SocketCommandContext
     {
         internal GuildSettings guildSettings;
         internal string Prefix => guildSettings?.prefix ?? "~";
@@ -41,7 +41,7 @@ namespace AMI.Commands
             }
         }
 
-        public CustomSocketCommandContext(DiscordSocketClient client, SocketUserMessage msg)
+        public CustomCommandContext(DiscordSocketClient client, SocketUserMessage msg)
             : base(client, msg)
         {
 

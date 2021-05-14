@@ -5,29 +5,53 @@ using AMYPrototype;
 using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Collections.Generic;
+using AMI.Neitsillia.User.PlayerPartials;
 
 namespace AMI.Neitsillia.Items
 {
-    class IMethods
+    public static class IMethods
     {
-        public static Item Condition(Item item, int endurance)
+        public static Item Condition(this Item item, int endurance)
         {
             if(Program.Chance(Math.Max(Exponential.Durability(item.durability) - (endurance * Stats.DurabilityPerEnd), 8)))
                 item.condition--;
             return item;
         }
-        public static CharacterMotherClass AllArmorCND(CharacterMotherClass user)
+
+        public static List<string> AllArmorCND(CharacterMotherClass user)
         {
-            for(int i = 2; i <= Equipment.gearCount; i++)
+            List<string> results = new List<string>();
+            for (int i = 2; i <= Equipment.gearCount; i++)
             {
                 Item gear = user.equipment.GetGear(i);
                 if (gear != null && (i > 7 || i < 5))
+                {
                     Condition(gear, user.stats.endurance);
+                    if (VerifyOnBreak(gear, user))
+                        results.Add($"{gear.name} has broken");
+                }
             }
-            return user;
+            return results;
         }
 
-        public static int[] GetUpgrades(float[] stats, bool isWeapon)
+        public static bool VerifyOnBreak(this Item item, CharacterMotherClass character)
+        {
+            if(item.condition < 1)
+            {
+                Item equipped = character.equipment.GetGear(item.type);
+                if (equipped != item) return false;
+
+                character.equipment.Unequip(item.type);
+
+                character.inventory.Add(item, 1, -1);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static int[] GetUpgrades(float[] stats)
         {
             int negative = -1;
             int positive = 0;

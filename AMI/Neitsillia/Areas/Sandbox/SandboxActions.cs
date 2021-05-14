@@ -103,7 +103,8 @@ namespace AMI.Neitsillia.Areas.Sandbox
                 $"{EUI.ok} Produce **[{amount}]**" + Environment.NewLine +
                 $"{EUI.prev}|{EUI.lowerthan}|{EUI.greaterthan}|{EUI.next}"
                 + Environment.NewLine +
-                $" -5 | -1 | +1 | +5 |"),
+                $" -5 | -1 | +1 | +5 |" + Environment.NewLine +
+                $"Or `amount` command: `amount 10`"),
                 recipe.ToField(amount)
                 ).Build(), channel, MsgType.TileProduce, $"{source};{tileIndex};{productIndex};{amount}");
         }

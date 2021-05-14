@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NeitsilliaCommands
 {
-    public class LeaderBoardsCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class LeaderBoardsCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         static string[] options = { "stronghold" };
         [Command("LeaderBoard")]

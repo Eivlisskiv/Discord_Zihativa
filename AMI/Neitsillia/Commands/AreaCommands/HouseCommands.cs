@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace AMI.Neitsillia.Commands.AreaCommands
 {
     [Name("House")]
-    public class HouseCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class HouseCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         private static async Task<House> LoadHouse(Player player, ISocketMessageChannel chan)
         {

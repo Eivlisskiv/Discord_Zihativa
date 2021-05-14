@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace AMI.Neitsillia.Items.Abilities.Load
+﻿namespace AMI.Neitsillia.Items.Abilities.Load
 {
     static partial class LoadAbility
     {
@@ -60,14 +55,14 @@ namespace AMI.Neitsillia.Items.Abilities.Load
 
                 staminaDrain = 100,
                 level = 1,
-                maxLevel = 50,
+                maxLevel = 60,
                 tier = 1,
 
                 statusEffect = "Keen Evaluation",
                 evolves = new string[] { "Counter Prep", "Keen Eye"}
             }, level);
 
-            a.description = $"Has a {level}% chance to reflect {5 + level}% incoming damage ignoring resistance." +
+            a.description = $"Has a {5 + (level / 2)}% chance to reflect {5 + level}% incoming damage ignoring resistance. " +
                 $"Effect last {3 + (level / 5)} turns and wears off after one use.";
             return a;
         }

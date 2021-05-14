@@ -376,7 +376,7 @@ namespace AMI.Neitsillia.Combat
             return $"+{kuts} Kutsyei Coins " + Environment.NewLine;
         }
 
-        string EventRewards(Encounter enc, out (string name, int amount) eventReward)
+        string EventRewards(Encounter _, out (string name, int amount) eventReward)
         {
             int amount = 0;
             AMIData.Events.OngoingEvent cevent = AMIData.Events.OngoingEvent.Ongoing;

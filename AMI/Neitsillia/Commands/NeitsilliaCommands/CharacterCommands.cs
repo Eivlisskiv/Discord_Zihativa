@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NeitsilliaCommands
 {
-    public class CharacterCommands : ModuleBase<CustomSocketCommandContext>
+    public class CharacterCommands : ModuleBase<CustomCommandContext>
     {
         static readonly List<string> IllegalNames = new List<string>()
         {
@@ -176,7 +176,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         internal static async Task SetSkills(Player player, IMessageChannel channel,
             int e, int[] rolls, bool[] rused, bool edit = false)
         {
-            rolls = rolls ?? GetRolls();
+            rolls ??= GetRolls();
 
             if (e > 0) SetASkill(player, e - 1, rolls, rused);
 

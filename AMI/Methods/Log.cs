@@ -9,7 +9,7 @@ namespace AMI.Methods
 
         public static string LogS(Exception logs, string extra = null)
         {
-            string error =  DateTime.Now + $": {extra} {logs.Message} +>> {Environment.NewLine}"
+            string error = $"{extra} {logs.Message} +>> {Environment.NewLine}"
                 + logs.StackTrace;
             LogS(error);
             return error;

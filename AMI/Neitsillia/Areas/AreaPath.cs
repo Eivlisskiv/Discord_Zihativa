@@ -4,7 +4,8 @@ namespace AMI.Neitsillia.Areas
 {
     public class AreaPath
     {
-        public enum Table { Area, Dungeons,
+        public enum Table {
+            Area, Dungeons,
            // Nest
         }
 

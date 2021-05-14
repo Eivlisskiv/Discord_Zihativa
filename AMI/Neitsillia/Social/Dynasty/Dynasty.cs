@@ -32,7 +32,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             return dan;
         }
 
-        public static async Task<bool> Exist(string name)
+        public static bool Exist(string name)
         {
             var result = Database.LoadRecord<Dynasty>(TABLE_NAME, $"{{ name: {{ $regex: \"^{name}$\", $options: '-i' }} }}");
 

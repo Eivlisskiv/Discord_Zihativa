@@ -32,7 +32,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         public override string ToString() => partyName;
 
         [JsonConstructor]
-        public Party(bool json) { }
+        public Party(bool _) { }
         internal Party(string name, Player player)
         {
             _id = name.ToLower();
@@ -179,7 +179,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                     string[] data = npc.origin.Split('\\');
                     if (data.Length == 3 && ulong.TryParse(data[0], out ulong id) && id == player.userid)
                     {
-                        pl = pl ?? PetList.Load($"{data[0]}\\{data[1]}");
+                        pl ??= PetList.Load($"{data[0]}\\{data[1]}");
                         if (pl != null)
                         {
                             _ = pl.UpdatePet(npc);

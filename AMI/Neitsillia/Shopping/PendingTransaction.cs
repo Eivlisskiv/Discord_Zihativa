@@ -119,14 +119,13 @@ namespace AMI.Neitsillia.Shopping
         
         public long TotalPrice;
 
-        private Player player;
-        private NPC npc;
+        private readonly Player player;
+        private readonly NPC npc;
 
         private int Count => selections.Count;
 
-        private List<(int index, int amount)> selections;
+        private readonly List<(int index, int amount)> selections;
         string selection;
-        string errorList;
 
         public PendingTransaction(Player player, string[] inputs, Transaction t, bool complete = false)
         {

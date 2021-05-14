@@ -1,6 +1,7 @@
 ﻿using AMI.Neitsillia.Areas.Sandbox;
 using AMI.Neitsillia.Areas.Sandbox.Schematics;
 using AMI.Neitsillia.Commands.AreaCommands;
+using AMI.Neitsillia.User.PlayerPartials;
 using Discord;
 using Discord.WebSocket;
 using System;
@@ -262,15 +263,9 @@ namespace AMI.Neitsillia.User.UserInterface
 
         public async Task TileProduce(SocketReaction reaction, IUserMessage _)
         {
-            string[] ds = data.Split(';');
-            string source = ds[0];
-            Sandbox sb = await LoadSource(source);
-            string emote = reaction.Emote.ToString();
-            int.TryParse(ds[1], out int tileIndex);
+            (string source, Sandbox sb, int tileIndex, int productIndex, int amount) = await GetTileProcudeData(null);
 
-            //{source};{tile index};{product index};{amount}
-            int.TryParse(ds[2], out int productIndex);
-            int.TryParse(ds[3], out int amount);
+            string emote = reaction.Emote.ToString();
             switch (emote)
             {
                 case EUI.prev:
@@ -303,6 +298,22 @@ namespace AMI.Neitsillia.User.UserInterface
                     }
                     break;
             }
+        }
+
+        internal async Task<(string source, Sandbox sb, int tileIndex, int productIndex, int amount)> GetTileProcudeData(Player player)
+        {
+            if (player != null) this.player = player;
+
+            string[] ds = data.Split(';');
+            string source = ds[0];
+            Sandbox sb = await LoadSource(source);
+
+            int.TryParse(ds[1], out int tileIndex);
+            //{source};{tile index};{product index};{amount}
+            int.TryParse(ds[2], out int productIndex);
+            int.TryParse(ds[3], out int amount);
+
+            return (source, sb, tileIndex, productIndex, amount);
         }
     }
 }

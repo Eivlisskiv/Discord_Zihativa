@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Module
 {
-    public class ShopCommands : ModuleBase<CustomSocketCommandContext>
+    public class ShopCommands : ModuleBase<CustomCommandContext>
     {
         public static EmbedBuilder AllShops(EmbedBuilder embed)
         {

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class Other : ModuleBase<CustomSocketCommandContext>
+    public class Other : ModuleBase<CustomCommandContext>
     {
         public static async Task<string> GetSupportInvite()
         {
@@ -34,7 +34,6 @@ namespace AMI.AMIData.OtherCommands
             return inv.Url;
         }
 
-        //TODO using Lookup on Discord.CommandInfo and commandInfoEmbed
         [Command("Modules")] [Alias("Module")]
         public async Task Help2(string moduleName = null, params string[] commandName)
         {
@@ -152,7 +151,7 @@ namespace AMI.AMIData.OtherCommands
                 int maxRoll = 20;
                 int numRolls = 1;
                 bool error = false;
-                string[] values = null;
+                string[] values;
                 if (roll != null)
                 {
                     values = roll.Split('d', 'D');
@@ -193,7 +192,7 @@ namespace AMI.AMIData.OtherCommands
         [Command("user info")]
         public async Task UserInfoAsync(IUser user = null)
         {
-            user = user ?? Context.User;
+            user ??= Context.User;
             EmbedBuilder em = new EmbedBuilder();
             em.WithTitle(user.ToString());
             em.AddField("General Info",
@@ -284,24 +283,22 @@ namespace AMI.AMIData.OtherCommands
         [Command("suggest", true)][Alias("sug")]
         public async Task SendSuggestion(string suggestion)
         {
-            string content = Context.Message.Content;
-            content = content.Remove(0, content.IndexOf(' '));
-            if (content.Trim().Length < 1)
+            if (suggestion == null || suggestion.Trim().Length < 1)
                 await DUtils.Replydb(Context, "Your suggestion is empty, please enter your suggestion after the command:" +
                     $" ex: `{Context.Prefix}suggest More content pls`", lifetime: 2);
             else
             {
                 string message = "Suggestion sent" + Environment.NewLine;
-                Embed embed = null;
+                Embed embed;
                 if (Context.guildSettings == null || Context.guildSettings.suggestionChannel == null)
                 {
-                    (string url, Embed e) = await Program.data.SendSuggestion(content, Context.User);
+                    (string url, Embed e) = await Program.data.SendSuggestion(suggestion, Context.User);
                     message += "To support server " + url;
                     embed = e;
                 }
                 else
                 {
-                    (string url, Embed e) = await Context.guildSettings.SendSuggestion(content, Context.User, Context.Guild);
+                    (string url, Embed e) = await Context.guildSettings.SendSuggestion(suggestion, Context.User, Context.Guild);
                     message += "To support server " + url;
                     embed = e;
                 }
@@ -310,18 +307,16 @@ namespace AMI.AMIData.OtherCommands
             } 
         }
 
-        [Command("BugReport", true)]
-        public async Task BugReport(string report)
+        [Command("BugReport")]
+        public async Task BugReport([Remainder] string report)
         {
-            string content = Context.Message.Content;
-            content = content.Remove(0, content.IndexOf(' '));
-            if (content.Trim().Length < 1)
+            if (report == null || report.Trim().Length < 1)
                 await DUtils.Replydb(Context, "Your report is empty, please enter your report following the command:" +
                     $" ex: `{Context.Prefix}BugReport I get stuck after going in x area while being y`", lifetime: 2);
             else
             {
                 string message = "Report sent" + Environment.NewLine;
-                (string url, Embed embed) = await Program.data.SendBugReport(content, Context.User);
+                (string url, Embed embed) = await Program.data.SendBugReport(report, Context.User);
                 message += "To support server " + url;
 
                 DUtils.DeleteMessage(await ReplyAsync(message, embed: embed));
@@ -338,9 +333,9 @@ namespace AMI.AMIData.OtherCommands
             await ReplyAsync(msg ?? "Website unavailable.");
         }
 
-        [Command("Emote")][Alias("e")]
+        [Command("Emote", true)][Alias("e")]
         [Summary("Sends gif emotes")]
-        public async Task SendGifEmote(string action = null, IUser target = null, params string[] args)
+        public async Task SendGifEmote(string action = null, IUser target = null)
         {
             
             if(target?.Id == Handlers.DiscordBotHandler.Client.CurrentUser.Id && Context.User.Id != 201875246091993088)
@@ -349,7 +344,7 @@ namespace AMI.AMIData.OtherCommands
                     "I do not condone this behavior.", "Your desires are of no concern to me.", "A pitiful wish, it will remain denied.",
                     "Keep me out of your quarrels."));
             }
-            else if (target?.Id == 201875246091993088  && Context.User.Id != 212631292469051392)
+            else if (target?.Id == 201875246091993088  && Context.User.Id != 666713944781488156)
             {
                 throw NeitsilliaError.ReplyError(Utils.RandomElement("Blasphemy!", "I will not allow this.", "Cease this.",
                     "I do not condone this behavior.", "A pitiful wish, it will remain denied.", "Such is unacceptable behavior."

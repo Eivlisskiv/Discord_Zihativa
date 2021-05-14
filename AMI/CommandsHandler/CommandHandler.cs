@@ -10,7 +10,6 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using AMI.Handlers;
-using System.Collections.Generic;
 using System.Collections;
 
 namespace AMYPrototype.Commands
@@ -107,7 +106,7 @@ namespace AMYPrototype.Commands
 
             if (!(s is SocketUserMessage msg) || (guildSet != null && guildSet.Ignore)) return;
 
-            CustomSocketCommandContext context = new CustomSocketCommandContext(_client, msg)
+            CustomCommandContext context = new CustomCommandContext(_client, msg)
             { guildSettings = guildSet};
 
             string prefix = guildSet == null ? "" : guildSet.prefix == null || guildSet.prefix.Length < 1 ? defaultPrefix : guildSet.prefix;
@@ -151,7 +150,7 @@ namespace AMYPrototype.Commands
         {
             try
             {
-                CustomSocketCommandContext context = (CustomSocketCommandContext)ctx;
+                CustomCommandContext context = (CustomCommandContext)ctx;
                 if (!result.IsSuccess && command.IsSpecified)
                     await BabResult(command.Value, context, result);
                 else
@@ -176,7 +175,7 @@ namespace AMYPrototype.Commands
             running.Remove(ctx.User.Id);
         }
 
-        async Task BabResult(CommandInfo method, CustomSocketCommandContext context, IResult result)
+        async Task BabResult(CommandInfo method, CustomCommandContext context, IResult result)
         {
             if (await CommandErrorType(method, context, result)) return;
 
@@ -268,7 +267,7 @@ namespace AMYPrototype.Commands
             }
         }
         
-        internal static async Task<bool> CommandErrorType(CommandInfo method, CustomSocketCommandContext context, IResult result)
+        internal static async Task<bool> CommandErrorType(CommandInfo method, CustomCommandContext context, IResult result)
         {
             switch(result.Error)
             {

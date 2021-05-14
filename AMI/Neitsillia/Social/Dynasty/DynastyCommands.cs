@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
 {
     [Name("Dynasty")]
-    public class DynastyCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class DynastyCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         public static async Task<(Dynasty dan, DynastyMember membership)> GetDynasty(Player player)
         {
@@ -44,7 +44,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
         {
             Context.WIPCheck();
 
-            if(await Dynasty.Exist(dynastyName))
+            if(Dynasty.Exist(dynastyName))
             {
                 await ReplyAsync($"Dyansty name {dynastyName} is already in use");
                 return;
@@ -125,7 +125,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
                     await dan.Save();
                     break;
                 case "name":
-                    if (await Dynasty.Exist(value))
+                    if (Dynasty.Exist(value))
                     {
                         await ReplyAsync($"Dyansty name {value} is already in use");
                         return;

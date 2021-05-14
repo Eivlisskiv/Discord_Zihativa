@@ -35,9 +35,6 @@ namespace AMI.AMIData
         }
 
 
-        //readonly bool islocal = false;
-        readonly string user;
-        readonly string pw;
         readonly string name;
         readonly string url;
 
@@ -45,9 +42,7 @@ namespace AMI.AMIData
 
         public MongoDatabase(string dbName, string aurl, string user, string password)
         {
-            this.user = user;
             name = dbName;
-            pw = password;
             url = aurl;
             Connect($"mongodb+srv://{user}:{password}@{url}/{dbName}?retryWrites=true&w=majority");
         }

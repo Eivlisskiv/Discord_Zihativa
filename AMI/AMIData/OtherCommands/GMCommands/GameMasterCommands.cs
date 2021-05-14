@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public partial class GameMaster : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public partial class GameMaster : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         internal static MongoDatabase Database => AMYPrototype.Program.data.database;
         //level 0; GMs wanna-be, low and always random, monthly limits
@@ -325,7 +325,7 @@ namespace AMI.AMIData.OtherCommands
                 else await DUtils.Replydb(Context, "No Guild found.");
             }
         }
-        internal static async Task<bool> VerifyChannel(CustomSocketCommandContext context, GuildSettings guildset)
+        internal static async Task<bool> VerifyChannel(CustomCommandContext context, GuildSettings guildset)
         {
             try
             {

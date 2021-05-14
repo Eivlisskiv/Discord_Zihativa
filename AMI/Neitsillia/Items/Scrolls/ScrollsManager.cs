@@ -84,6 +84,7 @@ namespace AMI.Neitsillia.Items.Scrolls
                 originalName = name,
                 description = definition,
                 durability = tier * 100,
+                baseValue = tier * 100,
             };
 
         public static async Task Use(Player player, int slot, Item scroll, IMessageChannel channel)

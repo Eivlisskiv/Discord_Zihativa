@@ -1,4 +1,5 @@
-﻿using AMI.Neitsillia.Items.ItemPartials;
+﻿using AMI.Module;
+using AMI.Neitsillia.Items.ItemPartials;
 using System;
 
 namespace AMI.Neitsillia.Collections
@@ -87,22 +88,14 @@ namespace AMI.Neitsillia.Collections
         {
             if (jewelry == null)
                 jewelry = new Item[3];
-            switch (i)
-            {
-                case 0: weapon = item; break;
-                case 1: secondaryWeapon = item; break;
-                case 2: helmet = item; break;
-                case 3: mask = item; break;
-                case 4: chestp = item; break;
-                case 5:
-                case 6:
-                case 7: jewelry[i - 5] = item; break;
-                case 8: trousers = item; break;
-                case 9: boots = item; break;
-            }
+            
         }
-        internal Item Equip(Item item, int i = 0)
+
+        internal Item Equip(Item item, int i = 0, bool throwException = true)
         {
+            if(item.condition == 0 && throwException)
+                throw NeitsilliaError.ReplyError("You may not equip a broken item");
+
             //Put aside the currently equipped
             Item ret = GetGear(item.type, i);
             switch(item.type)
@@ -114,10 +107,54 @@ namespace AMI.Neitsillia.Collections
                 case Item.IType.Jewelry: jewelry[i] = item; break;
                 case Item.IType.Trousers: trousers = item; break;
                 case Item.IType.Boots: boots = item; break;
+
+                default:
+                    if(throwException)
+                        throw NeitsilliaError.ReplyError("You may not equip this kind of item");
+                    break;
             }
             return ret;
         }
-        //
+
+        public Item Unequip(Item.IType type, int i = 0)
+        {
+            Item item;
+            switch (type)
+            {
+                case Item.IType.Weapon: 
+                    item = weapon; 
+                    weapon = null; 
+                    break;
+                case Item.IType.Helmet:
+                    item = helmet; 
+                    helmet = null; 
+                    break;
+                case Item.IType.Mask:
+                    item = mask; 
+                    mask = null; 
+                    break;
+                case Item.IType.Chest:
+                    item = chestp;
+                    chestp = null;
+                    break;
+                case Item.IType.Jewelry:
+                    item = jewelry[i]; 
+                    jewelry[i] = null; 
+                    break;
+                case Item.IType.Trousers:
+                    item = trousers;
+                    trousers = null;
+                    break;
+                case Item.IType.Boots:
+                    item = boots;
+                    boots = null;
+                    break;
+
+                default: return null;
+            }
+            return item;
+        }
+
         public long Damage(int i)
         {
             long dmg = 0;
@@ -131,6 +168,7 @@ namespace AMI.Neitsillia.Collections
                     dmg += j.damage[i];
             return dmg;
         }
+
         public int Resistance(int r)
         {
             int value = 0;
@@ -142,6 +180,7 @@ namespace AMI.Neitsillia.Collections
             }
             return value;
         }
+
         public long Health()
         {
             long value = 0;
@@ -153,6 +192,7 @@ namespace AMI.Neitsillia.Collections
             }
             return value;
         }
+
         public int Stamina()
         {
             int value = 0;
@@ -164,6 +204,7 @@ namespace AMI.Neitsillia.Collections
             }
             return value;
         }
+
         public int Agility()
         {
             int value = 0;
@@ -175,6 +216,7 @@ namespace AMI.Neitsillia.Collections
             }
             return value;
         }
+
         public double CritChance()
         {
             double value = 0;
@@ -186,6 +228,7 @@ namespace AMI.Neitsillia.Collections
             }
             return value;
         }
+
         public double CritMult()
         {
             double value = 0;
@@ -197,6 +240,7 @@ namespace AMI.Neitsillia.Collections
             }
             return value;
         }
+
         public int Rank()
         {
             double value = 0;
@@ -207,21 +251,6 @@ namespace AMI.Neitsillia.Collections
                     value += gear.tier;
             }
             return Convert.ToInt32(Math.Floor(value/(gearCount - 1)));
-        }
-        //
-        public string VerifyCND()
-        {
-            string result = null;
-            for (int i = 0; i <= gearCount; i++)
-            {
-                var gear = GetGear(i);
-                if (gear != null && gear.condition <= 0)
-                {
-                    result += gear + Environment.NewLine;
-                    SetGear(i, null);
-                }
-            }
-            return result;
         }
     }
 }

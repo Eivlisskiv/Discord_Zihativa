@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class Admin : ModuleBase<Commands.CustomSocketCommandContext>
+    public class Admin : ModuleBase<Commands.CustomCommandContext>
     {
         internal static MongoDatabase Database => AMYPrototype.Program.data.database;
 

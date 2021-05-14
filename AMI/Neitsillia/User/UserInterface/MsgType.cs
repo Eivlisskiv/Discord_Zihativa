@@ -38,7 +38,7 @@
         //Tavern Service
         Tavern, BountyBoard,
         //Gambling
-        Lottery, GamblingGames, DiceGame, CardGame,
+        Lottery, GamblingGames, GameBet, DiceGame, CardGame,
         //Event
         Event, EventShop,
         //House

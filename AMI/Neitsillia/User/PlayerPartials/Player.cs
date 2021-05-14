@@ -62,7 +62,6 @@ namespace AMI.Neitsillia.User.PlayerPartials
         public static Player Load(ulong userID, IgnoreException ignore = IgnoreException.None)
         {
             BotUser u = BotUser.Load(userID);
-            string characterId = $"{userID}\\{u.loaded}";
             return Load(u, ignore);
         }
 

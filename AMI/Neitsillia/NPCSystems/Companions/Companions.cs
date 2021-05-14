@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NPCSystems.Companions
 {
-    public class CompanionCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class CompanionCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         [Command("EggPocket"), Alias("epocket")]
         public async Task ViewEggPocket()

@@ -33,23 +33,28 @@ namespace AMI.Neitsillia.Gambling.Games
         {
             if (!player.IsLeader) throw NeitsilliaError.ReplyError("You must be party leader to start a group gambling game.");
 
-            string description = null;
+            gamesInfo.TryGetValue(game, out string description);
 
-            gamesInfo.TryGetValue(game, out description);
-
+            bet = Math.Max(bet, 10);
 
             EmbedBuilder embed = DUtils.BuildEmbed(game, description, null, player.userSettings.Color,
                 DUtils.NewField("Initial Bet",
                 $"Starting bet: {bet} Kuts {Environment.NewLine}" +
-                $"{EUI.two} : Multiply bet by 2 {Environment.NewLine}" +
+                $"{EUI.two } : Multiply bet by 2 {Environment.NewLine}" +
                 $"{EUI.five} : Multiply bet by 5 {Environment.NewLine}" +
                 $"{EUI.zero} : Multiply bet by 10 {Environment.NewLine}" +
                 $"{EUI.prev} Reduce starting bet. {Environment.NewLine}" +
                 $"{EUI.next} Increase starting bet. {Environment.NewLine}" +
+                $"Use the `amount` command to set a specific amount: `amount 1074` {Environment.NewLine}" +
                 $"{EUI.ok} Start a game of {game} with this initial bet."
                 ));
 
-            await player.EditUI("", embed.Build(), chan, MsgType.CardGame, $"{game};{bet}");
+            await player.EditUI(null, embed.Build(), chan, MsgType.GameBet, $"{game};{bet};");
+        }
+
+        public static async Task ComformInitialBet(Player player, string game, long bet, IMessageChannel chan)
+        {
+
         }
 
         internal static Type GetGameType(string name)

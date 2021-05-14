@@ -2,6 +2,6 @@
 {
     class NamedNPC
     {
-        string name;
+        readonly string name;
     }
 }

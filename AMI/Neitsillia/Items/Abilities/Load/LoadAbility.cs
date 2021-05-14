@@ -18,6 +18,7 @@ namespace AMI.Neitsillia.Items.Abilities.Load
 
         static Ability Set(Ability a, int l)
         {
+            if (a.level > l) return a;
             l -= a.level;
             //l++;
             while (l > a.level && a.level < a.maxLevel) a.LevelUp(true);

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public class Guild : ModuleBase<Commands.CustomSocketCommandContext>
+    public class Guild : ModuleBase<Commands.CustomCommandContext>
     {
         [Command("View Permissions")]
         [Alias("View Perms")]

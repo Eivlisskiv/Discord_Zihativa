@@ -39,7 +39,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     _ = await Dynasty.Load(player);
                     if (player.dynasty == null)
                     {
-                        if (await Dynasty.Exist(data))
+                        if (Dynasty.Exist(data))
                         {
                             await reaction.Channel.SendMessageAsync(
                                 $"Dyansty name {data} is already in use");

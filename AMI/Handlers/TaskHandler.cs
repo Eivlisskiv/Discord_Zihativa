@@ -7,7 +7,7 @@ namespace AMI.Handlers
     class TaskHandler
     {
         public static bool Active = true; 
-        static Dictionary<string, TaskHandler> tasks = new Dictionary<string, TaskHandler>();
+        static readonly Dictionary<string, TaskHandler> tasks = new Dictionary<string, TaskHandler>();
 
         public static TaskHandler Add(string key, int minutesdelay, Func<Task> func)
         {
@@ -33,6 +33,7 @@ namespace AMI.Handlers
 
             Add("AdventureQuests", 720, async () => {
                 Neitsillia.Adventures.Adventure.currentQuests = Neitsillia.Adventures.Adventure.GenerateNewQuests();
+                await Task.Delay(1);
             });
         }
 

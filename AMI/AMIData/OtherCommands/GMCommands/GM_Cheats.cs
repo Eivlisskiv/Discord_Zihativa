@@ -110,6 +110,7 @@ namespace AMI.AMIData.OtherCommands
 
                 Player player = Player.Load(user.Id, Player.IgnoreException.All);
                 player.inventory.Add(scroll, 1, -1);
+                player.SaveFileMongo();
                 await ReplyAsync($"{scroll} given to {player}");
             }
         }

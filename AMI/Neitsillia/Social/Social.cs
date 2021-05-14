@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NeitsilliaCommands
 {
-    public class SocialCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class SocialCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         [Command("mail")] [Alias("inbox")]
         public async Task Viewinbox(int page = 0)

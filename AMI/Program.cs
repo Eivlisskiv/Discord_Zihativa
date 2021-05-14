@@ -43,7 +43,6 @@ namespace AMYPrototype
         {
             try
             {
-                
                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
                 AppDomain.CurrentDomain.ProcessExit += OnExit;
                 new Program().Start().GetAwaiter().GetResult();

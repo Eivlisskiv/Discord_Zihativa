@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NeitsilliaCommands
 {
-    public class GamblingCommands : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public class GamblingCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         static Random rng = Program.rng;
 
@@ -75,9 +75,10 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             {
                 int roll = rng.Next(6) + 1;
                 bool even = roll % 2 == 0;
-                embed.AddField("Bet Placed", $"Bet: {(bet == 2 ? "Even" : "Odd")} {Environment.NewLine} Dice Roll: {roll} {Environment.NewLine} Win Streak : {streak} ");
-                string result = null;
-                if((bet == 2 && even) || (bet == 1 && !even))
+                embed.AddField("Bet Placed", $"Bet: {(bet == 2 ? "Even" : "Odd")} " +
+                    $"{Environment.NewLine} Dice Roll: {roll} {Environment.NewLine} Win Streak : {streak} ");
+                string result;
+                if ((bet == 2 && even) || (bet == 1 && !even))
                 {
                     int reward = coins;
                     result = $"You won your bet! +{coins} Kuts";
@@ -91,7 +92,6 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 }
                 else
                 {
-                    int reward = coins;
                     result = $"You lost your bet! -{coins} Kuts";
                     if (streak > 0)
                         result += Environment.NewLine + $"You lost your {streak} winning streak! :(";

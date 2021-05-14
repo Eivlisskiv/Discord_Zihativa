@@ -26,7 +26,7 @@ using AMI.Neitsillia.Areas.InteractiveAreas;
 
 namespace AMI.Neitsillia.Commands
 {
-    public partial class Areas : ModuleBase<AMI.Commands.CustomSocketCommandContext>
+    public partial class Areas : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         public static string LocationRestriction(string locationTarget, string userLocation)
         {
@@ -65,23 +65,40 @@ namespace AMI.Neitsillia.Commands
         }
         internal static async Task Enter(Player player, string areaName, ISocketMessageChannel chan)
         {
-            string error;
-            //
             //Player is in combat
             if (player.IsEncounter("Combat"))
+            {
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not enter another area while in combat"));
-            //player is not leader
-            else if (player.Party != null && player.Party.GetLeaderID() != player.userid)
-                await chan.SendMessageAsync($"{player.name} may not lead the party in a new area.");
-            //Player is currently in dungeon
-            else if (player.Area.type == AreaType.Dungeon && areaName != "Floor")
-                DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not leave this dungeon so easily, the only way is forward."));
-            else if ((error = await TryEnter(player, areaName, chan)) != null)
-                DUtils.DeleteMessage(await chan.SendMessageAsync($"{player.name}, {error} {Environment.NewLine} Use `~Travel Post` for accessible areas."));
+                return;
+            }
 
-            if (player.Party != null)
-                await player.Party.SyncArea(player.AreaInfo);
+            //player is not leader
+            if (player.Party != null && player.Party.GetLeaderID() != player.userid)
+            {
+                await chan.SendMessageAsync($"{player.name} may not lead the party in a new area.");
+                return;
+            }
+
+            //Player is currently in dungeon
+            if (player.Area.type == AreaType.Dungeon && player.Area.arena == null && areaName != "Floor")
+            {
+                DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not leave this dungeon so easily, the only way is forward."));
+                return;
+            }
+
+            string error = await TryEnter(player, areaName, chan);
+
+            if(error == null)
+            {
+                if (player.Party != null)
+                    await player.Party.SyncArea(player.AreaInfo);
+                return;
+            }
+
+            DUtils.DeleteMessage(await chan.SendMessageAsync(
+                $"{player.name}, {error} {Environment.NewLine} Use `~Travel Post` for accessible areas."));
         }
+
         static async Task<string> TryEnter(Player player, string areaName, ISocketMessageChannel chan)
         {
             switch(areaName)
@@ -109,6 +126,9 @@ namespace AMI.Neitsillia.Commands
                         Junction j = player.Area.junctions.Find(Junction.FindName(areaName));
                         if (j != null)
                         {
+                            if (player.Area.arena != null)
+                                await player.Area.arena.EndChallenge(player.Encounter, player.Area, player.areaPath.floor);
+
                             await EnterJunction(player, j, chan);
 
                             if(player.Area.AreaId == "Neitsillia\\Casdam Ilse\\Central Casdam\\Serene Cliffside\\Ruined Shrine" 
@@ -179,7 +199,7 @@ namespace AMI.Neitsillia.Commands
 
         internal static async Task EnterJunction(Player player, Junction junction, ISocketMessageChannel chan)
         {
-            junction.PassJunction(player);
+            await junction.PassJunction(player);
 
             if (AMIData.Events.OngoingEvent.Ongoing != null)
                 AMIData.Events.OngoingEvent.Ongoing.EventBounty(player.Area, player.AreaInfo.floor);

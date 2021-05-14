@@ -33,7 +33,6 @@ namespace AMI.Handlers
                 try
                 {
                     await bot.Stop();
-
                 }
                 catch (Exception e)
                 {
@@ -74,7 +73,6 @@ namespace AMI.Handlers
             try { await Connect(); } catch(Exception e) { Log.LogS(e); }
         }
 
-        private bool reconnect = true;
         private readonly DiscordSocketClient _client;
         private CommandHandler _handler;
         private DiscordBotHandler()
@@ -108,7 +106,6 @@ namespace AMI.Handlers
 
         public async Task Stop()
         {
-            reconnect = false;
             _client?.SetStatusAsync(UserStatus.Offline);
             await Logout();
             try { await _client?.StopAsync(); } catch (Exception) { }
@@ -146,7 +143,7 @@ namespace AMI.Handlers
                 ("Guilds").DeleteOneAsync($"{{_id:{arg.Id}}}");
         }
 
-        private async Task LogAsync(LogMessage log)
+        private Task LogAsync(LogMessage log)
         {
             if (log.Exception != null)
                 Log.LogS(log.Exception, "LogAsync => " +
@@ -154,9 +151,15 @@ namespace AMI.Handlers
             else Log.LogS($"{log.Source}: {log.Message}");
 
             //if(reconnect && log.Message == "Disconnecting")
-               //_ = WaitReconnect(5);
+            //_ = WaitReconnect(5);
+
+            return Task.CompletedTask;
         }
 
-        private async Task OnDisconnect(Exception e) =>  Log.LogS(e);
+        private Task OnDisconnect(Exception e)
+        {
+            Log.LogS(e);
+            return Task.CompletedTask;
+        }
     }
 }

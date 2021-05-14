@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Commands.InventoryCommands
 {
-    public class Crafting : ModuleBase<CustomSocketCommandContext>
+    public class Crafting : ModuleBase<CustomCommandContext>
     {
         [Command("Craft")]
         [Summary("Craft an item from your `Schematics` list. \n Example: ~Craft Wooden Spear")]
@@ -158,7 +158,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
         }
         async Task<bool> CheckSchemGain(Player player, Item i, Random r, double extraSchemChance = 0)
         {
-            if (i.CanBeEquip()) return false;
+            if (!i.CanBeEquip()) return false;
             double cnd = ((i.condition * 100.00) / i.durability);
             double schemChance = r.Next(101) - (player.stats.GetINT() * Stats.SchemDropRatePerInt) - extraSchemChance -
                 (player.schematics.Count < 3 ? 10 : 0);
@@ -294,7 +294,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
                 {
                     amountOfMaterialsToUse = Verify.Max(amountOfMaterialsToUse, player.inventory.GetCount(indexOfMaterialToUse));
                     List<float> stats = igiv.GetStatList(irec.type == Item.IType.Weapon);
-                    int[] mods = IMethods.GetUpgrades(stats.ToArray(), (irec.type == Item.IType.Weapon));
+                    int[] mods = IMethods.GetUpgrades(stats.ToArray());
                     int newTier = IMethods.GetNewTier(irec, stats, mods, amountOfMaterialsToUse);
 
                     if (!player.IsRequiredLevel(newTier))

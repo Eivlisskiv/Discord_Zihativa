@@ -2,15 +2,17 @@
 
 namespace AMI.Neitsillia
 {
+#pragma warning disable CS0162
     static class PatchNote
     {
         public static string GeneralPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Combat encounter is now shown when trying to explore while in combat instead of a useless message. {Environment.NewLine}"
-                + $"Only gear schematics may now be gained from scarpping. (Other items will become products from house buildings) {Environment.NewLine}"
-                + $"Added house building: Mine {Environment.NewLine}";
+                $"The `amount` command can now be used to set the amount of a bet in a card game " +
+                $"or the amount of production to produce in a house {Environment.NewLine}"
+                + $" {Environment.NewLine}"
+                ;
         }
         public static string StatsPatchNotes()
         {
@@ -22,25 +24,24 @@ namespace AMI.Neitsillia
         }
         public static string ItemsPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"new Scroll: Dungeon Scroll: Allows players to spawn a dungeon. {Environment.NewLine}"
-                + $" New Scroll: Scroll Of Homecoming: allows players to teleport to the last safe area they visited. " +
-                $"(Currently no drops while testing) {Environment.NewLine}"
+                $"Items broken in combat will now be unequiped and returned to the inventory {Environment.NewLine}"
+                + $" {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()
         {
-            return null;
+            //return null;
             return
-                $" {Environment.NewLine}"
+                $"Fixed reactions for combat controls while in a party {Environment.NewLine}"
                  ;
         }
         public static string AbilitiesPatchNotes()
         {
-            //return null;
+            return null;
             return
-                $"Added Reflect ability in Counter Prep Tree. {Environment.NewLine}" 
+                $" {Environment.NewLine}" 
                  ;
         }
         public static string WorldPatchNotes()
@@ -88,4 +89,6 @@ namespace AMI.Neitsillia
                 ;
         }
     }
+#pragma warning restore CS0162
 }
+

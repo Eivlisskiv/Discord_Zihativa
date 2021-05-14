@@ -22,7 +22,7 @@ using AMI.Neitsillia.Items.Scrolls;
 
 namespace AMI.Neitsillia.InventoryCommands
 {
-    public class Inventory : ModuleBase<CustomSocketCommandContext>
+    public class Inventory : ModuleBase<CustomCommandContext>
     {
         public static (int, string) ParseInvUIData(string data)
         {
@@ -269,8 +269,7 @@ namespace AMI.Neitsillia.InventoryCommands
             }
             if (index > -1 && index < 10)
             {
-                temp = player.equipment.GetGear(index);
-                player.equipment.SetGear(index, eItem);
+                temp = player.equipment.Equip(eItem);
                 equipped = true;
             }
             if (temp != null && temp.type == Item.IType.notfound)
@@ -287,17 +286,26 @@ namespace AMI.Neitsillia.InventoryCommands
             int slot = 0)
         {
             slot--;
+            Item.IType type;
             switch (gearSlot?.ToLower())
             {
                 case "all": await StripEquipment(); return;
-                case "weapon": slot = 0; break;
-                case "secondary": slot = 1; break;
-                case "helmet": slot = 2; break;
-                case "mask": slot = 3; break;
-                case "chest": slot = 4; break;
-                case "jewelry": slot = Verify.MinMax(slot + 5, 7, 0); break;
-                case "trousers": slot = 8; break;
-                case "boots": slot = 9; break;
+                case "weapon": type = Item.IType.Weapon; break;
+                case "secondary":
+                    type = Item.IType.Weapon;
+                    slot = 1; break;
+                case "helmet": type = Item.IType.Helmet; break;
+                case "mask": type = Item.IType.Mask; break;
+                case "chest": type = Item.IType.Chest; break;
+                case "jewelry":
+                    type = Item.IType.Jewelry;
+                    slot = Verify.MinMax(slot + 5, 7, 0); break;
+                case "trousers": 
+                    type = Item.IType.Trousers;
+                    break;
+                case "boots":
+                    type = Item.IType.Boots;
+                    break;
                 default:
                     await DUtils.Replydb(Context, "Gear Slot unrecognized, example: ``~unequip Weapon`` to unequip primary weapon" + Environment.NewLine
                     + "Weapon: Primary Weapon" + Environment.NewLine
@@ -315,18 +323,22 @@ namespace AMI.Neitsillia.InventoryCommands
             Player player = Context.GetPlayer(Player.IgnoreException.Resting);
             if (player.IsDead())
                 throw NeitsilliaError.ReplyError($"{player.name} may not unequip gear while dead...");
-            Item temp = player.equipment.GetGear(slot);
-            if (temp != null)
+
+            Item temp = player.equipment.Unequip(type, slot);
+            if (temp == null)
             {
-                if (player.CollectItem(temp, 1))
-                {
-                    await DUtils.Replydb(Context, $"{temp} Returned to inventory", lifetime: 2);
-                    player.equipment.SetGear(slot, null);
-                    await UpdateinventoryUI(player, Context.Channel);
-                }
-                else await DUtils.Replydb(Context, "Inventory Full", lifetime: 1);
+                await DUtils.Replydb(Context, "Gear Slot Empty.", lifetime: 1);
+                return;
             }
-            else await DUtils.Replydb(Context, "Gear Slot Empty.", lifetime: 1);
+
+            if (!player.CollectItem(temp, 1))
+            {
+                await DUtils.Replydb(Context, "Inventory Full", lifetime: 1);
+                return;
+            }
+
+            await DUtils.Replydb(Context, $"{temp} Returned to inventory", lifetime: 2);
+            await UpdateinventoryUI(player, Context.Channel);
 
         }
 
@@ -357,7 +369,7 @@ namespace AMI.Neitsillia.InventoryCommands
         [Summary("Get the info on an item from its name.")]
         public async Task ItemInfo(params string[] itemName)
         {
-            string message = null;
+            string message;
             string name = StringM.UpperAt(ArrayM.ToString(itemName, " "));
             Item item = Item.LoadItem(name);
 
@@ -416,7 +428,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 bool inCombat = player.IsEncounter("Combat");
                 if (inCombat && player.duel != null && player.duel.abilityName != null
                     && player.duel.abilityName.StartsWith("~"))
-                    await ReplyAsync($"{player.name} may not change their turn action from {player.duel.abilityName.Substring(1)}");
+                    await ReplyAsync($"{player.name} may not change their turn action from {player.duel.abilityName[1..]}");
                 else if (player.HealthStatus(out string hpstate) < -1)
                     await ReplyAsync($"{player.name} may not consume an item while in a {hpstate} state.");
                 else
@@ -525,7 +537,7 @@ namespace AMI.Neitsillia.InventoryCommands
             bool inCombat = player.IsEncounter("Combat");
             if (inCombat && player.duel != null && player.duel.abilityName != null
                 && player.duel.abilityName.StartsWith("~"))
-                await ReplyAsync($"{player.name} may not change their turn action from {player.duel.abilityName.Substring(1)}");
+                await ReplyAsync($"{player.name} may not change their turn action from {player.duel.abilityName[1..]}");
 
             (int index, int amount) = Verify.IndexXAmount(indexXamount);
             index--;
@@ -723,8 +735,7 @@ namespace AMI.Neitsillia.InventoryCommands
             firstSlot--;
             secondSlot--;
 
-            Item a = null;
-            Item b = null;
+            Item a, b;
             bool bIsEquipped = false;
             if (firstSlot < 0 || firstSlot > player.inventory.Count - 1)
                 throw NeitsilliaError.ReplyError("First Slot entered is invalid.");
@@ -794,7 +805,7 @@ namespace AMI.Neitsillia.InventoryCommands
         [Summary("Upgrade the specified tool: ~UpgradeTool Axe")]
         public async Task UpgradeTool(string toolName)
         {
-            string reply = null;
+            string reply;
             Player player = Player.Load(Context.BotUser);
             if (player.Tools == null)
                 player.Tools = new Tools(player._id);
@@ -887,9 +898,8 @@ namespace AMI.Neitsillia.InventoryCommands
             => await CollectLoot(Context.Player, Context.Channel, arg);
         internal static async Task CollectLoot(Player player, ISocketMessageChannel chan, string arg = "all")
         {
-            int index = -1;
-            int amount = 1;
-            string result = "Failed to retrieve item.";
+            int index, amount;
+            string result;
             
             if (player.Encounter != null && player.Encounter.loot != null && player.Encounter.loot.Count > 0)
             {

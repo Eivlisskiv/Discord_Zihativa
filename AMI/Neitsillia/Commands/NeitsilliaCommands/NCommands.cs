@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Module
 {
-    public class GameCommands : ModuleBase<CustomSocketCommandContext>
+    public class GameCommands : ModuleBase<CustomCommandContext>
     {
         //23.20..8.22.19.4.8.26..2.22.16.15.4.26.13.
         ////////////Neitsillia Discord RPG Game 
@@ -80,7 +80,7 @@ namespace AMI.Module
             IUserMessage reply = await chan.SendMessageAsync(embed: nChar.Build());
             await player.NewUI(reply, MsgType.Stats);
         }
-        internal static string Stats_General(Player player, bool longInfo = true)
+        internal static string Stats_General(Player player)
         {
             string result = null;
             result += "**Level:** " + player.level + Environment.NewLine;
@@ -147,7 +147,7 @@ namespace AMI.Module
         internal static async Task ShortStatsDisplay(Player player, ISocketMessageChannel chan)
         {
             EmbedBuilder nChar = StatsStart(player);
-            nChar.Description += Stats_General(player, false);
+            nChar.Description += Stats_General(player);
             nChar.WithFooter("~stats  OR  ~ls  for more detailed stats sheet.");
             await player.NewUI(await chan.SendMessageAsync(embed: nChar.Build()), MsgType.Stats);
         }
@@ -179,13 +179,11 @@ namespace AMI.Module
         }
         internal static async Task ViewXP(Player player, ISocketMessageChannel chan)
         {
-                EmbedBuilder nXP = new EmbedBuilder();
-                nXP = player.UserEmbedColor(nXP);
-                nXP.WithTitle(player.name);
-                string xpPoints = player.experience.ToString() + "/" + Quadratic.XPCalc(player.level + 1).ToString();
-                if (xpPoints.Length > 50)
-                    xpPoints = Environment.NewLine + xpPoints;
-                string details = "Level: " + player.level + Environment.NewLine + player.DetailedXP();
+            EmbedBuilder nXP = new EmbedBuilder();
+            nXP = player.UserEmbedColor(nXP);
+            nXP.WithTitle(player.name);
+
+            string details = "Level: " + player.level + Environment.NewLine + player.DetailedXP();
             nXP.AddField("Experience", details);
             //Next level reward
             string nextLevelRewards = null;
@@ -395,13 +393,14 @@ namespace AMI.Module
                 if(gear != null && gear.perk != null)
                     playerPerkList += $"**{gear.perk}** (*{gear.name}*) {Environment.NewLine} ``{gear.perk.desc}`` {Environment.NewLine}";
             }
+
             EmbedBuilder embed = player.UserEmbedColor(new EmbedBuilder());
             embed.WithTitle(player.name + " Perks");
             embed.WithDescription(playerPerkList);
             await DUtils.Replydb(Context, embed: embed.Build());
         }
 
-        [Command("Quest"), Alias("Quests")]
+        [Command("Quest"), Alias("Quests", "Q")]
         public async Task ViewQuests(int page = 1)
         {
             Player player = Player.Load(Context.BotUser, Player.IgnoreException.Resting);

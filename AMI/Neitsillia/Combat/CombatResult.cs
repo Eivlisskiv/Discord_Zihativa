@@ -15,7 +15,7 @@ namespace AMI.Neitsillia.Combat
         internal enum Action { Cast, Missed, Escape, FailedEscape, Consume, Exhausted, Paralyzed }
         internal enum Team { P, M }
         //
-        internal Team charTeam;
+        readonly internal Team charTeam;
         internal Combat combat;
         internal Random rng;
         internal string position;
@@ -33,7 +33,7 @@ namespace AMI.Neitsillia.Combat
         internal bool SentHit => sentHit && action == Action.Cast;
         //
         internal Action action = Action.Cast;
-        private string[] results = new string[2];
+        private readonly string[] results = new string[2];
         //
         internal int bonusDodgeChances;
         //
@@ -57,20 +57,22 @@ namespace AMI.Neitsillia.Combat
         internal int[] baseResistance = new int[ReferenceData.DmgType.Length];
         internal int[] bonusResistance = new int[ReferenceData.DmgType.Length];
         internal double[] resistanceMultiplier = new double[ReferenceData.DmgType.Length];
-        //
+
         internal List<string> perkProcs = new List<string>();
-        //
+        internal List<string> gearCondition = new List<string>();
+
         internal CombatResult(CharacterMotherClass arg1, Ability arg2, Random arg3, Combat c, Team t)
         {
+            charTeam = t;
             combat = c;
             character = arg1; abilityUsed = arg2; rng = arg3;
             if (abilityUsed == null && character is Player player)
-                switch (player.duel.abilityName)
+                switch (player.duel.abilityName?.ToLower())
                 {
-                    case "~Consumed":
                     case "~consumed":
                         action = Action.Consume; break;
-                    case "~Run": action = Action.FailedEscape;  break;
+                    case "~run": 
+                        action = Action.FailedEscape;  break;
                 }
             for (int i = 0; i < ReferenceData.DmgType.Length; i++)
             {
@@ -78,12 +80,14 @@ namespace AMI.Neitsillia.Combat
                 baseResistance[i] = arg1.Resistance(i);
             }
         }
+
         internal void CalculateHitChanceModifier()
         {
             if (abilityUsed != null)
                 baseHitChance = abilityUsed.Agility(character.Agility(), character.Efficiency());
             else baseHitChance = -100;
         }
+
         internal void CalculateBaseCrtiChance()
         {
             double critChance = abilityUsed.CritChance(character.CritChance(), character.stats.Efficiency());
@@ -93,11 +97,13 @@ namespace AMI.Neitsillia.Combat
             else if (x < critChance)
                 isBaseCritical = true;
         }
+
         double GetCritChance()
         {
             return (abilityUsed.CritChance(character.CritChance(), character.stats.Efficiency())
                 * (1 + multiplicativeBonusHitChance)) + bonusAdditiveCritChance;
         }
+
         internal void CalculateCriticalMultiplier()
         {
             if (abilityUsed != null)
@@ -145,19 +151,7 @@ namespace AMI.Neitsillia.Combat
                 PerkLoad.CheckPerks(target.character, Perk.Trigger.BeforeDefense, target, this);
                 //
                 CalculateCriticalMultiplier();
-                switch (abilityUsed.type)
-                {
-                    case Ability.AType.Martial:
-                    case Ability.AType.Elemental:
-                    case Ability.AType.Enchantment:
-                    case Ability.AType.Tactical:
-                        sentHit = IsHit(-(target.character.Agility() + target.bonusDodgeChances));
-                        break;
-                    case Ability.AType.Defensive:
-                        sentHit = IsHit(target.character.Agility() +
-                            target.bonusDodgeChances);
-                        break;
-                }
+                GetIsHit(target);
                 //
                 int spDrain = -(abilityUsed.StaminaDrain() + bonusStaminaDrain);
                 if (character.stamina + spDrain < 0)
@@ -171,40 +165,69 @@ namespace AMI.Neitsillia.Combat
                 PerkLoad.CheckPerks(target.character, Perk.Trigger.Defense, target, this);
 
                 abilityUsed.InvokeEffect(this, target);
-                if (SentHit)
-                {
-                    switch (abilityUsed.type)
-                    {
-                        case Ability.AType.Martial:
-                        case Ability.AType.Elemental:
-                        case Ability.AType.Enchantment:
-                            {
-                                for (int i = 0; i < baseDamage.Length; i++)
-                                    totalUnresistedDamage += NPCCombat.ElementalResistance(
-                                        target.GetTotalResistance(i),
-                                        GetTotalDamage(i));
-
-                                results[0] = $"Dealt" +
-                                $" {target.character.TakeDamage(GetDamageDealt(totalUnresistedDamage))}" +
-                                $" => {target.Name}";
-
-                                if (abilityUsed.type != Ability.AType.Elemental && character.equipment.weapon != null)
-                                    IMethods.Condition(character.equipment.weapon, character.stats.endurance);
-                                IMethods.AllArmorCND(target.character);
-                            }
-                            break;
-                        default: results[0] = $"{abilityUsed.name} => {target.Name}";break;
-                    }
-                    if (isCritical)
-                        results[0] += " [CRIT]";
-
-                    long axp = target.character.XPDrop((abilityUsed.level * abilityUsed.tier) + (character.level / 10));
-                    abilityUsed.GainXP(axp, 1);
-                    if (abilityUsed.type == Ability.AType.Elemental) character.specter?.GainXP(axp);
-                }
+                if (SentHit) RegisterHit(target);
                 if (!sentHit && action == Action.Cast) action = Action.Missed;
             }
         }
+
+        private void RegisterHit(CombatResult target)
+        {
+            switch (abilityUsed.type)
+            {
+                case Ability.AType.Martial:
+                case Ability.AType.Elemental:
+                case Ability.AType.Enchantment:
+                    for (int i = 0; i < baseDamage.Length; i++)
+                        totalUnresistedDamage += NPCCombat.ElementalResistance(
+                            target.GetTotalResistance(i),
+                            GetTotalDamage(i));
+
+                    results[0] = $"Dealt" +
+                    $" {target.character.TakeDamage(GetDamageDealt(totalUnresistedDamage))}" +
+                    $" => {target.Name}";
+
+                    RegisterGearDamage(target);
+                    break;
+                default: results[0] = $"{abilityUsed.name} => {target.Name}"; break;
+            }
+            if (isCritical)
+                results[0] += " [CRIT]";
+
+            long axp = target.character.XPDrop((abilityUsed.level * abilityUsed.tier) + (character.level / 10));
+            abilityUsed.GainXP(axp, 1);
+            if (abilityUsed.type == Ability.AType.Elemental) character.specter?.GainXP(axp);
+        }
+
+        private void RegisterGearDamage(CombatResult target)
+        {
+            if (abilityUsed.type != Ability.AType.Elemental &&
+                                        character.equipment.weapon != null)
+            {
+                var item = character.equipment.weapon.Condition(character.stats.endurance);
+                if (item.VerifyOnBreak(character))
+                    gearCondition.Add($"{item.name} has broken");
+            }
+
+            target.gearCondition.AddRange(IMethods.AllArmorCND(target.character));
+        }
+
+        private void GetIsHit(CombatResult target)
+        {
+            switch (abilityUsed.type)
+            {
+                case Ability.AType.Martial:
+                case Ability.AType.Elemental:
+                case Ability.AType.Enchantment:
+                case Ability.AType.Tactical:
+                    sentHit = IsHit(-(target.character.Agility() + target.bonusDodgeChances));
+                    break;
+                case Ability.AType.Defensive:
+                    sentHit = IsHit(target.character.Agility() +
+                        target.bonusDodgeChances);
+                    break;
+            }
+        }
+
         bool IsHit(int modifier)
         {
             int hitChance = Verify.MinMax(baseHitChance + modifier, ReferenceData.maximumAgilityDifference);
@@ -226,11 +249,8 @@ namespace AMI.Neitsillia.Combat
             return Math.Max(NumbersM.NParse<long>(totalDamage * (GetTotalCriticalMultiplier() + 1)), 0);
         }
         internal double GetTotalCriticalMultiplier()
-        {
-            if (isCritical)
-                return (CriticalMultiplier * (bonusMutiplicativeCritChance + 1)) + bonusAdditiveCritMultiplier;
-            return 0;
-        }
+            => !isCritical ? 0 : 
+            (CriticalMultiplier * (bonusMutiplicativeCritChance + 1)) + bonusAdditiveCritMultiplier;
 
         internal string GetResultInfo(string targetIndex)
         {
@@ -245,11 +265,12 @@ namespace AMI.Neitsillia.Combat
                 r += $"`➤ {string.Join($"{Environment.NewLine}➤ ", perkProcs)}`" + Environment.NewLine;
             r += results[1];
 
-            string eqCND = character.equipment.VerifyCND();
-            if (character is Player && eqCND != null)
-                r += Environment.NewLine + eqCND;
+            if (gearCondition.Count > 0)
+                r += string.Join(Environment.NewLine, gearCondition);
+
             return r;
         }
+
         internal string GetAction()
         {
             switch (action)
@@ -279,22 +300,22 @@ namespace AMI.Neitsillia.Combat
 
         internal CombatResult[] GetAllies()
         {
-            switch (charTeam)
+            return charTeam switch
             {
-                case Team.M: return combat.mobParty;
-                case Team.P: return combat.playerParty;
-            }
-            return null;
+                Team.M => combat.mobParty,
+                Team.P => combat.playerParty,
+                _ => null,
+            };
         }
 
         internal CombatResult[] GetEnemies()
         {
-            switch (charTeam)
+            return charTeam switch
             {
-                case Team.M: return combat.playerParty;
-                case Team.P: return combat.mobParty;
-            }
-            return null;
+                Team.M => combat.playerParty,
+                Team.P => combat.mobParty,
+                _ => null,
+            };
         }
 
         public void Paralyse(string result = "Paralyzed")
