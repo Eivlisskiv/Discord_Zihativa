@@ -62,10 +62,10 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         [Alias("PartyI", "pinfo")]
         public async Task Party_Info()
         {
-            Player p = Player.Load(Context.BotUser, Player.IgnoreException.Resting);
-            if (p.Party == null)
-                await DUtils.Replydb(Context, $"{p.name} is not in a party");
-            else await DUtils.Replydb(Context, embed: p.Party.EmbedInfo(), lifetime: 3);
+            Player player = Player.Load(Context.BotUser, Player.IgnoreException.Resting);
+            if (player.Party == null)
+                await DUtils.Replydb(Context, $"{player.name} is not in a party");
+            else await DUtils.Replydb(Context, embed: player.Party.EmbedInfo(player.Encounter), lifetime: 3);
         }
 
         [Command("Party Invite")]

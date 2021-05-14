@@ -11,7 +11,8 @@ namespace AMI.Neitsillia
             return
                 $"The `amount` command can now be used to set the amount of a bet in a card game " +
                 $"or the amount of production to produce in a house {Environment.NewLine}"
-                + $" {Environment.NewLine}"
+                + $"Fixed many shared reactions not appearing when in a party {Environment.NewLine}"
+                + $"Party info now displays combat actions {Environment.NewLine}"
                 ;
         }
         public static string StatsPatchNotes()

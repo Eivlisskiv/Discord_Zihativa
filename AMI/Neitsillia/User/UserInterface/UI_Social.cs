@@ -61,7 +61,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     inviter.AreaInfo.floor == player.AreaInfo.floor)
                 {
                     await inviter.Party.Add(player);
-                    await EditMessage(embed: player.Party.EmbedInfo());
+                    await EditMessage(embed: player.Party.EmbedInfo(null));
                 }
                 else await EditMessage($"{player.name} must be in the same area to join. Floor {inviter.AreaInfo.floor} of {inviter.Area.name} {inviter.Area.parent}.");
             }

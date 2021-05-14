@@ -71,7 +71,11 @@ namespace AMI.Neitsillia.User.PlayerPartials
                 "combat" => Encounter.IsCombatEncounter(),
                 "passive" => Encounter.IsPassiveEncounter(),
                 "npc" => Encounter.IsNPC(),
-                "partyshared" => Encounter.IsCombatEncounter() || Encounter.Name == Encounter.Names.Puzzle || Encounter.IsNPC(),
+                "partyshared" => 
+                    Encounter.IsCombatEncounter() || 
+                    Encounter.Name == Encounter.Names.Puzzle || 
+                    Encounter.Name == Encounter.Names.Loot || 
+                    Encounter.IsNPC(),
                 _ => false,
             };
         }

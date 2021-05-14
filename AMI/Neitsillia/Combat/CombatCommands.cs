@@ -68,7 +68,6 @@ namespace AMI.Neitsillia.Combat
                     await PVPTurn(player, temp[0], Context.Channel);
                 else
                     await TurnCombat(player, temp[0], Context.Channel);
-                await DUtils.DeleteContextMessageAsync(Context);
             }
         }
 

@@ -194,8 +194,16 @@ namespace AMI.Neitsillia.Commands
         }
 
         private static int FloorIncrease(Player player)
-            => player.Area.type == AreaType.Dungeon || player.Area.type == AreaType.Arena ? 1 :
-            Math.Min(player.level < player.Area.level ? 1 : Math.Min((player.level - player.Area.level) / 5, 6), player.Area.floors - player.AreaInfo.floor);
+        {
+            if (player.Area.type == AreaType.Dungeon || player.Area.type == AreaType.Arena)
+                return 1;
+
+            if (player.AreaInfo.floor >= player.Area.floors) return 0;
+
+            if (player.level < player.Area.level) return 1;
+
+            return Math.Min(Math.Max((player.level - player.Area.level) / 5, 1), 6);
+        }
 
         internal static async Task EnterJunction(Player player, Junction junction, ISocketMessageChannel chan)
         {
@@ -343,9 +351,9 @@ namespace AMI.Neitsillia.Commands
                     }
                 }
                 var msg = await chan.SendMessageAsync(message, embed: embed?.Build());
+                await player.NewUI(msg, menuType, null);
                 if (!player.IsSolo && player.IsEncounter("partyshared"))
-                    player.Party.UpdateUI(player, msg, menuType, menuType.ToString());
-                else await player.NewUI(msg, menuType, menuType.ToString());
+                    player.Party.UpdateUI(player, msg, menuType, null);
             }
             else DUtils.DeleteMessage(await chan.SendMessageAsync(message));
         }
