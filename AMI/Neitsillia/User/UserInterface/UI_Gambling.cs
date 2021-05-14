@@ -6,13 +6,55 @@ using Discord;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
     public partial class UI
     {
+        private static void InitO_Gambling()
+        {
+            OptionsLoad.Add(MsgType.GamblingGames, ui =>
+            {
+                ui.options = new List<string>();
+                switch (ui.data)
+                {
+                    case "Tavern":
+                        ui.options.Add(EUI.Dice(1));
+                        ui.options.Add(EUI.GetNum(0));
+                        break;
+                }
+            });
+
+            OptionsLoad.Add(MsgType.DiceGame, ui =>
+                ui.options = new List<string>()
+                {
+                    EUI.prev,
+                    EUI.Dice(1),
+                    EUI.Dice(2),
+                    EUI.next,
+                    EUI.two, EUI.five, EUI.zero,
+                    EUI.cancel
+                });
+
+            OptionsLoad.Add(MsgType.GameBet, ui =>
+                ui.options = new List<string>()
+                {
+                    EUI.prev,
+                    EUI.next,
+                    EUI.two, EUI.five, EUI.zero,
+                    EUI.ok,
+                });
+
+            OptionsLoad.Add(MsgType.CardGame, ui =>
+            {
+                Type type = GamblingGame.GetGameType(ui.data);
+                Dictionary<string, string> actions = Utils.GetVar
+                    <Dictionary<string, string>>(type, "Actions", true);
+                ui.options = new List<string>(actions.Keys);
+            });
+        }
+
         public async Task GamblingGames(SocketReaction reaction, IUserMessage msg)
         {
             switch (data)
@@ -51,13 +93,6 @@ namespace AMI.Neitsillia.User.UserInterface
             string[] d = data.Split(';');
             int bet = int.Parse(d[1]);
 
-            if (d.Length == 3)
-            {
-                await GamblingGame.Initialise(
-                        player, d[0], bet, reaction.Channel);
-                return;
-            }
-
             switch (reaction.Emote.ToString())
             {
                 case EUI.prev: bet -= 10; break;
@@ -69,10 +104,16 @@ namespace AMI.Neitsillia.User.UserInterface
 
                 case EUI.ok:
                     if (player.IsSolo)
+                    {
                         await GamblingGame.Initialise(
                             player, d[0], bet, reaction.Channel);
-                    else await GamblingGame.ComformInitialBet(
-                        player, d[0], bet, reaction.Channel);
+                        return;
+                    }
+                    bool accepted = false;
+                    if(d.Length == 3) bool.TryParse(d[2], out accepted);
+
+                    await GamblingGame.ConfirmInitialBet(
+                        player, d[0], bet, accepted, reaction.Channel);
                     return;
             }
 
@@ -103,8 +144,6 @@ namespace AMI.Neitsillia.User.UserInterface
         }
         public async Task CardGame(SocketReaction reaction, IUserMessage msg)
         {
-            string[] d = data.Split(';');
-
             if (reaction.Emote.ToString() == EUI.cancel)
             {
                 await QuitCardGame(reaction);
@@ -113,7 +152,8 @@ namespace AMI.Neitsillia.User.UserInterface
 
             if (player.GamblingHand.turn != null)
             {
-                await reaction.Channel.SendMessageAsync($"You've already played your turn for this round: {player.GamblingHand.turn}");
+                await reaction.Channel.SendMessageAsync(
+                    $"You've already played your turn for this round: {player.GamblingHand.turn}");
                 return;
             }
 

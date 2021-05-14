@@ -1,5 +1,6 @@
 ﻿using AMI.Neitsillia.Areas;
 using AMI.Neitsillia.Areas.AreaPartials;
+using AMI.Neitsillia.Encounters;
 using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.NPCSystems.Companions;
 using AMI.Neitsillia.NPCSystems.Companions.Pets;
@@ -45,13 +46,13 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             player.PartyKey = new AMIData.DataBaseRelation<string, Party>(_id, this);
         }
 
-        internal Embed EmbedInfo()
+        internal Embed EmbedInfo(Encounter encounter)
         {
             EmbedBuilder info = new EmbedBuilder();
             info.WithTitle(partyName);
             for(int i = 0; i < members.Count; i++)
             {
-                info.Description += $"{(i == 0 ? "👑" : "🔘")} {members[i].characterName} {Environment.NewLine}";   
+                info.Description += $"{(i == 0 ? "👑" : "🔘")} {GetPartyPlayerInfo(members[i], encounter)} {Environment.NewLine}";   
             }
             if (NPCMembers.Count > 0)
             {
@@ -62,6 +63,19 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 }
             }
             return info.Build();
+        }
+
+        private string GetPartyPlayerInfo(PartyMember member, Encounter encounter)
+        {
+            if (encounter == null) return member.characterName;
+
+            if (encounter.IsCombatEncounter())
+            {
+                var duel = member.LoadPlayer().duel;
+                return $"{member.characterName} [{duel.abilityName} {duel.target}]";
+            }
+
+            return member.characterName;
         }
 
         internal ulong GetLeaderID() => members[0].id;

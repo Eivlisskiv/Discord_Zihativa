@@ -52,9 +52,65 @@ namespace AMI.Neitsillia.Gambling.Games
             await player.EditUI(null, embed.Build(), chan, MsgType.GameBet, $"{game};{bet};");
         }
 
-        public static async Task ComformInitialBet(Player player, string game, long bet, IMessageChannel chan)
+        public static async Task ConfirmInitialBet(Player player, string game, int bet, bool accepted, IMessageChannel chan)
         {
+            string players = null;
 
+            var msg = await player.ui.GetUiMessage();
+
+            bool allReady = true;
+
+            player.Party.ForEachPlayerSync(player, p =>
+            {
+                bool a = player == p ? !accepted : VerifyConfirmUI(p, game, bet, msg);
+                players += $"{p.name}: " + (a ? "Accepted" : "Waiting to accept")
+                + Environment.NewLine;
+                if (!a) allReady = false;
+            });
+
+            if (!allReady)
+            {
+                await WaitForBetConfirm(player, game, bet, accepted, chan, players);
+                return;
+            }
+
+            await Initialise(player, game, bet, chan);
+        }
+
+        private static async Task WaitForBetConfirm(Player player, string game, long bet, bool accepted, IMessageChannel chan, string players)
+        {
+            gamesInfo.TryGetValue(game, out string description);
+
+            EmbedBuilder embed = DUtils.BuildEmbed(game, description, null, player.userSettings.Color,
+                DUtils.NewField("Initial Bet",
+                $"Confirm your bet: {bet} Kuts {Environment.NewLine}" +
+                players + Environment.NewLine +
+                $"{EUI.ok} confirm you bet!"
+                ));
+
+            await player.EditUI(null, embed.Build(), chan, MsgType.GameBet, $"{game};{bet};{!accepted}");
+        }
+
+        private static bool VerifyConfirmUI(Player player, string game, long bet, IUserMessage message)
+        {
+            if( player.ui == null || 
+                player.ui.type != MsgType.GameBet || 
+                player.ui.msgId != message.Id)
+            {
+                player.ui = new UI(message, MsgType.GameBet, player, $"{game};{bet};{false}");
+                player.SaveFileMongo();
+                return false;
+            }
+
+            var d = player.ui.data.Split(';');
+
+            if(d.Length == 3)
+            {
+                bool.TryParse(d[2], out bool a);
+                return a;
+            }
+
+            return false;
         }
 
         internal static Type GetGameType(string name)

@@ -13,7 +13,7 @@ namespace AMI.Neitsillia.User.UserInterface
     {
         static readonly Action[] OptionsInitializers = { InitO_Events, InitO_Area, 
             InitO_Inventory, InitO_Strongholds, InitO_Dynasty, InitO_Sandbox,
-            InitO_Encounter, InitO_Social
+            InitO_Encounter, InitO_Social, InitO_Gambling,
         };
         static Dictionary<MsgType, Action<UI>> OptionsLoad;
 
@@ -484,48 +484,6 @@ namespace AMI.Neitsillia.User.UserInterface
                 case MsgType.DynastyUpgrade:
                 case MsgType.DynastyInvite:
                     options = new List<string> { ok, cancel };
-                    break;
-                #endregion
-
-                #region Gambling
-                case MsgType.GamblingGames:
-                    {
-                        options = new List<string>();
-                        switch (data)
-                        {
-                            case "Tavern":
-                                options.Add(Dice(1));
-                                options.Add(GetNum(0));
-                                break;
-                        }
-                    }
-                    break;
-                case MsgType.DiceGame:
-                    {
-                        options = new List<string>()
-                        {
-                            prev,
-                            EUI.Dice(1),
-                            EUI.Dice(2),
-                            next,
-                            two, five, zero,
-                            cancel
-                        };
-                    }
-                    break;
-                case MsgType.CardGame:
-                    {
-                        if (data.Split(';').Length > 1)
-                        {
-                            options = new List<string>() { prev, next, two, five, zero, ok, cancel };
-                        }
-                        else
-                        {
-                            Type type = GamblingGame.GetGameType(data);
-                            Dictionary<string, string> actions = Utils.GetVar<Dictionary<string, string>>(type, "Actions", true);
-                            options = new List<string>(actions.Keys);
-                        }
-                    }
                     break;
                 #endregion
 
