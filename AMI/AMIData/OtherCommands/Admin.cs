@@ -91,7 +91,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("Upload")]
-        public async Task UploadAt(string type, params string[] path)
+        public async Task UploadAt(string type, [Remainder] string path)
         {
             AdminCheck();
                 try
@@ -442,7 +442,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Cheat_GiveItem_NPC")]
         [Alias("chitemnpc")]
-        public async Task GiveNPCItme(params string[] args)
+        public async Task GiveNPCItme([Remainder] string args)
         {
             if (AdminCheck())
             {
@@ -484,7 +484,7 @@ namespace AMI.AMIData.OtherCommands
 
         #region Files
         [Command("Download File")]
-        public async Task DownloadFile(params string[] arg)
+        public async Task DownloadFile([Remainder] string arg)
         {
             if (AdminCheck())
             {
@@ -496,7 +496,7 @@ namespace AMI.AMIData.OtherCommands
         }
         
         [Command("dir")]
-        public async Task ShowPathDirectories(params string[] arg)
+        public async Task ShowPathDirectories([Remainder] string arg)
         {
             if (AdminCheck())
             {
@@ -513,7 +513,7 @@ namespace AMI.AMIData.OtherCommands
             }
         }
         [Command("dirf")]
-        public async Task ShowPathFiles(params string[] arg)
+        public async Task ShowPathFiles([Remainder] string arg)
         {
             if (AdminCheck())
             {

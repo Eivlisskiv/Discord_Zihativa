@@ -15,7 +15,7 @@ namespace AMI.AMIData.OtherCommands
     {
         [Command("Move To Area")]
         [Alias("mtarea")]
-        public async Task MoveToArea(IUser user, params string[] argName)
+        public async Task MoveToArea(IUser user, [Remainder] string argName)
         {
             if (await IsGMLevel(4))
             {
@@ -31,7 +31,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Generate Dungeon")]
         [Alias("GenDungeon")]
-        public async Task GenerateDungeon(IUser user, params string[] args)
+        public async Task GenerateDungeon(IUser user, [Remainder] string args)
         {
             if (await IsGMLevel(3))
             {

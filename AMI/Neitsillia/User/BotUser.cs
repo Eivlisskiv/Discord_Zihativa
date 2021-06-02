@@ -52,20 +52,20 @@ namespace AMI.Neitsillia.User
         }
 
         #region Characters
-        public string ChangeCharacter(string charname)
+        public string ChangeCharacter(string charname, string prefix)
         {
             if (charname == null) return null;
 
-            if((charname = GetCharFiles(_id).Find(x => x.name.ToLower().Equals(charname.ToLower()))?.name) != null)
+            var found = GetCharFiles(_id).Find(x => x.name.ToLower().Equals(charname.ToLower()))?.name;
+            if (found != null)
             {
-                loaded = charname;
+                loaded = found;
                 Save();
-                return $"Character {charname} Loaded";
+                return $"Character {found} Loaded";
             }
-            else if (loaded != null)
-                    return $"Character {charname} was not found. Currently loaded character: {loaded}";
-            return $"Character {charname} not found. No character currently loaded. Make a new character using ``~New Character charnamehere``" +
-                $" or view existing characters using ``~List Characters``";
+            return (loaded != null) ? $"Character {charname} was not found. Currently loaded character: {loaded}" :
+                $"Character {charname} not found. Make a new character using `{prefix}New Char`" +
+                $" or view existing characters using `{prefix}Chars`";
         }
 
         public static List<Player> GetCharFiles(ulong id)

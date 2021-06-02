@@ -8,18 +8,18 @@ namespace AMI.CommandsHandler
 {
     class CommandInfoEmbed
     {
-        CommandInfo command;
+        readonly CommandInfo command;
 
         public Embed Embed => embed.Build();
 
-        EmbedBuilder embed;
+        readonly EmbedBuilder embed;
 
-        public CommandInfoEmbed(CommandInfo ci, bool isShort = false)
+        public CommandInfoEmbed(CommandInfo ci, string prefix, bool isShort = false)
         {
             command = ci;
 
             embed = DUtils.BuildEmbed(command.Name + " Command Help", 
-                $"**Syntax:** `~{command.Name} {(command.Parameters.Count > 0 ? $"{{{string.Join("} {", command.Parameters.Select(p => p.Name))}}}" : null)}`" + Environment.NewLine +
+                $"**Syntax:** `{prefix}{command.Name} {(command.Parameters.Count > 0 ? $"{{{string.Join("} {", command.Parameters.Select(p => p.Name))}}}" : null)}`" + Environment.NewLine +
                 command.Summary, "use the Help command for more help", Color.DarkRed);
 
             if(!isShort)

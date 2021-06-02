@@ -35,7 +35,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("Modules")] [Alias("Module")]
-        public async Task Help2(string moduleName = null, params string[] commandName)
+        public async Task Help2(string moduleName = null, [Remainder] string commandName = null)
         {
             var cservice = CommandHandler.CommandService;
             if (moduleName == null)
@@ -53,7 +53,7 @@ namespace AMI.AMIData.OtherCommands
                 if (module == null) await ReplyAsync("Module was not found");
                 else if (module.Commands.Count == 0)
                     await ReplyAsync($"Module {module.Name} is empty");
-                else if (commandName.Length == 0)
+                else if (commandName == null)
                 {
                     await ReplyAsync("Please enter command name", embed:
                     DUtils.BuildEmbed("Commands", string.Join(Environment.NewLine, module.Commands.Select(c => c.Name)), null, Color.DarkRed,
@@ -62,10 +62,10 @@ namespace AMI.AMIData.OtherCommands
                 }
                 else
                 {
-                    string name = string.Join(" ", commandName).ToLower();
+                    string name = commandName.ToLower();
                     CommandInfo ci = module.Commands.First(c => c.Name.ToLower() == name);
                     if (ci == null) await ReplyAsync($"Command {name} not found");
-                    else await ReplyAsync(embed: new CommandsHandler.CommandInfoEmbed(ci).Embed);
+                    else await ReplyAsync(embed: new CommandsHandler.CommandInfoEmbed(ci, Context.Prefix).Embed);
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("chelp")]
-        public async Task  CommandHelp(params string[] commandName)
+        public async Task  CommandHelp([Remainder] string commandName)
         {
             if (commandName.Length == 0) await ReplyAsync("No command name was given");
             else
@@ -90,7 +90,7 @@ namespace AMI.AMIData.OtherCommands
                 else
                 {
                     var ci = search.Commands.First().Command;
-                    await ReplyAsync(embed: new CommandsHandler.CommandInfoEmbed(ci).Embed);
+                    await ReplyAsync(embed: new CommandsHandler.CommandInfoEmbed(ci, Context.Prefix).Embed);
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace AMI.AMIData.OtherCommands
         public async Task Createinvite() =>  await ReplyAsync(await GetSupportInvite());
 
         [Command("Roll")]
-        public async Task Roll(params string[] message)
+        public async Task Roll([Remainder] string message)
         {
             EmbedBuilder em = new EmbedBuilder
             { Title = Context.User.Username + "'s Roll" };
@@ -141,13 +141,15 @@ namespace AMI.AMIData.OtherCommands
             result += ability.description;
             return em.AddField(ability.name + " Roll", result);
         }
-        EmbedBuilder DiceRolls(string[] message, EmbedBuilder em)
+        EmbedBuilder DiceRolls(string message, EmbedBuilder em)
         {
             Random r = new Random();
             for (int i = 5; i < 5; i++)
                 r.Next(101);
-            foreach (string roll in message)
+            string[] array = message.Split(' ');
+            for (int i1 = 0; i1 < array.Length; i1++)
             {
+                string roll = array[i1];
                 int maxRoll = 20;
                 int numRolls = 1;
                 bool error = false;
@@ -280,8 +282,8 @@ namespace AMI.AMIData.OtherCommands
             return patch;
         }
 
-        [Command("suggest", true)][Alias("sug")]
-        public async Task SendSuggestion(string suggestion)
+        [Command("suggest")][Alias("sug")]
+        public async Task SendSuggestion([Remainder]string suggestion)
         {
             if (suggestion == null || suggestion.Trim().Length < 1)
                 await DUtils.Replydb(Context, "Your suggestion is empty, please enter your suggestion after the command:" +

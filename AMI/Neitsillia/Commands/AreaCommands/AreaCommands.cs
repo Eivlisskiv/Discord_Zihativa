@@ -52,7 +52,7 @@ namespace AMI.Neitsillia.Commands
         #region Entering
         [Command("Enter")]
         [Summary("Enter the specified area if available.")]
-        public async Task Enter(params string[] args)
+        public async Task Enter([Remainder] string args)
         {
             if (args.Length > 0)
             {
@@ -325,13 +325,22 @@ namespace AMI.Neitsillia.Commands
 
             if (embed != null)
             {
-                embed.WithColor(player.userSettings.Color);
-                MsgType menuType = MsgType.Main;
-                if (player.Encounter != null)
-                {
-                    if (player.Encounter.IsCombatEncounter())
-                        menuType = MsgType.Combat;
-                    else
+                await ExploreEmbedResult(player, chan, message, embed);
+                return;
+            }
+
+            DUtils.DeleteMessage(await chan.SendMessageAsync(message));
+        }
+
+        private static async Task ExploreEmbedResult(Player player, ISocketMessageChannel chan, string message, EmbedBuilder embed)
+        {
+            embed.WithColor(player.userSettings.Color);
+            MsgType menuType = MsgType.Main;
+            if (player.Encounter != null)
+            {
+                if (player.Encounter.IsCombatEncounter())
+                    menuType = MsgType.Combat;
+                else
                     switch (player.Encounter.Name)
                     {
                         case Encounter.Names.Loot:
@@ -349,13 +358,11 @@ namespace AMI.Neitsillia.Commands
                         case Encounter.Names.NPC: menuType = MsgType.NPC; break;
                         case Encounter.Names.Puzzle: menuType = MsgType.Puzzle; break;
                     }
-                }
-                var msg = await chan.SendMessageAsync(message, embed: embed?.Build());
-                await player.NewUI(msg, menuType, null);
-                if (!player.IsSolo && player.IsEncounter("partyshared"))
-                    player.Party.UpdateUI(player, msg, menuType, null);
             }
-            else DUtils.DeleteMessage(await chan.SendMessageAsync(message));
+            var msg = await chan.SendMessageAsync(message, embed: embed.Build());
+            await player.NewUI(msg, menuType, null);
+            if (!player.IsSolo && player.IsEncounter("partyshared"))
+                player.Party.UpdateUI(player, null);
         }
 
         [Command("jump floor")][Alias("floor jump")]
@@ -485,7 +492,7 @@ namespace AMI.Neitsillia.Commands
         #region StrongHolds
         [Command("Create Stronghold")]
         [Summary("Create a new stronghold near your current area. Your current area and floor level will become requirements to access the area.")]
-        public async Task Request_Stronghold(int size, params string[] areaCustomName)
+        public async Task Request_Stronghold(int size, [Remainder] string areaCustomName)
         {
             Player player = Context.Player;
             int junctedStrongholds = 0;

@@ -9,8 +9,7 @@ namespace AMI.Neitsillia
         {
             return null;
             return
-                $"The `amount` command can now be used to set the amount of a bet in a card game " +
-                $"or the amount of production to produce in a house {Environment.NewLine}"
+                $"Multiple Bug Fixes {Environment.NewLine}"
                 + $"Fixed many shared reactions not appearing when in a party {Environment.NewLine}"
                 + $"Party info now displays combat actions {Environment.NewLine}"
                 ;
@@ -28,7 +27,7 @@ namespace AMI.Neitsillia
             return null;
             return
                 $"Items broken in combat will now be unequiped and returned to the inventory {Environment.NewLine}"
-                + $" {Environment.NewLine}"
+                + $"Fixed auto equip not ignoring broken gear {Environment.NewLine}"
                 ;
         }
         public static string CombatPatchNotes()

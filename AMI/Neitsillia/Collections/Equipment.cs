@@ -86,9 +86,18 @@ namespace AMI.Neitsillia.Collections
 
         internal void SetGear(int i, Item item)
         {
-            if (jewelry == null)
-                jewelry = new Item[3];
-            
+            switch (i)
+            {
+                case 0: weapon = item; break;
+                case 1: secondaryWeapon = item; break;
+                case 2: helmet = item; break;
+                case 3: mask = item; break;
+                case 4: chestp = item; break;
+                case 5: case 6: case 7:
+                    jewelry[i - 5] = item; break;
+                case 8: trousers = item; break;
+                case 9: boots = item; break;
+            }
         }
 
         internal Item Equip(Item item, int i = 0, bool throwException = true)
@@ -118,35 +127,28 @@ namespace AMI.Neitsillia.Collections
 
         public Item Unequip(Item.IType type, int i = 0)
         {
-            Item item;
+            Item item = GetGear(type, i);
             switch (type)
             {
-                case Item.IType.Weapon: 
-                    item = weapon; 
+                case Item.IType.Weapon:
                     weapon = null; 
                     break;
                 case Item.IType.Helmet:
-                    item = helmet; 
                     helmet = null; 
                     break;
                 case Item.IType.Mask:
-                    item = mask; 
                     mask = null; 
                     break;
                 case Item.IType.Chest:
-                    item = chestp;
                     chestp = null;
                     break;
                 case Item.IType.Jewelry:
-                    item = jewelry[i]; 
                     jewelry[i] = null; 
                     break;
                 case Item.IType.Trousers:
-                    item = trousers;
                     trousers = null;
                     break;
                 case Item.IType.Boots:
-                    item = boots;
                     boots = null;
                     break;
 

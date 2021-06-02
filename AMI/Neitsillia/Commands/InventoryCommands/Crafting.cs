@@ -28,16 +28,16 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
         [Summary("Craft an item from your `Schematics` list. \n Example: ~Craft Wooden Spear")]
         public async Task ICraft(
             [Summary("Full name of the item you wish to craft")]
-            params string[] itemToCraft)
+            [Remainder] string itemToCraft)
         {
             if (itemToCraft.Length < 1)
                 throw NeitsilliaError.ReplyError("No item name was given. ex: ``~craft Wooden Spear``  use ``~schematics`` to view craftable items.");
 
-            if (itemToCraft.Length == 1 && int.TryParse(itemToCraft[0], out int err))
+            if (int.TryParse(itemToCraft, out int err))
                 throw NeitsilliaError.ReplyError($"If you are trying to craft an item using a schematic in your inventory, use ``~use {err}``.");
 
-            int countIndex = int.TryParse(itemToCraft[0], out int amount) ? 0 : int.TryParse(itemToCraft[^1], out amount) ? itemToCraft.Length - 1 : -1;
-            string itemname = StringM.UpperAt(ArrayM.ToKString(itemToCraft, " ", countIndex));
+            string itemname = itemToCraft;
+
             Player player = Context.Player;
             if (itemname == null)
                 await ReplyAsync($"{player.name} must enter the name of the schematic.");
@@ -382,7 +382,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             [Summary("Inventory slot number of the item to rename")]
             int slot,
             [Summary("New name")]
-            params string[] newItemName)
+            [Remainder] string newItemName)
         {
             slot--;
             Player p = Context.Player;

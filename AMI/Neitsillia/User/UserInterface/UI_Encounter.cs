@@ -84,7 +84,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     await player.Adventure.Display(player, reaction.Channel, true);
                     break;
                 case EUI.cancel:
-                    if (player.IsInAdventure) await player.Adventure.End(player, reaction.Channel);
+                    if (player.IsInAdventure) await player.Adventure.End(player, reaction.Channel, true);
                     else await GameCommands.StatsDisplay(player, reaction.Channel);
                     break;
             }

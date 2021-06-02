@@ -118,9 +118,8 @@ namespace AMI.Neitsillia.NeitsilliaCommands
 
         [Command("Create Party")]
         [Alias("cparty", "party create")]
-        public async Task Create_Party(params string[] name)
+        public async Task Create_Party([Remainder] string party_name)
         {
-            string partyName = ArrayM.ToString(name);
             Player player = Context.Player;
             if (player.Party != null)
             {
@@ -129,15 +128,15 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             }
             else if (player.IsEncounter("combat"))
                 await DUtils.Replydb(Context, $"You can't start a party while in combat.", lifetime: 1);
-            else if (name.Length < 1 || partyName.Length < 3 || partyName.Length > 30)
+            else if (party_name.Length < 3 || party_name.Length > 30)
                 await DUtils.Replydb(Context, $"Party name must be between 5 and 30 characters long.", lifetime: 1);
-            else if (!Regex.Match(partyName, @"^([a-zA-Z]|'|-|’|\s)+$").Success)
+            else if (!Regex.Match(party_name, @"^([a-zA-Z]|'|-|’|\s)+$").Success)
                 await DUtils.Replydb(Context, $"Party name must only contain A to Z, (-), ('), (’) and spaces.", lifetime: 1);
-            else if (AMYPrototype.Program.data.database.IdExists<Party, string>("Party", partyName.ToLower()))
+            else if (AMYPrototype.Program.data.database.IdExists<Party, string>("Party", party_name.ToLower()))
                 await DUtils.Replydb(Context, $"Party name already taken", lifetime: 1);
             else
             {
-                new Party(partyName, player);
+                new Party(party_name, player);
 
                 player.QuestTrigger(Items.Quests.Quest.QuestTrigger.QuestLine, "party");
 
@@ -330,7 +329,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
 
         [Command("Offer")]
         [Summary("Offer an item from your inventory to another user for a cost in Kutsyei Coins with an optional note.")]
-        public async Task Offer(string indexXamount, long cost, string user, params string[] notes)
+        public async Task Offer(string indexXamount, long cost, string user, [Remainder] string notes = null)
         {
             Player player = Context.Player;
             string prefix = Context.Prefix;
@@ -377,7 +376,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                     await player.NewUI(await ReplyAsync($"{Context.User.Mention}", 
                         embed: offer.Build()), MsgType.ConfirmOffer,
                         JsonConvert.SerializeObject(new string[] {index.ToString(), amount.ToString(),
-                    cost.ToString(), utarget.Id.ToString(), ArrayM.ToString(notes)}));
+                    cost.ToString(), utarget.Id.ToString(), notes}));
                 }
             }
             else await ReplyAsync("Selection invalid");

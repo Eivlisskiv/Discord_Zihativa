@@ -30,7 +30,7 @@ namespace AMI.Neitsillia.User.UserInterface
 {
     public partial class UI
     {
-        private static ReflectionCache<UI> reflectionCache = new ReflectionCache<UI>();
+        private static readonly ReflectionCache<UI> reflectionCache = new ReflectionCache<UI>();
 
         public ulong channelID;
         public ulong msgId;

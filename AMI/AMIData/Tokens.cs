@@ -18,6 +18,7 @@ namespace AMI.AMIData
 
         public Tokens() { }
 
-        internal static Tokens Load(string filepath) => Utils.JSONFromFile<Tokens>(filepath);
+        internal static Tokens Load(string filepath)
+            => Utils.JSONFromFile<Tokens>(filepath);
     }
 }

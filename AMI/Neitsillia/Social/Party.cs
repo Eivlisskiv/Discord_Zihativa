@@ -82,24 +82,21 @@ namespace AMI.Neitsillia.NeitsilliaCommands
 
         internal Player GetLeader() => members[0].LoadPlayer();
 
-        internal async Task UpdateUI(Player current, IMessageChannel chan, MsgType type, string data, bool edit, string content, Embed embed)
+        internal async Task UpdateUI(Player current, IMessageChannel chan, MsgType type, string data, bool edit, 
+            string content, Embed embed, Func<Player, string> getData = null)
         {
-            IUserMessage msg = await current.EnUI(edit, content, embed, chan, type, data);
-            foreach (PartyMember member in members)
-            {
-                if(current.userid != member.id)
-                    member.LoadPlayer().SetUI(msg, type, data);
-            }
+            await current.EnUI(edit, content, embed, chan, type, data);
+            UpdateUI(current, getData);
         }
 
-        internal void UpdateUI(Player current, IUserMessage msg, MsgType type, string data = null)
+        internal void UpdateUI(Player leader, Func<Player, string> data = null)
         {
             foreach (PartyMember member in members)
             {
-                ((current.userid != member.id) ?
-                    member.LoadPlayer()
-                    : current
-                ).SetUI(msg, type, data);
+                if (leader.userid == member.id) continue;
+
+                Player player = member.LoadPlayer();
+                player.SetUI(leader.ui, data != null ? data(player) : null);
             }
         }
 

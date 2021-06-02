@@ -278,7 +278,7 @@ namespace AMYPrototype.Commands
                     {
                         await context.Channel.SendMessageAsync($"`{result.ErrorReason}` {Environment.NewLine}" +
                             $"Type `{context.Prefix}chelp {method.Name}` for more details",
-                            embed:new AMI.CommandsHandler.CommandInfoEmbed(method, true).Embed);
+                            embed:new AMI.CommandsHandler.CommandInfoEmbed(method, context.Prefix, true).Embed);
                     }
                     return true;
                 default:

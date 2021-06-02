@@ -240,7 +240,7 @@ namespace AMI.Module
         }
         [Command("Mod-Sheet")]
         [Alias("msheet", "mod sheet")]
-        public async Task ModSheet(string property, params string[] value)
+        public async Task ModSheet(string property, [Remainder] string value)
         {
             const int maxChar = 350;
             Player player = Player.Load(Context.User.Id, Player.IgnoreException.Resting);
@@ -327,10 +327,10 @@ namespace AMI.Module
         //Abilities
         [Command("Abilities")][Alias("ab", "ability", "ainfo", "abilityinfo")]
         [Summary("Displays the character's abilities. Enter a ability name to view more details on a specific ability")]
-        public async Task Abilities(params string[] abilityName)
+        public async Task Abilities([Remainder] string abilityName)
         => await AbilityInfo(abilityName);
 
-        public async Task AbilityInfo(params string[] arg)
+        public async Task AbilityInfo([Remainder] string arg)
         {
             Player player = Context.GetPlayer(Player.IgnoreException.Resting);
             if (arg.Length < 1) await Abilities(player, Context.Channel);

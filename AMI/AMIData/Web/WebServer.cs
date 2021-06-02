@@ -19,7 +19,7 @@ namespace AMI.AMIData.Webhooks
 {
     public class WebServer
     {
-        static AMIData.MongoDatabase Database => AMYPrototype.Program.data.database;
+        static MongoDatabase Database => Program.data.database;
         static IConfigurationRoot CreateConfig()
             => new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())

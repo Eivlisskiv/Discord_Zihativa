@@ -180,6 +180,7 @@ namespace AMI.Neitsillia.Combat
                             player.Area.GeneratePath(false) + player.Area.parent, null),
                             player.AreaInfo.floor);
                     }
+                    player.duel = null;
                     player.SaveFileMongo();
                 }
                 else
@@ -278,8 +279,7 @@ namespace AMI.Neitsillia.Combat
 
             if (!player.IsSolo)
             {
-                player.Party.UpdateUI(player, reply,
-                    resultType, abilityName);
+                player.Party.UpdateUI(player, p => p.duel.abilityName);
             }
         }
 
@@ -349,8 +349,7 @@ namespace AMI.Neitsillia.Combat
         static double SneakattackMultiplier(int attackerAgi, int defenderAgi)
         {
             double crit = ((defenderAgi - attackerAgi) / 100) + 1;
-            if (crit > 1.5)
-                return 1.5;
+            if (crit > 1.5) return 1.5;
             return crit;
         }
 
@@ -368,7 +367,7 @@ namespace AMI.Neitsillia.Combat
                     Player p = m.id == player.userid ? player : m.LoadPlayer();
 
                     PerkLoad.CheckPerks(p, Perk.Trigger.EndFight, p);
-                    if(player.duel != null) player.duel.abilityName = null;
+                    player.duel = null;
                     p.SaveFileMongo();
                 }
 
@@ -504,7 +503,7 @@ namespace AMI.Neitsillia.Combat
 
             IUserMessage reply = await ReplyAsync(embed: player.Encounter.GetEmbed().Build());
             if (player.IsSolo) await player.NewUI(reply, MsgType.Combat);
-            else player.Party.UpdateUI(player, reply, MsgType.Combat);
+            else player.Party.UpdateUI(player, null);
         }
 
     }

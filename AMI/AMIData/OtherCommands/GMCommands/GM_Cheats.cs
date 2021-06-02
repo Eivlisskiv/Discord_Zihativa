@@ -116,11 +116,11 @@ namespace AMI.AMIData.OtherCommands
         }
 
         [Command("Grant Upgraded Gear"), Alias("grantug")]
-        public async Task GrantUpgradedGear(IUser user, int tier, params string[] namearg)
+        public async Task GrantUpgradedGear(IUser user, int tier, [Remainder] string namearg)
         {
             if (await IsGMLevel(4))
             {
-                Item item = Item.LoadItem(ArrayM.ToUpString(namearg));
+                Item item = Item.LoadItem(StringM.UpperAt(namearg));
                 if (tier > item.tier)
                     item.Scale(tier);
 
@@ -136,7 +136,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Schematic")]
         [Alias("grants")]
-        public async Task Grant_Schem(IUser user, params string[] argName)
+        public async Task Grant_Schem(IUser user, [Remainder] string argName)
         {
             if (await IsGMLevel(3))
             {
@@ -168,7 +168,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Temporary Schematic")]
         [Alias("grantts")]
-        public async Task GrantTempSchem(IUser user, params string[] argName)
+        public async Task GrantTempSchem(IUser user, [Remainder] string argName)
         {
             if (await IsGMLevel(3))
             {
@@ -230,7 +230,7 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Perk")]
         [Alias("grantp")]
-        public async Task Grant_Perk(IUser user, params string[] argName)
+        public async Task Grant_Perk(IUser user, [Remainder] string argName)
         {
             if (await IsGMLevel(3))
             {

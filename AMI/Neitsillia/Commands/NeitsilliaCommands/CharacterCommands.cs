@@ -31,14 +31,22 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         [Command("New Character")]
         [Alias("Create Character", "New Char", "Create Char")]
         public async Task StartGame(
-            [Summary("The name for your character. If empty, will take your discord username.")]
-            params string[] paramName)
+            [Summary("The name for your character. If empty, will take your discord username. " +
+            "If your discord username is not valid, it will use a random name")]
+            [Remainder] string character_name = null)
         {
             string charname = null;
             ulong playerID = Context.User.Id;
-            if (paramName.Length == 0)
-                charname = Context.User.Username;
-            else if (paramName[0] == "~rng")
+            if (character_name == null)
+            {
+                character_name = Regex.Replace(Context.User.Username, @"[^a-zA-Z'\-’\s]", "");
+                if (character_name == null || character_name.Length < 2)
+                    character_name = "~rng";
+                else if (character_name.Length > 28) 
+                    character_name = character_name.Substring(0, 28);
+            }
+
+            if (character_name.ToLower() == "~rng")
             {
                 charname = RandomName.ARandomName();
                 if (Program.rng.Next(3) == 0)
@@ -46,13 +54,14 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 if (Program.rng.Next(5) == 0)
                     charname += " " + RandomName.ARandomName();
             }
-            else charname = ArrayM.ToString(paramName, " ");
+            else charname = character_name;
 
-            if (Context.User.Id != 201875246091993088 && IllegalNames.Contains(charname.ToLower())) throw NeitsilliaError.ReplyError($"The name {charname} is not allowed, you fool.");
+            if (Context.User.Id != 201875246091993088 && IllegalNames.Contains(charname.ToLower())) 
+                throw NeitsilliaError.ReplyError($"The name {charname} is not allowed, you fool.");
 
             List<Player> characters = BotUser.GetCharFiles(playerID);
 
-            Match nameResult = Regex.Match(charname, @"^([a-zA-Z]|'|-|’|\s)+$");
+            Match nameResult = Regex.Match(charname, @"^(\w|'|-|’|\s)+$");
             int maxChar = ReferenceData.maxCharacterCount + Context.BotUser.membershipLevel;
             if (characters.Count >= maxChar)
                 DUtils.DeleteMessage(await ReplyAsync($"You may not have more than {maxChar} characters"), 1);
@@ -60,7 +69,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
                 DUtils.DeleteMessage(await ReplyAsync("Name must only contain A to Z, (-), ('), (’) and spaces"), 1);
             else if (charname.Length < 2 || charname.Length > 28)
                 DUtils.DeleteMessage(await ReplyAsync("Name must be 2 to 28 characters"), 1);
-            else if (characters.Find((x) => x.name.ToLower().Equals(charname.ToLower())) != null) //charname, StringComparer.OrdinalIgnoreCase))
+            else if (characters.Find((x) => x.name.ToLower().Equals(charname.ToLower())) != null)
                 DUtils.DeleteMessage(await ReplyAsync("Character name already used."), 1);
             else
             {
@@ -399,9 +408,9 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         [Alias("delchar", "delete", "deletechar")]
         public async Task DeleteChar(
             [Summary("The name of the character to delete. If empty, delete current character")]
-            params string[] args)
+            [Remainder] string character_name = null)
         {
-            string charName = ArrayM.ToString(args) ?? Context.BotUser.loaded ?? throw NeitsilliaError.ReplyError("No character name entered.");
+            string charName = character_name ?? Context.BotUser.loaded ?? throw NeitsilliaError.ReplyError("No character name entered.");
             List<Player> list = BotUser.GetCharFiles(Context.User.Id);
             string found = list.Find(x => x.name.ToLower().Equals(charName.ToLower()))?.name ?? null;
             if (found != null)
@@ -416,9 +425,9 @@ namespace AMI.Neitsillia.NeitsilliaCommands
         [Alias("LoadChar", "Load")]
         public async Task LoadCharacter(
             [Summary("Name of the character to load")]
-            params string[] charname)
+            [Remainder] string character_name)
         {
-            string res = Context.BotUser.ChangeCharacter(ArrayM.ToString(charname) ?? throw NeitsilliaError.ReplyError("No character name entered."));
+            string res = Context.BotUser.ChangeCharacter(character_name, Context.Prefix);
             await DUtils.Replydb(Context, res);
         }
     }

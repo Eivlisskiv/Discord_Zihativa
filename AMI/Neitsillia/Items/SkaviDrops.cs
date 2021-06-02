@@ -45,8 +45,11 @@ namespace AMI.Neitsillia.Items
 
         public static Item DropSchematic(string category)
         {
-            if((Program.Chance(50) && (Category.TryGetValue(category, out string[] drops))) 
-                || (drops = Universals).Length > 0)
+            if (category == null || Program.Chance(50) ||
+                !Category.TryGetValue(category, out string[] drops))
+                drops = Universals;
+
+            if(drops?.Length > 0)
             {
                 try
                 {

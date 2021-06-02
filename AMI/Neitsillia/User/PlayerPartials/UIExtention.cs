@@ -28,7 +28,6 @@ namespace AMI.Neitsillia.User.PlayerPartials
             MsgType argType, string argdata = null)
         {
             if (ui == null) ui = new UI(await chan.SendMessageAsync(content, embed: embed), argType, this, argdata);
-
             else await ui.Edit(this, content, embed, argType, argdata, !IsKeepReactions(ui, argType, argdata));
 
             SaveFileMongo();
@@ -66,9 +65,11 @@ namespace AMI.Neitsillia.User.PlayerPartials
             }
         }
 
-        public void SetUI(IUserMessage msg, MsgType type, string data)
+        public void SetUI(UI ui, string data)
         {
-            ui = new UI(msg, type, this, data, false);
+            this.ui = ui;
+            this.ui.data = data;
+
             SaveFileMongo();
         }
 

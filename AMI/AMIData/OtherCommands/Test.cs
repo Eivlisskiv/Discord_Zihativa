@@ -115,12 +115,13 @@ namespace AMI.AMIData.OtherCommands
             Ability ability = Ability.Load(StringM.UpperAt(arg), level);
             await ReplyAsync(embed: ability.InfoPage(new EmbedBuilder(), true).Build());
         }
+
         [Command("Enemy Level")]
-        public async Task EnemyLevel(int level, params string[] args)
+        public async Task EnemyLevel(int level, [Remainder] string enemy_name)
         {
             Context.AdminCheck();
 
-            string name = StringM.UpperFormat(args);
+            string name = StringM.UpperFormat(enemy_name);
             NPC mob = NPC.GenerateNPC(level, name);
             await (mob == null ? ReplyAsync("Creature not found") :
             ReplyAsync(embed: mob.StatEmbed().Build()));

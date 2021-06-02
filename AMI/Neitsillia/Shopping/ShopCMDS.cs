@@ -13,9 +13,12 @@ using Discord.WebSocket;
 using AMI.Neitsillia.Items.ItemPartials;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AMI.Module
 {
+    [Name("Trading")]
     public class ShopCommands : ModuleBase<CustomCommandContext>
     {
         public static EmbedBuilder AllShops(EmbedBuilder embed)
@@ -41,30 +44,58 @@ namespace AMI.Module
         {
             if (player.Encounter != null && player.Encounter.IsNPC())
             {
-                NPC n = player.Encounter.npc;
-                page = Verify.MinMax(page, (n.inventory.Count/15) + 1, 1);
-                if (n.profession == ReferenceData.Profession.Creature)
-                    await chan.SendMessageAsync("You may not trade with a creature");
-                else if (n.inventory != null && n.inventory.Count > 0)
-                {
-                    string itemList = null;
-                    for (int i = ((page - 1) * 15); i < n.inventory.Count && i < (page*15); i++)
-                    {
-                        var inst = n.inventory.inv[i];
-                        itemList += $"{i+1}|{inst} {inst.item.CompareTo(player.equipment)}| " +
-                            $"{GetPrice(inst.item.GetValue(),n.stats.PriceMod(),player.stats.PriceMod(), -1)}" +
-                            $"~~K~~" + Environment.NewLine;
-                    }
-
-                    EmbedBuilder embed = new EmbedBuilder();
-                    embed.WithTitle($"{n.name}'s Inventory");
-                    embed.WithDescription(itemList);
-
-                    await player.EnUI(edit, null, embed.Build(), chan, MsgType.NPCInv, page.ToString());
-                }
-                else await chan.SendMessageAsync($"```{Dialog.GetDialog(n, Dialog.nothingToSell)}```");
+                await ViewTradeInventory(player, chan, page, edit);
+                return;
             }
-            else await chan.SendMessageAsync("You are not in an interaction.");
+
+            await chan.SendMessageAsync("You are not in an interaction.");
+        }
+
+        private static async Task ViewTradeInventory(Player player, ISocketMessageChannel chan, int page, bool edit)
+        {
+            NPC n = player.Encounter.npc;
+            page = Verify.MinMax(page, (n.inventory.Count / 15) + 1, 1);
+            if (n.profession == ReferenceData.Profession.Creature)
+            {
+                await chan.SendMessageAsync("You may not trade with a creature");
+                return;
+            }
+            else if (n.inventory != null && n.inventory.Count > 0)
+            {
+                EmbedBuilder embed = ListItems(player, page, n);
+
+                await player.EnUI(edit, null, embed.Build(), chan, MsgType.NPCInv, page.ToString());
+                return;
+            }
+
+            await chan.SendMessageAsync($"```{Dialog.GetDialog(n, Dialog.nothingToSell)}```");
+            return;
+        }
+
+        private static EmbedBuilder ListItems(Player player, int page, NPC n)
+        {
+            List<string> itemList = new List<string>();
+            string current = null;
+            for (int i = ((page - 1) * 15); i < n.inventory.Count && i < (page * 15); i++)
+            {
+                StackedItems inst = n.inventory.inv[i];
+                current += $"{i + 1}|{inst} {EUI.ItemType(inst.item.type)}{inst.item.CompareTo(player.equipment)}| " +
+                    $"{GetPrice(inst.item.GetValue(), n.stats.PriceMod(), player.stats.PriceMod(), -1)}" +
+                    $"Kuts" + Environment.NewLine;
+
+                if (current.Length > 1000)
+                {
+                    itemList.Add(current);
+                    current = null;
+                }
+            }
+
+            itemList.Add(current);
+
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.WithTitle($"{n.name}'s Inventory");
+            embed.Fields = itemList.Select(s => DUtils.NewField("Items", s)).ToList();
+            return embed;
         }
 
         [Command("InspectNpcItem")]

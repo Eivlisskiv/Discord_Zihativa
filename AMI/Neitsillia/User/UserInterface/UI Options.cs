@@ -208,8 +208,7 @@ namespace AMI.Neitsillia.User.UserInterface
                     {
                         options = new List<string>
                         {
-                            ability,
-                         help
+                            ability, help
                         };
                         if (player != null)
                         {

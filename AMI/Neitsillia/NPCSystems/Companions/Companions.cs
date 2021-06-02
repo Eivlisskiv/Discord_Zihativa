@@ -30,7 +30,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions
         }
 
         [Command("Pet")][Alias("Pets")]
-        public async Task PetCommand(string action = "view", int slot = 0, params string[] arguments)
+        public async Task PetCommand(string action = "view", int slot = 0, [Remainder] string arguments = null)
         {
             Player player = Context.Player;
             slot--;
@@ -44,7 +44,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions
                 case "name":
                 case "rename":
                     if (slot < 0 || slot >= player.PetList.Count) throw NeitsilliaError.ReplyError("Please enter a valid slot for the pet you wish to rename: `~pet rename 1 \"Mister Paw\"");
-                    if (arguments.Length < 1) throw NeitsilliaError.ReplyError($"Please enter a name for the pet you wish to rename: `~pet rename {slot} \"Mister Paw\"");
+                    if (arguments == null || arguments.Length < 1) throw NeitsilliaError.ReplyError($"Please enter a name for the pet you wish to rename: `~pet rename {slot} \"Mister Paw\"");
                     if (player.PetList[slot].status != Pet.PetStatus.Idle) throw NeitsilliaError.ReplyError($"Pet must be [Idle] to do that");
 
                     player.PetList[slot].pet.displayName = string.Join(" ", arguments);

@@ -133,7 +133,7 @@ namespace AMI.Neitsillia.Adventures
 
             if (player.health > 0 && !ended)
                 await player.EnUI(edit, null, ToEmbed(looted, true).Build(), chan, MsgType.Adventure);
-            else await End(player, chan);
+            else await End(player, chan, edit);
         }
 
         EmbedBuilder ToEmbed((int nloot, long nxp, long koins)? looted, bool addLooted = false)
@@ -207,41 +207,50 @@ namespace AMI.Neitsillia.Adventures
             return $"[{(hours < 10 ? $"0{hours}" : hours.ToString())}:{(minutes < 10 ? $"0{minutes}" : minutes.ToString())}]";
         }
 
-        public async Task End(Player player, IMessageChannel chan)
+        public async Task End(Player player, IMessageChannel chan, bool edit)
         {
             await player.AdventureKey.Delete();
             player.AdventureKey = null;
 
+            player.ui = null;
+
             if (player.health > 0)
             {
-                await chan.SendMessageAsync($"{player.name}'s Adventure ended. Experience points and Coins were automatically collected");
-
-                player.KCoins += coins;
-                player.XpGain(xp);
-
-                if (loot > 0 || quest != null)
-                {
-                    Encounter enc = player.NewEncounter(Encounter.Names.Loot, true);
-
-                    int level = player.Area.level;
-                    if(quest != null) enc.loot.Add(quest.Loot(level), -1);
-                    for (int i = 0; i < loot; i++)
-                    {
-                        Item item = Item.RandomItem(level * 5);
-                        enc.loot.Add(item, item.type == Item.IType.Healing ? Rng.Next(3, 6) : 1, -1);
-                    }
-
-                    await InventoryCommands.Inventory.ViewLoot(player, chan, 0, true);
-                }
-                else
-                    await GameCommands.StatsDisplay(player, chan);
+                await AdventureSuccess(player, chan);
+                return;
             }
-            else
+
+            await player.Respawn(false);
+            
+            await chan.SendMessageAsync($"{player.name} has fallen during their adventure, losing all loot.",
+                embed: ToEmbed((-loot, -xp, -coins)).Build());
+            player.SaveFileMongo();
+        }
+
+        private async Task AdventureSuccess(Player player, IMessageChannel chan)
+        {
+            await chan.SendMessageAsync($"{player.name}'s Adventure ended. Experience points and Coins were automatically collected");
+
+            player.KCoins += coins;
+            player.XpGain(xp);
+
+            if (loot > 0 || quest != null)
             {
-                await player.Respawn(false);
-                await player.ui.EditMessage($"{player.name} has fallen during their adventure, losing all loot.", ToEmbed((-loot, -xp, -coins)).Build(), chan);
-                player.SaveFileMongo();
+                Encounter enc = player.NewEncounter(Encounter.Names.Loot, true);
+
+                int level = player.Area.level;
+                if (quest != null) enc.loot.Add(quest.Loot(level), -1);
+                for (int i = 0; i < loot; i++)
+                {
+                    Item item = Item.RandomItem(level * 5);
+                    enc.loot.Add(item, item.type == Item.IType.Healing ? Rng.Next(3, 6) : 1, -1);
+                }
+
+                await InventoryCommands.Inventory.ViewLoot(player, chan, 0, false);
+                return;
             }
+            
+            await GameCommands.StatsDisplay(player, chan);
         }
 
         string GetEncounter(int mult, ref (int l, long x, long c) looted)

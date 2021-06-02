@@ -207,7 +207,9 @@ namespace AMI.Neitsillia.InventoryCommands
             List<int> indexes = Enumerable.Range(0, player.inventory.Count).Where(i =>
             {
                 Item item = player.inventory.GetItem(i);
-                return item.type == slot && player.IsRequiredLevel(item.tier);
+                return item.type == slot &&
+                       item.condition > 0 &&
+                       player.IsRequiredLevel(item.tier);
 
             }).ToList();
 
@@ -299,7 +301,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 case "chest": type = Item.IType.Chest; break;
                 case "jewelry":
                     type = Item.IType.Jewelry;
-                    slot = Verify.MinMax(slot + 5, 7, 0); break;
+                    slot = Verify.MinMax(slot, 3, 1); break;
                 case "trousers": 
                     type = Item.IType.Trousers;
                     break;
@@ -367,7 +369,7 @@ namespace AMI.Neitsillia.InventoryCommands
         ////    
         [Command("ItemInfo")]
         [Summary("Get the info on an item from its name.")]
-        public async Task ItemInfo(params string[] itemName)
+        public async Task ItemInfo([Remainder] string itemName)
         {
             string message;
             string name = StringM.UpperAt(ArrayM.ToString(itemName, " "));
@@ -475,7 +477,15 @@ namespace AMI.Neitsillia.InventoryCommands
             while (index > -1 && player.health < mhp)// While has healing item and health not full
             {
                 //Consume and write information
-                embed.AddField(Consume(player, player.inventory.GetItem(index), player.inventory.GetCount(index), out int ate));
+                var field = Consume(player, player.inventory.GetItem(index), player.inventory.GetCount(index), out int ate);
+
+                if(embed.Fields.Count >= 24)
+                {
+                    await ReplyAsync(embed: embed.Build());
+                    embed = DUtils.BuildEmbed(player.name, color: player.userSettings.Color);
+                }
+
+                embed.AddField(field);
                 //Remove what was consumed
                 player.inventory.Remove(index, ate);
                 //Search for next healing item
@@ -875,6 +885,7 @@ namespace AMI.Neitsillia.InventoryCommands
             await ViewLoot(Context.Player, Context.Channel, page - 1);
             await DUtils.DeleteContextMessageAsync(Context);
         }
+
         internal static async Task ViewLoot(Player player, IMessageChannel chan, int page, bool isEdit = false)
         {
             if (player.Encounter == null || player.Encounter.loot == null || player.Encounter.loot.Count <= 0)
@@ -894,8 +905,8 @@ namespace AMI.Neitsillia.InventoryCommands
             }
         }
         [Command("Loot")]
-        public async Task CollectLoot(string arg = "all")
-            => await CollectLoot(Context.Player, Context.Channel, arg);
+        public async Task CollectLoot(string loot_target = "all")
+            => await CollectLoot(Context.Player, Context.Channel, loot_target);
         internal static async Task CollectLoot(Player player, ISocketMessageChannel chan, string arg = "all")
         {
             int index, amount;
@@ -935,6 +946,8 @@ namespace AMI.Neitsillia.InventoryCommands
                 {
                     var ia = Verify.IndexXAmount(arg);
                     index = ia.index - 1;
+                    if (index < 0) return;
+
                     amount = ia.amount;
                     index = Verify.Max(index, enc.loot.Count - 1);
                     amount = Verify.MinMax(amount, enc.loot.GetCount(index), 1);
