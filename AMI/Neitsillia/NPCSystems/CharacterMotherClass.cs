@@ -450,7 +450,7 @@ namespace AMI.Neitsillia.NPCSystems
             {
                 if (i != 1)
                 {
-                    Item gear = this.equipment.GetGear(i);
+                    Item gear = equipment.GetGear(i);
                     if (gear != null)
                         str += start + gear.ToString() + Environment.NewLine;
                     else if(!(this is NPC n) || n.HasGearSlot(i))

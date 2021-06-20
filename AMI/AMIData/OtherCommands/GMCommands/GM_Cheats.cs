@@ -136,11 +136,11 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Schematic")]
         [Alias("grants")]
-        public async Task Grant_Schem(IUser user, [Remainder] string argName)
+        public async Task Grant_Schem(IUser user, [Remainder] string name)
         {
             if (await IsGMLevel(3))
             {
-                string schemName = StringM.UpperAt(ArrayM.ToString(argName));
+                string schemName = StringM.UpperAt(name);
                 Item item = Item.LoadItem(schemName);
                 if (item.type != Item.IType.notfound)
                 {
@@ -168,11 +168,11 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Temporary Schematic")]
         [Alias("grantts")]
-        public async Task GrantTempSchem(IUser user, [Remainder] string argName)
+        public async Task GrantTempSchem(IUser user, [Remainder] string name)
         {
             if (await IsGMLevel(3))
             {
-                Item item = Item.NewTemporarySchematic(ArrayM.ToString(argName));
+                Item item = Item.NewTemporarySchematic(name);
                 if (item == null)
                     await ReplyAsync("Item Not Found");
                 else if (HasFuel(item.tier, 2).Result)
@@ -230,11 +230,11 @@ namespace AMI.AMIData.OtherCommands
         }
         [Command("Grant Perk")]
         [Alias("grantp")]
-        public async Task Grant_Perk(IUser user, [Remainder] string argName)
+        public async Task Grant_Perk(IUser user, [Remainder] string name)
         {
             if (await IsGMLevel(3))
             {
-                string perkName = StringM.UpperAt(ArrayM.ToString(argName));
+                string perkName = StringM.UpperAt(name);
                 Player p = Player.Load(user.Id, Player.IgnoreException.All);
                 int i = p.HasPerk(perkName);
                 if (i == -1)

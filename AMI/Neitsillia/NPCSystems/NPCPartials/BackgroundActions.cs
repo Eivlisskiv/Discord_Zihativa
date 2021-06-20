@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.NPCSystems
 {
-    partial class NPC
+    public partial class NPC
     {
         private static string GetTime => $"[{DateTime.UtcNow.TimeOfDay:hh\\:mm}]";
 
@@ -64,50 +64,50 @@ namespace AMI.Neitsillia.NPCSystems
             if (health + (Health() * 0.1) < Health()) Healing(Convert.ToInt32(Health() * 0.1));
             else Healing(1);
         }
+
         async Task<(bool explored, bool remove)> Explore(Area area)
         {
-            if (area.eLootRate == 0 && area.eMobRate == 0)
-                return (false, false);
-            else
+            if (area.eLootRate == 0 && area.eMobRate == 0) return (false, false);
+
+            Random rng = new Random();
+            int x = rng.Next(101);
+            if (x <= area.eLootRate)
             {
-                Random rng = new Random();
-                int x = rng.Next(101);
-                if (x <= area.eLootRate)
-                {
-                    int t = ArrayM.IndexWithRates(area.loot.Length, rng);
-                    AddItemToInv(SpawnItem(area.loot[t][ArrayM.IndexWithRates(area.loot[t].Length, rng)]));
-                    KCoins += rng.Next(1 + Rank());
+                int t = ArrayM.IndexWithRates(area.loot.Length, rng);
+                AddItemToInv(SpawnItem(area.loot[t][ArrayM.IndexWithRates(area.loot[t].Length, rng)]));
+                KCoins += rng.Next(1 + Rank());
 
-                    _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** found loot in {area.name}");
+                _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** found loot in {area.name}");
 
-                    return (true, false);
-                }
-                else if (false && x <= area.eMobRate + (area.eLootRate))
-                {
-                    //To fix
-                    x = rng.Next(11);
-                    var bounties = area.GetPopulation(Population.Type.Bounties);
-                    NPC mob = null;
-                    if (x <= 2 && bounties != null && bounties.Count > 0)
-                        mob = bounties.Random();
-                    else
-                    {
-                        int rtier = ArrayM.IndexWithRates(area.mobs.Length, rng);
-                        mob = GenerateNPC(area.level, area.mobs[rtier][ArrayM.IndexWithRates(area.mobs[rtier].Count, rng)]);
-                    }
-                    if (mob.displayName == displayName)
-                        return (false, false);
-                }
-                else if (health < Health())
-                {
-                    health++;
-                    _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** found nothing while exploring {area.name}");
-                    return (true, false);
-                }
-
-                return (false, false);
+                return (true, false);
             }
+            else if (false && x <= area.eMobRate + (area.eLootRate))
+            {
+                //To fix
+                x = rng.Next(11);
+                var bounties = area.GetPopulation(Population.Type.Bounties);
+                NPC mob = null;
+                if (x <= 2 && bounties != null && bounties.Count > 0)
+                    mob = bounties.Random();
+                else
+                {
+                    int rtier = ArrayM.IndexWithRates(area.mobs.Length, rng);
+                    mob = GenerateNPC(area.level, area.mobs[rtier][ArrayM.IndexWithRates(area.mobs[rtier].Count, rng)]);
+                }
+                if (mob.displayName == displayName)
+                    return (false, false);
+            }
+            else if (health < Health())
+            {
+                health++;
+                _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** found nothing while exploring {area.name}");
+                return (true, false);
+            }
+
+            return (false, false);
+
         }
+
         void Work(Area area, int multiplier)
         {
             if (area.type == AreaType.Tavern) GetsAProfession(ReferenceData.Profession.Tapster);
@@ -225,6 +225,8 @@ namespace AMI.Neitsillia.NPCSystems
                 Random r = Program.rng;
 
                 Area toTravel = Area.LoadArea(area.junctions[r.Next(area.junctions.Count)].filePath);
+
+                if (!toTravel.IsExplorable) return false;
 
                 int rank = Rank() / 5;
 

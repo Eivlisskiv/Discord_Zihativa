@@ -52,11 +52,11 @@ namespace AMI.Neitsillia.Commands
         #region Entering
         [Command("Enter")]
         [Summary("Enter the specified area if available.")]
-        public async Task Enter([Remainder] string args)
+        public async Task Enter([Remainder] string name)
         {
-            if (args.Length > 0)
+            if (name != null)
             {
-                string areaName = StringM.UpperAt(ArrayM.ToString(args, " "));
+                string areaName = StringM.UpperAt(name);
                 Player player = Context.Player;
                 await Enter(player, areaName, Context.Channel);
                 await DUtils.DeleteContextMessageAsync(Context);
@@ -459,7 +459,14 @@ namespace AMI.Neitsillia.Commands
         }
         internal static async Task AdventureStat(Player player, IMessageChannel chan)
         {
+            if (player.IsInAdventure)
+            {
+                await player.Adventure.Display(player, chan, false);
+                return;
+            }
+
             if (player.level < 0) throw NeitsilliaError.ReplyError("You must first complete your character");
+
             if (player.Encounter != null && player.Encounter.IsCombatEncounter())
                 DUtils.DeleteMessage(await chan.SendMessageAsync("You may not Adventure while in combat"));
             else if (player.Party != null)
@@ -468,7 +475,6 @@ namespace AMI.Neitsillia.Commands
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"You may not freely Adventure in this {player.Area.type}."));
             else if (player.Area.IsNonHostileArea())
                 DUtils.DeleteMessage(await chan.SendMessageAsync($"There are no Adventures in this {player.Area.type}."));
-            else if (player.IsInAdventure) await player.Adventure.Display(player, chan, false);
             else await Adventures.Adventure.SelectType(player, chan);
         }
 
@@ -492,12 +498,12 @@ namespace AMI.Neitsillia.Commands
         #region StrongHolds
         [Command("Create Stronghold")]
         [Summary("Create a new stronghold near your current area. Your current area and floor level will become requirements to access the area.")]
-        public async Task Request_Stronghold(int size, [Remainder] string areaCustomName)
+        public async Task Request_Stronghold(int size, [Remainder] string area_custom_name)
         {
             Player player = Context.Player;
             int junctedStrongholds = 0;
             long cost = 0;
-            string strongholdName = StringM.UpperAt(ArrayM.ToString(areaCustomName));
+            string strongholdName = StringM.UpperAt(area_custom_name);
             size = Verify.MinMax(size, 5, 1);
             if (Context.User.Id != 201875246091993088)
                 await DUtils.Replydb(Context, $"This WIP content is currently unavailable.");

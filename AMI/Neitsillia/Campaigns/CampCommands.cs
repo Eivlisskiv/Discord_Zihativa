@@ -12,7 +12,7 @@ namespace AMI.Module
         
         /*[Command("New Campaign")]
         [Alias("ncampg")]//*/
-        public async Task New_Campaign(params string[] arg)
+        public async Task New_Campaign([Remainder] string arg)
         {
             if(IsGMLevel(0).Result)
             {
@@ -21,7 +21,7 @@ namespace AMI.Module
                     await ReplyAsync("You are already hosting a campaign");
                 else
                 {
-                    string name = StringM.UpperAt(ArrayM.ToString(arg));
+                    string name = StringM.UpperAt(arg);
                     Campaign campaign = Campaign.Load(name);
                     if(campaign == null && IsGMLevel(3).Result)
                     {

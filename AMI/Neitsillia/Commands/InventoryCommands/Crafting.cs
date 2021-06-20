@@ -382,7 +382,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             [Summary("Inventory slot number of the item to rename")]
             int slot,
             [Summary("New name")]
-            [Remainder] string newItemName)
+            [Remainder] string new_item_name)
         {
             slot--;
             Player p = Context.Player;
@@ -392,11 +392,11 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
                 DUtils.DeleteMessage(await ReplyAsync("Invalid selection"), 0.5);
             else if (item.tier - item.baseTier <= 10)
                 DUtils.DeleteMessage(await ReplyAsync("Gear may only be renamed once they reach more than 10 ranks above their base rank."), 0.5);
-            else if (newItemName.Length < 1)
+            else if (new_item_name.Length < 1)
                 DUtils.DeleteMessage(await ReplyAsync($"You must enter a new name for your item: `{prefix}IRename #slot newItemName"), 0.5);
             else
             {
-                string rename = StringM.UpperFormat(ArrayM.ToString(newItemName));
+                string rename = StringM.UpperFormat(new_item_name);
                 if (rename == null)
                     DUtils.DeleteMessage(await ReplyAsync($"You must enter a new item name: ``{prefix}iRename 13 The Slayer``"), 0.5);
                 else if (rename.Length > 30)

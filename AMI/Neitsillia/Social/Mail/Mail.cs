@@ -137,9 +137,12 @@ namespace AMI.Neitsillia.Social.Mail
             Task.Run(async () =>
             {
                 var user = DiscordBotHandler.Client.GetUser(receiver);
-                var dms = await user.GetOrCreateDMChannelAsync();
-                await dms.SendMessageAsync("I've been looking for you. Got something I'm supposed to deliver - your hands only." +
-                    Environment.NewLine + " Use the `mail` command to view your mail.", embed: ToEmbed().Build());
+                if (user != null)
+                {
+                    var dms = await user.GetOrCreateDMChannelAsync();
+                    await dms.SendMessageAsync("I've been looking for you. Got something I'm supposed to deliver - your hands only." +
+                        Environment.NewLine + " Use the `mail` command to view your mail.", embed: ToEmbed().Build());
+                }
             });
         }
 

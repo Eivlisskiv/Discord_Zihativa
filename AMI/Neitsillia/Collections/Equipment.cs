@@ -59,7 +59,7 @@ namespace AMI.Neitsillia.Collections
                 case 5:
                 case 6:
                 case 7:
-                    return $"Jewelry {i - 5}";
+                    return $"Jewelry {i - 4}";
                 case 8: return "Trousers";
                 case 9: return "Boots";
                 default: return null;

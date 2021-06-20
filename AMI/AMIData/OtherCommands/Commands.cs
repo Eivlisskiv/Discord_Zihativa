@@ -103,7 +103,7 @@ namespace AMI.AMIData.OtherCommands
         {
             EmbedBuilder em = new EmbedBuilder
             { Title = Context.User.Username + "'s Roll" };
-            string abilityName = StringM.UpperAt(ArrayM.ToString(message));
+            string abilityName = StringM.UpperAt(message);
             Player player = Player.Load(Context.User.Id, Player.IgnoreException.All);
             if (player.HasAbility(abilityName, out int index))
                 em = AbilityRoll(index, player, player.UserEmbedColor(em));

@@ -216,6 +216,7 @@ namespace AMI.Neitsillia.Adventures
 
             if (player.health > 0)
             {
+                if(!edit) await player.EnUI(edit, null, ToEmbed(null, true).Build(), chan, MsgType.Adventure);
                 await AdventureSuccess(player, chan);
                 return;
             }

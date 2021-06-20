@@ -7,7 +7,7 @@ namespace AMI.Neitsillia
     {
         public static string GeneralPatchNotes()
         {
-            return null;
+            //return null;
             return
                 $"Multiple Bug Fixes {Environment.NewLine}"
                 + $"Fixed many shared reactions not appearing when in a party {Environment.NewLine}"
@@ -24,7 +24,7 @@ namespace AMI.Neitsillia
         }
         public static string ItemsPatchNotes()
         {
-            return null;
+            //return null;
             return
                 $"Items broken in combat will now be unequiped and returned to the inventory {Environment.NewLine}"
                 + $"Fixed auto equip not ignoring broken gear {Environment.NewLine}"

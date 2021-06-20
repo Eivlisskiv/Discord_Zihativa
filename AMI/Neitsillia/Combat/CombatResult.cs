@@ -133,6 +133,7 @@ namespace AMI.Neitsillia.Combat
                     baseDamage[i] = abilityUsed.Damage(i, character.Damage(i), character.stats.Efficiency());
             }
         }
+
         internal void Initiate()
         {
             if (character is Player player) target = player.duel.target;

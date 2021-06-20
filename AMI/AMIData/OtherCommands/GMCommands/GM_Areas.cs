@@ -15,12 +15,12 @@ namespace AMI.AMIData.OtherCommands
     {
         [Command("Move To Area")]
         [Alias("mtarea")]
-        public async Task MoveToArea(IUser user, [Remainder] string argName)
+        public async Task MoveToArea(IUser user, [Remainder] string name)
         {
             if (await IsGMLevel(4))
             {
                 Player player = Player.Load(user.Id);
-                Area area = Area.LoadFromName(StringM.UpperAt(ArrayM.ToString(argName)));
+                Area area = Area.LoadFromName(StringM.UpperAt(name));
                 player.EndEncounter();
                 await player.SetArea(area);
                 player.SaveFileMongo();
@@ -29,16 +29,17 @@ namespace AMI.AMIData.OtherCommands
                 , MsgType.Main);
             }
         }
+
         [Command("Generate Dungeon")]
         [Alias("GenDungeon")]
-        public async Task GenerateDungeon(IUser user, [Remainder] string args)
+        public async Task GenerateDungeon(IUser user, [Remainder] string name)
         {
             if (await IsGMLevel(3))
             {
                 Player player = Player.Load(user.Id);
                 Area dungeon;
-                if (args.Length > 0)
-                    dungeon = Dungeons.ManualDungeon(StringM.UpperAt(ArrayM.ToString(args)), player.AreaInfo.floor, player.Area);
+                if (name.Length > 0)
+                    dungeon = Dungeons.ManualDungeon(StringM.UpperAt(name), player.AreaInfo.floor, player.Area);
                 else dungeon = Dungeons.Generate(player.AreaInfo.floor, player.Area);
                 if (dungeon != null)
                 {
@@ -48,6 +49,7 @@ namespace AMI.AMIData.OtherCommands
                 else await ReplyAsync("Dungeon not Found");
             }
         }
+
         [Command("AutoInvade")]
         public async Task AutoInvade(IUser user = null)
         {
@@ -65,12 +67,14 @@ namespace AMI.AMIData.OtherCommands
                 else await ReplyAsync("Area is not a Stronghold");
             }
         }
+
         [Command("AddChildArea")]
         public async Task AddChildArea_CMD(string childType, string childName, string arguments = null)
         {
             if (await IsGMLevel(4))
                 await ReplyAsync(AddChildArea(childType, childName, arguments));
         }
+
         string AddChildArea(string childType, string childName, string arguments)
         {
             Area parent = Player.Load(Context.BotUser, Player.IgnoreException.All).Area;
@@ -121,6 +125,7 @@ namespace AMI.AMIData.OtherCommands
             if (!await IsGMLevel(4)) return;
             await Neitsillia.Areas.Nests.Nest.SpawnNest();
         }
+
         [Command("VerifyNests")]
         public async Task VerifyExistingNests()
         {

@@ -242,41 +242,28 @@ namespace AMI.Neitsillia.InventoryCommands
         private bool EquipItem(Player player, Item eItem, out Item temp)
         {
             temp = null;
-            bool equipped = false;
-            int index = -1;
             if (!player.IsRequiredLevel(eItem.tier))
                 throw NeitsilliaError.ReplyError($"{player.name} must be minimum level {Math.Ceiling(eItem.tier / 5.00)} to equip this item.");
-            switch (eItem.type)
-            {
-                case Item.IType.Weapon:
-                    {
-                        index = 0;
-                    } break;
-                //case Item.IType.weapon: index = 1; break;
-                case Item.IType.Helmet: index = 2; break;
-                case Item.IType.Mask: index = 3; break;
-                case Item.IType.Chest: index = 4; break;
-                case Item.IType.Jewelry:
-                    {
-                        for (int i = 0; i < player.equipment.jewelry.Length; i++)
-                            if (player.equipment.jewelry[i] == null)
-                                index = 5 + i;
-                        if (index == -1)
-                            throw NeitsilliaError.ReplyError("You do not have any free jewelry slot");
-                    } break;
-                case Item.IType.Trousers: index = 8; break;
-                case Item.IType.Boots: index = 9; break;
 
-                default: return false;
-            }
-            if (index > -1 && index < 10)
-            {
-                temp = player.equipment.Equip(eItem);
-                equipped = true;
-            }
+            temp = eItem.type == Item.IType.Jewelry
+                ? EquipJewelry(player, eItem)
+                : player.equipment.Equip(eItem);
+
             if (temp != null && temp.type == Item.IType.notfound)
-            { temp = null; }
-            return equipped;
+                temp = null;
+
+            return true;
+        }
+
+        private static Item EquipJewelry(Player player, Item eItem)
+        {
+            for (int i = 0; i < player.equipment.jewelry.Length; i++)
+            {
+                if (player.equipment.jewelry[i] == null)
+                    return player.equipment.Equip(eItem, i);
+            }
+
+            throw NeitsilliaError.ReplyError("You do not have any free jewelry slot");
         }
 
         [Command("Unequip")][Alias("uneq")]
@@ -301,7 +288,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 case "chest": type = Item.IType.Chest; break;
                 case "jewelry":
                     type = Item.IType.Jewelry;
-                    slot = Verify.MinMax(slot, 3, 1); break;
+                    slot = Verify.MinMax(slot, 3, 1) - 1; break;
                 case "trousers": 
                     type = Item.IType.Trousers;
                     break;
@@ -369,10 +356,10 @@ namespace AMI.Neitsillia.InventoryCommands
         ////    
         [Command("ItemInfo")]
         [Summary("Get the info on an item from its name.")]
-        public async Task ItemInfo([Remainder] string itemName)
+        public async Task ItemInfo([Remainder] string item_name)
         {
             string message;
-            string name = StringM.UpperAt(ArrayM.ToString(itemName, " "));
+            string name = StringM.UpperAt(item_name);
             Item item = Item.LoadItem(name);
 
             if (item != null)
@@ -486,6 +473,9 @@ namespace AMI.Neitsillia.InventoryCommands
                 }
 
                 embed.AddField(field);
+
+                if (ate == 0) break;
+
                 //Remove what was consumed
                 player.inventory.Remove(index, ate);
                 //Search for next healing item
@@ -526,8 +516,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 itemE += $"+ {stamRegen} Stamina: {player.stamina}/{msp}{Environment.NewLine}";
             if (item.perk != null)
             {
-                if (consumed == 0)
-                    consumed = 1;
+                if (consumed == 0) consumed = 1;
                 player.Status(item.perk.name, item.perk.maxRank, item.perk.tier);
                 itemE += $"+ Status Effect: {item.perk.name} {Environment.NewLine} {item.perk.desc}";
             }

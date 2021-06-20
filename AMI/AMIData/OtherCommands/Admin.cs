@@ -96,7 +96,7 @@ namespace AMI.AMIData.OtherCommands
             AdminCheck();
                 try
                 {
-                    await DownloadDiscordFiles(ArrayM.ToString(path), type);
+                    await DownloadDiscordFiles(path, type);
                 }
                 catch (Exception e)
                 { Log.LogS(e); await ReplyAsync("Muo, something went wrong!"); }
@@ -446,7 +446,7 @@ namespace AMI.AMIData.OtherCommands
         {
             if (AdminCheck())
             {
-                Item item = Item.LoadItem(StringM.UpperAt(ArrayM.ToString(args, " ")));
+                Item item = Item.LoadItem(StringM.UpperAt(args));
                 if (item != null)
                 {
                     Player p = Context.Player;
@@ -484,11 +484,10 @@ namespace AMI.AMIData.OtherCommands
 
         #region Files
         [Command("Download File")]
-        public async Task DownloadFile([Remainder] string arg)
+        public async Task DownloadFile([Remainder] string path)
         {
             if (AdminCheck())
             {
-                string path = ArrayM.ToString(arg);
                 if (!path.EndsWith("\\") && File.Exists(path))
                     await Context.Channel.SendFileAsync(path);
                 else await ReplyAsync("File not found");
@@ -496,11 +495,11 @@ namespace AMI.AMIData.OtherCommands
         }
         
         [Command("dir")]
-        public async Task ShowPathDirectories([Remainder] string arg)
+        public async Task ShowPathDirectories([Remainder] string path)
         {
             if (AdminCheck())
             {
-                string path = @"./" + ArrayM.ToString(arg);
+                path = @"./" + path;
                 DirectoryInfo[] dirs = new DirectoryInfo(path).GetDirectories();
                 string result = null;
                 foreach (var d in dirs)
@@ -513,11 +512,11 @@ namespace AMI.AMIData.OtherCommands
             }
         }
         [Command("dirf")]
-        public async Task ShowPathFiles([Remainder] string arg)
+        public async Task ShowPathFiles([Remainder] string path)
         {
             if (AdminCheck())
             {
-                string path = @"./" + ArrayM.ToString(arg);
+                path = @"./" + path;
                 FileInfo[] dirs = new DirectoryInfo(path).GetFiles();
                 string result = null;
                 foreach (var d in dirs)

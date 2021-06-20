@@ -118,7 +118,8 @@ namespace AMYPrototype.Commands
                     case Program.State.Paused:
                         if (s.Author.Id != 201875246091993088)
                         {
-                            DUtils.DeleteMessage(await context.Channel.SendMessageAsync("Server under maintenance, please refer to the support server for more information."));
+                            DUtils.DeleteMessage(await context.Channel.SendMessageAsync(
+                                "Server under maintenance, please refer to the support server for more information."));
                             return;
                         }
                         break;
@@ -188,9 +189,6 @@ namespace AMYPrototype.Commands
                       $"Character was not found, please load a character `{prefix}load charnamehere` from your characters list `{prefix}List Characters`" +
                       $" OR create a new character `{prefix}new char charnamehere`");
             }
-            else if (exception is NeitsilliaError replyerror && replyerror.ErrorType == NeitsilliaError.NeitsilliaErrorType.ReplyError)
-                await context.Channel.SendMessageAsync(replyerror.ExtraMessage);
-
             else if (exception is Discord.Net.HttpException httpException)
             {
                 switch (httpException.HttpCode)
@@ -229,42 +227,44 @@ namespace AMYPrototype.Commands
                         await context.Channel.SendMessageAsync(httpException.ToString());
                         break;
                 }
-            }
-            else
-            {
-                bool log = true;
-                try
-                {
-                    log = !await NeitsilliaError.SpecialExceptions(exception, context.Channel, context.BotUser);
 
-                }catch(Exception e)
-                {
-                    string info = result.ErrorReason;
-                    try { info += " ||" + e.StackTrace; }
-                    catch (Exception b)
-                    {
-                        Log.LogS(b.Message + " => " + b.StackTrace);
-                    }
-                    var er = $"Exception Type: {NeitsilliaError.GetType(e)}" + Environment.NewLine +
-                        $" =>  {info} ";
-                    Log.LogS(er);
-                    await AMI.Handlers.UniqueChannels.Instance.SendToLog(e, null, context.Channel);
-                }
-                if (log)
-                {
-                    string info = result.ErrorReason;
-                    try { info += " ||" + exception.StackTrace; }
-                    catch (Exception e)
-                    {
-                        Log.LogS(e.Message + " => " + e.StackTrace);
-                    }
-                    string er = $"Exception Type: {NeitsilliaError.GetType(exception)}" + Environment.NewLine +
-                        $" Guild: {(context.Guild != null ? context.Guild.Id.ToString() : "DMs")} | Channel: {context.Channel.Id}" +
-                        $" | ''{context.Message.Content}''  =>  {info} ";
-                    Log.LogS(er);
-                    await UniqueChannels.Instance.SendToLog(er);
-                }
+                return;
             }
+
+            bool log = true;
+            try
+            {
+                log = !await NeitsilliaError.SpecialExceptions(exception, context.Channel, context.BotUser);
+
+            }
+            catch (Exception e)
+            {
+                string info = result.ErrorReason;
+                try { info += " ||" + e.StackTrace; }
+                catch (Exception b)
+                {
+                    Log.LogS(b.Message + " => " + b.StackTrace);
+                }
+                var er = $"Exception Type: {NeitsilliaError.GetType(e)}" + Environment.NewLine +
+                    $" =>  {info} ";
+                Log.LogS(er);
+                await AMI.Handlers.UniqueChannels.Instance.SendToLog(e, null, context.Channel);
+            }
+            if (log)
+            {
+                string info = result.ErrorReason;
+                try { info += " ||" + exception.StackTrace; }
+                catch (Exception e)
+                {
+                    Log.LogS(e.Message + " => " + e.StackTrace);
+                }
+                string er = $"Exception Type: {NeitsilliaError.GetType(exception)}" + Environment.NewLine +
+                    $" Guild: {(context.Guild != null ? context.Guild.Id.ToString() : "DMs")} | Channel: {context.Channel.Id}" +
+                    $" | ''{context.Message.Content}''  =>  {info} ";
+                Log.LogS(er);
+                await UniqueChannels.Instance.SendToLog(er);
+            }
+
         }
         
         internal static async Task<bool> CommandErrorType(CommandInfo method, CustomCommandContext context, IResult result)

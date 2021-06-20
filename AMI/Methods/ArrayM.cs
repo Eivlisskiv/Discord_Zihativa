@@ -268,10 +268,7 @@ namespace AMI.Methods
         }
         public static string ToKString<T>(T[] array, string seperator = " ", int skipIndex = -1)
         {
-            if (array == null)
-                return null;
-            if (array.Length == 0)
-                return null;
+            if (array == null || array.Length == 0) return null;
             string result = "";
             for (int i = 0; i < array.Length; i++)
             {
@@ -284,12 +281,13 @@ namespace AMI.Methods
             }
             return result;
         }
+
         public static string ToString<T>(this IEnumerable<T> array, string seperator = " ")
         {
-            if (array == null || System.Linq.Enumerable.Count(array) == 0)
-                return null;
+            if (array == null || System.Linq.Enumerable.Count(array) == 0) return null;
             return string.Join(seperator, array);
         }
+
         public static string ToString<T>(List<T>[] array, string sep1 = "\r\n", string sep2 = ", ")
         {
             if (array == null)

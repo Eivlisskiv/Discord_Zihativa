@@ -151,6 +151,7 @@ namespace AMI.Module
             nChar.WithFooter("~stats  OR  ~ls  for more detailed stats sheet.");
             await player.NewUI(await chan.SendMessageAsync(embed: nChar.Build()), MsgType.Stats);
         }
+
         [Command("equipment", true)][Alias("eq")]
         public async Task EquipmentDisplay()
         {
@@ -244,17 +245,16 @@ namespace AMI.Module
         {
             const int maxChar = 350;
             Player player = Player.Load(Context.User.Id, Player.IgnoreException.Resting);
-            string text = ArrayM.ToString(value, " ");
             if (player.name == null)
                 await DUtils.Replydb(Context, Context.User.Mention + NoCharacterMessage());
             else
             {
-                if (text.Length > maxChar)
-                    await ReplyAsync($"Text must be less than {maxChar} | {text.Length}/{maxChar}");
+                if (value.Length > maxChar)
+                    await ReplyAsync($"Text must be less than {maxChar} | {value.Length}/{maxChar}");
                 else if (Verify.IsInArray(property.ToLower(), Sheet.properties))
                 {
 
-                    if (player.userSheet.ModifyProperty(property.ToLower(), text))
+                    if (player.userSheet.ModifyProperty(property.ToLower(), value))
                         await DUtils.Replydb(Context, "Modifications Completed", lifetime: 2);
                     player.SaveFileMongo();
                 }
@@ -327,16 +327,15 @@ namespace AMI.Module
         //Abilities
         [Command("Abilities")][Alias("ab", "ability", "ainfo", "abilityinfo")]
         [Summary("Displays the character's abilities. Enter a ability name to view more details on a specific ability")]
-        public async Task Abilities([Remainder] string abilityName)
+        public async Task Abilities([Remainder] string abilityName = null)
         => await AbilityInfo(abilityName);
 
-        public async Task AbilityInfo([Remainder] string arg)
+        public async Task AbilityInfo(string name)
         {
             Player player = Context.GetPlayer(Player.IgnoreException.Resting);
-            if (arg.Length < 1) await Abilities(player, Context.Channel);
+            if (name == null) await Abilities(player, Context.Channel);
             else
             {
-                string name = ArrayM.ToString(arg);
                 if (player.HasAbility(name, out int index))
                 {
                     EmbedBuilder e = player.UserEmbedColor(new EmbedBuilder());

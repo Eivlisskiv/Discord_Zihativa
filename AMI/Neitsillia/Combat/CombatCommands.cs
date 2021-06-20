@@ -31,7 +31,7 @@ namespace AMI.Neitsillia.Combat
             + "`cast {ability name}` : use ability with default target (first enemy for attacks, self for defense) \n"
             + "`cast {ability name} {target}` : uses attack ability on the target \n"
             )]
-        public async Task Attack([Remainder] string arguments = null)
+        public async Task Attack([Remainder] string ability_and_target = null)
         {
             Player player = Context.Player;
             if (!player.IsEncounter("Combat") && !player.IsEncounter("NPC"))
@@ -40,7 +40,7 @@ namespace AMI.Neitsillia.Combat
                 await DUtils.Replydb(Context, "There are no targets available.");
             else
             {
-                string[] temp = GetAbilityAndTarget(player, arguments?.Split(' ') ?? new string[0]);
+                string[] temp = GetAbilityAndTarget(player, ability_and_target?.Split(' ') ?? new string[0]);
                 if (player.duel != null && player.duel.abilityName != null
                     && player.duel.abilityName.StartsWith("~"))
                     throw NeitsilliaError.ReplyError($"{player.name} may not change their turn action from {player.duel.abilityName[1..]}");
@@ -82,20 +82,19 @@ namespace AMI.Neitsillia.Combat
                 case 1:
                     {
                         if (args[0].Length > 2)
-                            results = ParseAbility(player, args[0], results);
-                        else
-                            results = ParseTarget(args[0], results);
-                    }break;
+                            return ParseAbility(player, args[0], results);
+                        
+                        return ParseTarget(args[0], results);
+                    }
                 default:
                     {
                         if(args[^1].Length > 2)
-                            results = ParseAbility(player, ArrayM.ToString(args), results);
-                        else
-                        results = ParseAbility(player, ArrayM.ToKString(args, skipIndex: args.Length - 1), 
+                            return  ParseAbility(player, ArrayM.ToString(args), results);
+                        
+                        return ParseAbility(player, ArrayM.ToKString(args, skipIndex: args.Length - 1), 
                             ParseTarget(args[^1], results));
                         
                     }
-                    break;
             }
             
             return results;
@@ -106,6 +105,7 @@ namespace AMI.Neitsillia.Combat
             name = name.Trim();
             if (player.HasAbility(name, out _))
             { results[0] = name; return results; }
+
             throw NeitsilliaError.ReplyError($"{player.name} does not have ability {name}. To view character's abilities, type `~abilities`.");
         }
 
@@ -250,7 +250,7 @@ namespace AMI.Neitsillia.Combat
             //
             EmbedBuilder fight = DUtils.BuildEmbed(
                 (player.Party?.partyName ?? player.name) + " VS " + (mob.Length == 1 ? mob[0].displayName : "Creatures"),
-                "Turn " + (player.Encounter.turn++),
+                "Turn " + (++player.Encounter.turn),
                 ((player.Party == null || player.Party.members.Count == 1) ? $"{EUI.brawl} : {abilityName}" : null)
                 + $"           [{watch.ElapsedMilliseconds}ms]",
                 player.userSettings.Color,

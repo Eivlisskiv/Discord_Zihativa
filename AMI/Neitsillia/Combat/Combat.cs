@@ -12,8 +12,6 @@ namespace AMI.Neitsillia.Combat
 {
     public class Combat
     {
-        static AMIData.MongoDatabase Database => Program.data.database;
-
         internal static CombatResult GetTargetCR(CombatResult caster, CombatResult[] friends, CombatResult[] foes)
         {
             if (caster.abilityUsed == null) return caster;
