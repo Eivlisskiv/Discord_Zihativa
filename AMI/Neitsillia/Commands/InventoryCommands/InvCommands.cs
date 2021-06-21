@@ -480,6 +480,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 player.inventory.Remove(index, ate);
                 //Search for next healing item
                 index = player.inventory.inv.FindIndex(si => si.item.type == Item.IType.Healing);
+                mhp = player.Health();
             }
 
             if (index == -1) embed.AddField("Out of healing items", "You are out of healing items in your inventory!");
@@ -499,21 +500,27 @@ namespace AMI.Neitsillia.InventoryCommands
             consumed = 0;
             for (; consumed < amount; consumed++)
             {
-                bool hp = item.healthBuff > 0 && mhp > player.health;
-                bool sp = item.staminaBuff > 0 && msp > player.stamina;
+                bool hp = item.healthBuff > 0 && mhp > (player.health + healing);
+                bool sp = (item.staminaBuff > 0 || item.healthBuff > 0) && msp > (player.stamina + stamRegen);
                 if (hp || sp)
                 {
-                    if (hp) healing += player.Healing(item.healthBuff, false);
-                    if (sp) stamRegen += player.StaminaE(((int)item.healthBuff / 2) + item.staminaBuff);
+                    if (hp) healing += item.healthBuff;
+                    if (sp) stamRegen += ((int)item.healthBuff / 2) + item.staminaBuff;
                 }
                 else break;
             }
 
             //Get Item changes info
             if (healing != 0)
+            {
+                healing = player.Healing(healing, false);
                 itemE += $"+ {healing} Health : {player.health}/{mhp}{Environment.NewLine}";
+            }
             if (stamRegen != 0)
+            {
+                stamRegen = player.StaminaE(stamRegen);
                 itemE += $"+ {stamRegen} Stamina: {player.stamina}/{msp}{Environment.NewLine}";
+            }
             if (item.perk != null)
             {
                 if (consumed == 0) consumed = 1;

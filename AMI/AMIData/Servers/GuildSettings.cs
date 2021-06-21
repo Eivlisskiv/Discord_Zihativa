@@ -12,7 +12,7 @@ using AMI.Neitsillia.User.UserInterface;
 namespace AMI.AMIData.Servers
 {
     [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
-    class GuildSettings
+    public class GuildSettings
     {
         static MongoDatabase Database => Program.data.database;
         //private static Cache<ulong, GuildSettings> cache = new Cache<ulong, GuildSettings>();

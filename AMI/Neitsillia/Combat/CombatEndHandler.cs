@@ -165,7 +165,8 @@ namespace AMI.Neitsillia.Combat
                     partyLeader.NewEncounter(encounter);
             }
 
-           if (!allMobsDead && currentEncounter.Name != Encounter.Names.Bounty 
+           if (!allMobsDead && currentEncounter.Name != Encounter.Names.Bounty
+                && currentArea.IsExplorable
                 && currentArea.type != AreaType.Dungeon && currentArea.type != AreaType.Arena)
                 PopulationHandler.Add(currentArea, mob);
             return msgType;

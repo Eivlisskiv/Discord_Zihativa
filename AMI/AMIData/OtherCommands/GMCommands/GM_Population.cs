@@ -52,6 +52,29 @@ namespace AMI.AMIData.OtherCommands
             }
         }
 
+        [Command("RemovePopu")]
+        public async Task RemovePopu(bool isNpcs = true)
+        {
+            Context.AdminCheck();
+
+            Player player = Context.GetPlayer(Player.IgnoreException.All);
+
+            Area area = player.Area;
+
+            var popu = area.GetPopulation(isNpcs ?
+                Neitsillia.Areas.AreaExtentions.Population.Type.Population
+                : Neitsillia.Areas.AreaExtentions.Population.Type.Bounties);
+
+            if (popu == null)
+            {
+                await ReplyAsync("No population here");
+                return;
+            }
+
+            await popu.Delete();
+            await ReplyAsync($"{popu.Count} population eradicated");
+        }
+
         [Command("New NPC")]
         public async Task New_NPC(string areaName, int amount = 1, string profession = "Child", int level = 0)
         {

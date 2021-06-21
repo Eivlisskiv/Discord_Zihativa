@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AMI.AMIData.Servers
 {
-    class Channel
+    public class Channel
     {
         public ulong id;
         public string name;

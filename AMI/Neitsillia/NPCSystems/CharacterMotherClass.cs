@@ -135,8 +135,7 @@ namespace AMI.Neitsillia.NPCSystems
         {
             if (heal != 0)
             {
-                if (!canOverHeal)
-                    heal = Verify.Max(heal, Verify.Min(Health() - health, 0));
+                if (!canOverHeal)  heal = Verify.Max(heal, Verify.Min(Health() - health, 0));
                 heal = PerkLoad.CheckPerks<long>(this, Perk.Trigger.Healing, heal);
                 PerkLoad.CheckPerks(this, Perk.Trigger.Health, this);
                 health += heal;

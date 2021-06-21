@@ -523,36 +523,36 @@ namespace AMI.AMIData.OtherCommands
                 await ReplyAsync($"Sent to {(await SendToSubscribed(notification, noti?.Build())).Count} Subbed server channels.");
             }
         }
-        public static async Task<List<RestUserMessage>> SendToSubscribed(string notification, Embed embed = null)
+
+        public static async Task<List<RestUserMessage>> SendToSubscribed(string notification, Embed embed = null, 
+            Func<GuildSettings, Channel> getChannel = null)
         {
             List<GuildSettings> gs = GuildSettings.LoadGuildSettings();
             List<RestUserMessage> msgs = new List<RestUserMessage>();
-            int sentTo = 0;
             foreach (GuildSettings g in gs)
             {
-                if (g != null && g.notificationChannel != null && g.notificationChannel.id != 0)
+                if (g == null || g.Guild == null) continue;
+
+                var channel = getChannel?.Invoke(g) ?? g.notificationChannel;
+
+                if (channel == null || channel.id == 0) continue;
+
+                try
                 {
-                    try
-                    {
-                        if (g.Guild != null)
-                        {
-                            var chan = g.Guild.GetTextChannel(g.notificationChannel.id);
-                            if (chan != null)
-                            {
-                                msgs.Add(await chan.SendMessageAsync(notification, false, embed));
-                                sentTo++;
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Log.LogS(e);
-                    }
+                    var chan = g.Guild.GetTextChannel(channel.id);
+                    if (chan != null)
+                        msgs.Add(await chan.SendMessageAsync(notification, false, embed));
+                }
+                catch (Exception e)
+                {
+                    Log.LogS(e);
                 }
             }
-            Console.WriteLine("Notification sent to " + sentTo + " server's channels");
+
+            Console.WriteLine("Notification sent to " + msgs.Count + " server's channels");
             return msgs;
         }
+
         public static async Task ReportActivityToServers(string notification, EmbedBuilder noti)
         {
             List<GuildSettings> gs = GuildSettings.LoadGuildSettings();
