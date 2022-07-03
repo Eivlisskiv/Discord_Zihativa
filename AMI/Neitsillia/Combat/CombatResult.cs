@@ -247,7 +247,7 @@ namespace AMI.Neitsillia.Combat
 
         internal long GetDamageDealt(long totalDamage)
         {
-            return Math.Max(NumbersM.NParse<long>(totalDamage * (GetTotalCriticalMultiplier() + 1)), 0);
+            return Math.Max((long)(totalDamage * (GetTotalCriticalMultiplier() + 1)), 0);
         }
         internal double GetTotalCriticalMultiplier()
             => !isCritical ? 0 : 

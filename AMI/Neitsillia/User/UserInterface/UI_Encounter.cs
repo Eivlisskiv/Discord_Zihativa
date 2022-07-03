@@ -45,7 +45,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 {
                     player.QuestTrigger(Quest.QuestTrigger.Puzzle, $"{puz.name};{(int)puz.rewardType};{puz.reward}");
                     puz.Solved_Puzzle(enc);
-                    await reaction.Channel.SendMessageAsync(embed: enc.GetEmbed().Build());
+                    await Channel.SendMessageAsync(embed: enc.GetEmbed().Build());
                 }
                 else enc.turn++;
 
@@ -61,7 +61,7 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 if (data[0] == 'Q') //Select a quest
                 {
-                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel, i);
+                    await Adventures.Adventure.SelectIntensity(player, Channel, i);
                 }
                 else //Select difficulty
                 {
@@ -75,17 +75,17 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (e)
             {
                 case EUI.ok:
-                    await Adventures.Adventure.SelectIntensity(player, reaction.Channel, 0);
+                    await Adventures.Adventure.SelectIntensity(player, Channel, 0);
                     break;
                 case EUI.sideQuest:
-                    await Adventures.Adventure.SelectQuest(player, reaction.Channel);
+                    await Adventures.Adventure.SelectQuest(player, Channel);
                     break;
                 case EUI.cycle:
-                    await player.Adventure.Display(player, reaction.Channel, true);
+                    await player.Adventure.Display(player, Channel, true);
                     break;
                 case EUI.cancel:
-                    if (player.IsInAdventure) await player.Adventure.End(player, reaction.Channel, true);
-                    else await GameCommands.StatsDisplay(player, reaction.Channel);
+                    if (player.IsInAdventure) await player.Adventure.End(player, Channel, true);
+                    else await GameCommands.StatsDisplay(player, Channel);
                     break;
             }
         }

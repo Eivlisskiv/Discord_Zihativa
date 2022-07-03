@@ -61,7 +61,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         
         public async Task Delete() => await Delete(_id);
 
-        public async Task DiscordUI(Player player, ISocketMessageChannel chan)
+        public async Task DiscordUI(Player player, IMessageChannel chan)
         {
             await player.NewUI(null, DUtils.BuildEmbed("Arena Fights",
                 quests.Join(Environment.NewLine, (q, i) => q.ShortDescription(i+1)),
@@ -69,7 +69,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                 User.UserInterface.MsgType.ArenaFights, $"#{quests.Length}");
         }
 
-        public async Task DiscordUI(int fight, Player player, ISocketMessageChannel chan)
+        public async Task DiscordUI(int fight, Player player, IMessageChannel chan)
         {
             await player.NewUI(null, DUtils.BuildEmbed("Arena Fights",
                 quests[fight].LongDescription(level),
@@ -77,7 +77,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                 User.UserInterface.MsgType.ArenaFights, $"{fight}");
         }
 
-        internal async Task StartFight(int v, Player player, ISocketMessageChannel channel)
+        internal async Task StartFight(int v, Player player, IMessageChannel channel)
         {
             ArenaQuest fight = quests[v];
 

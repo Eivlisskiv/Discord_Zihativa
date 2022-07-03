@@ -276,6 +276,11 @@ namespace AMI.Neitsillia.User.UserInterface
                     options = new List<string>()
                     { ok, next, info };
                     break;
+                case MsgType.ConfirmCharDel:
+                    options = new List<string> { ok, cancel };
+                    if (UserId == 201875246091993088)
+                        options.AddRange(new[] { npc, bounties });
+                    break;
                 #endregion
 
                 #region Area
@@ -471,7 +476,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 case MsgType.NPCRepair:
                 case MsgType.ConfirmTransaction:
                 case MsgType.ConfirmSkills:
-                case MsgType.ConfirmCharDel:
+                
                 case MsgType.EndRest:
                 case MsgType.ConfirmUpgrade:
                 case MsgType.PartyInvite:

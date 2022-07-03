@@ -71,7 +71,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
             }
         }
 
-        public static async Task StorageView(Player player, Sandbox sb, string source, int page, string filter, ISocketMessageChannel chan, bool edit = true)
+        public static async Task StorageView(Player player, Sandbox sb, string source, int page, string filter, IMessageChannel chan, bool edit = true)
         {
             Embed embed = sb.storage.ToEmbed(ref page, ref filter,
                 "Storage", sb.StorageSize, player.equipment).Build();
@@ -79,21 +79,21 @@ namespace AMI.Neitsillia.Areas.Sandbox
             else await player.NewUI(null, embed, chan, MsgType.SandboxStorage, $"{source};{page};{filter}");
         }
 
-        internal static async Task ViewTiles(Player player, Sandbox sandbox, string source, ISocketMessageChannel channel)
+        internal static async Task ViewTiles(Player player, Sandbox sandbox, string source, IMessageChannel channel)
         {
             await player.EditUI(null, DUtils.BuildEmbed("Buildings", 
                 sandbox.tiles.Join(Environment.NewLine, (tile, i) => $"{EUI.GetNum(i + 1)} {tile.Name}") ?? "No buildings to display"
                 ).Build(), channel, MsgType.TileControls, $"{source};{sandbox.tiles.Count}");
         }
 
-        internal static async Task InspectTile(Player player, Sandbox sb, string source, int index, ISocketMessageChannel channel)
+        internal static async Task InspectTile(Player player, Sandbox sb, string source, int index, IMessageChannel channel)
         {
             SandboxTile tile = sb.tiles[index];
             await player.EditUI(null, tile.ToEmbed(sb.tier, player.userSettings.Color), channel,
                 MsgType.TileControls, $"{source};{index};{(tile.production != null ? tile.AmountReady.ToString() : "null")}");
         }
 
-        internal static async Task ProduceAmount(Player player, Sandbox sb, string source, int tileIndex, int productIndex, int amount, ISocketMessageChannel channel)
+        internal static async Task ProduceAmount(Player player, Sandbox sb, string source, int tileIndex, int productIndex, int amount, IMessageChannel channel)
         {
             SandboxTile tile = sb.tiles[tileIndex];
             ProductionRecipe recipe = ProductionRecipes.Get(tile.type, tile.productionOptions[productIndex]);
@@ -109,7 +109,7 @@ namespace AMI.Neitsillia.Areas.Sandbox
                 ).Build(), channel, MsgType.TileProduce, $"{source};{tileIndex};{productIndex};{amount}");
         }
 
-        internal static async Task ProductSelection(Player player, Sandbox sb, string source, int tileIndex, int page, ISocketMessageChannel channel)
+        internal static async Task ProductSelection(Player player, Sandbox sb, string source, int tileIndex, int page, IMessageChannel channel)
         {
             SandboxTile tile = sb.tiles[tileIndex];
 

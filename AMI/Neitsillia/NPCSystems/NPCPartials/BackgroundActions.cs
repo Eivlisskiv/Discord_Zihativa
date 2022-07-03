@@ -26,9 +26,12 @@ namespace AMI.Neitsillia.NPCSystems
             {
                 int actionrng = Program.rng.Next(101);
 
+                if (!area.IsExplorable && Travel(area))
+                    return false;
+
                 if (actionrng <= 20 && area.IsExplorable)
                 {
-                    (bool explored, bool remove) = await Explore(area);
+                    (bool explored, bool remove) = Explore(area);
                     if (!explored) actionrng = -1;
                     else if (remove) return false;
                 }
@@ -58,6 +61,7 @@ namespace AMI.Neitsillia.NPCSystems
 
             return true;
         }
+
         void Rest()
         {
             _ = UniqueChannels.Instance.SendMessage("Population", $" **{displayName}** rested");
@@ -65,7 +69,7 @@ namespace AMI.Neitsillia.NPCSystems
             else Healing(1);
         }
 
-        async Task<(bool explored, bool remove)> Explore(Area area)
+        (bool explored, bool remove) Explore(Area area)
         {
             if (area.eLootRate == 0 && area.eMobRate == 0) return (false, false);
 
@@ -213,83 +217,71 @@ namespace AMI.Neitsillia.NPCSystems
             if (profession == ReferenceData.Profession.Child && level > 13)
                 GetsAProfession((ReferenceData.Profession)rng.Next(2,8));
         }
+
         bool Travel(Area area)
         {
-            //return false; //disabled for now;
-            if (profession == ReferenceData.Profession.Creature)
-                return false;
-            if(area.junctions == null || area.junctions.Count < 1)
-                return false;
-            else
+            if(area.junctions == null || area.junctions.Count < 1) return false;
+
+            Random r = Program.rng;
+
+            Area toTravel = Area.LoadArea(area.junctions[r.Next(area.junctions.Count)].filePath);
+
+            if (!toTravel.IsExplorable) return false;
+
+            int rank = Rank() / 5;
+
+            int x = r.Next(60) + rank;
+
+            switch (profession)
             {
-                Random r = Program.rng;
+                case ReferenceData.Profession.Peasant:
+                        if (!area.IsNonHostileArea() && toTravel.IsNonHostileArea())
+                            return HasTraveled(area, toTravel);
+                        else return false;
 
-                Area toTravel = Area.LoadArea(area.junctions[r.Next(area.junctions.Count)].filePath);
+                case ReferenceData.Profession.Child:
+                        if (area.IsNonHostileArea() && rank < 25) x -= (25 - rank);
+                        x -= (10 - area.GetPopulation(Population.Type.Population).Count);
 
-                if (!toTravel.IsExplorable) return false;
+                        if (area.IsNonHostileArea()) x -= 20;
+                        if (level < 18) x -= 18 - level;
+                    break;
 
-                int rank = Rank() / 5;
+                case ReferenceData.Profession.Creature:
+                        if (toTravel.IsNonHostileArea())
+                            return false;
+                        if(area.IsNonHostileArea())
+                            return HasTraveled(area, toTravel);
+                    break;
 
-                int x = r.Next(60) +  rank;
+                default:
+                    if (area.IsNonHostileArea() && rank < 25) x -= (25 - rank);
+                    x -= (10 - area.GetPopulation(Population.Type.Population).Count);
 
-                switch(profession)
-                {
-                    case ReferenceData.Profession.Peasant:
-                        {
-                            if (!area.IsNonHostileArea() && toTravel.IsNonHostileArea())
-                                return HasTraveled(area, toTravel);
-                            else return false;
-                        }
-
-                    case ReferenceData.Profession.Child:
-                        {
-                            if (area.IsNonHostileArea() && rank < 25)
-                                x -= (25 - rank);
-                            x -= (10 - area.GetPopulation(Population.Type.Population).Count);
-
-                            if (area.IsNonHostileArea())
-                                x -= 20;
-                            if (level < 18)
-                                x -= 18 - level;
-                        }
-                        break;
-
-                    case ReferenceData.Profession.Creature:
-                        {
-                            if (toTravel.IsNonHostileArea())
-                                return false;
-                        }
-                        break;
-
-                    default:
-                        {
-                            if (area.IsNonHostileArea() && rank < 25)
-                                x -= (25 - rank);
-                            x -= (10 - area.GetPopulation(Population.Type.Population).Count);
-
-                            if (!toTravel.IsNonHostileArea() && area.IsNonHostileArea())
-                            {
-                                if (toTravel.level > level + 10)
-                                    x -= toTravel.level - level;
-                                else if (toTravel.level < level)
-                                    return false;
-                            }
-
-                        }break;
-                }
-
-
-                if (Program.Chance(x))
-                    return HasTraveled(area, toTravel);
+                    if (!toTravel.IsNonHostileArea() && area.IsNonHostileArea())
+                    {
+                        if (toTravel.level > level + 10)
+                            x -= toTravel.level - level;
+                        else if (toTravel.level < level)
+                            return false;
+                    }
+                    break;
             }
+
+
+            if (Program.Chance(x))
+                return HasTraveled(area, toTravel);
+
             return false;
         }
+
         bool HasTraveled(Area old, Area anew)
         {
             anew.GetPopulation(Population.Type.Population).Add(this);
             _ = UniqueChannels.Instance.SendMessage("Population", $"{GetTime} **{displayName}** has traveled from {old} to {anew}");
             return true;
         }
+
         bool AttemptMate(Area area)
         {
             if (level >= 18)

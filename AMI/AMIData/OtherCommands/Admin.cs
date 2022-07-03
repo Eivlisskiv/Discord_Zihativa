@@ -225,26 +225,17 @@ namespace AMI.AMIData.OtherCommands
                                         {
                                             case "item":
                                                 await temp.SaveItemAsync();
-                                                await ReplyAsync($"{temp} Uploaded/Updated");
                                                 break;
                                             case "skavi":
                                                 await temp.SaveItemAsync("Skavi");
-                                                await ReplyAsync($"{temp} Uploaded/Updated");
                                                 break;
                                             case "event":
                                                 await temp.SaveItemAsync("Event Items");
-                                                await ReplyAsync($"{temp} Uploaded/Updated");
                                                 break;
                                             default: throw NeitsilliaError.ReplyError("Database Table Name is invalid: Item OR Skavi (Unique Items are automatic if unique == true)");
                                         }
 
-                                }
-                                break;
-                            case "skavi":
-                                {
-                                    Item temp = Utils.JSON<Item>(json);
-                                    temp.VerifyItem(true);
-                                    await temp.SaveItemAsync("Skavi");
+                                    await ReplyAsync($"{temp} Uploaded/Updated");
                                 }
                                 break;
                             case "creature":

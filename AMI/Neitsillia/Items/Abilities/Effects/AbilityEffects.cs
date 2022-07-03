@@ -103,7 +103,7 @@ namespace AMI.Neitsillia.Items.Abilities.Effects
                 else
                 {
                     double percHealing = ((heal.level + 10 + caster.character.stats.GetINT())/100.00);
-                    long maxOutput = NumbersM.NParse<long>(mhp * percHealing);
+                    long maxOutput = (long)(mhp * percHealing);
                     long healing = target.character.Healing(maxOutput, true);
                     caster.perkProcs.Add($"Healed {target.Name} for {healing}HP");
                 }
@@ -346,7 +346,7 @@ namespace AMI.Neitsillia.Items.Abilities.Effects
                 {
                     double maxOverHeal = 0.20 + (a.level / 100.00) +
                         (caster.character.stats.GetINT() / 100.00);
-                    long healing = NumbersM.CeilParse<long>(maxhp * maxOverHeal);
+                    long healing = NumbersM.CeilParseLong(maxhp * maxOverHeal);
                     if (target.character.health > maxhp)
                         healing = Verify.Min(healing - target.character.health, 0);
                     caster.perkProcs.Add($"Overhealed {target} for {target.character.Healing(healing, true)} hp");

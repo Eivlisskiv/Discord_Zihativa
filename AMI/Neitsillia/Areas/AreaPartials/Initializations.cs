@@ -2,9 +2,9 @@
 using AMI.Methods;
 using AMI.Module;
 using NeitsilliaEngine;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace AMI.Neitsillia.Areas.AreaPartials
 {
@@ -67,9 +67,9 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         /// <summary>
         /// Use Area.LoadArea instead
         /// </summary>
-        /// <param name="jsonOnly"></param>
         [JsonConstructor]
-        public Area(bool jsonOnly) { }
+        public Area(bool json = true) { }
+
         public Area(AreaType type, string name, Area parentArea)
         {
             this.name = name;

@@ -28,7 +28,7 @@ namespace AMI.AMIData.Web.Controllers
             BotUser botUser = BotUser.Load(userId);
 
             return Ok("{" +
-                $"discord: {discordResponse}," + Environment.NewLine +
+                $"discord: ," + Environment.NewLine +
                 $"server: {{ {Utils.JSON(botUser)} }}," +
                 $"characters: {{ {Utils.JSON(BotUser.GetCharFiles(userId))} }}," +
                 "}");

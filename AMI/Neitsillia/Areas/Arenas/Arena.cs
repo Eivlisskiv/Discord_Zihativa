@@ -33,7 +33,7 @@ namespace AMI.Neitsillia.Areas.Arenas
             "Test Mode 5.",
         };
             
-        internal static async Task Service(Player player, ISocketMessageChannel chan)
+        internal static async Task Service(Player player, IMessageChannel chan)
         {
             await player.NewUI("", DUtils.BuildEmbed("Arena Lobby Services",
                 $"{EUI.sideQuest} View arena quests" + Environment.NewLine +
@@ -41,7 +41,7 @@ namespace AMI.Neitsillia.Areas.Arenas
                 null, player.userSettings.Color).Build(), chan, MsgType.ArenaService);
         }
 
-        internal static async Task SelectMode(Player player, int i, ISocketMessageChannel chan, bool edit = false)
+        internal static async Task SelectMode(Player player, int i, IMessageChannel chan, bool edit = false)
         {
             Array modes = Enum.GetValues(typeof(ArenaMode));
             //Loop index
@@ -61,7 +61,7 @@ namespace AMI.Neitsillia.Areas.Arenas
         }
 
         internal static async Task SelectModifiers(Player player, string mode, int page,
-            string boolArray, ISocketMessageChannel chan, bool edit = false)
+            string boolArray, IMessageChannel chan, bool edit = false)
         {
             Array mods = Enum.GetValues(typeof(ArenaModifier.ArenaModifiers));
             //Loop index
@@ -200,13 +200,13 @@ namespace AMI.Neitsillia.Areas.Arenas
             //await TODO
 
             //Koins rewards
-            enc.koinsToGain += NumbersM.NParse<long>(Modifiers.CurrentScore * Modifiers.koinMult);
-            enc.xpToGain += NumbersM.NParse<long>((Modifiers.CurrentScore * arena.level) * Modifiers.xpMult);
+            enc.koinsToGain += (long)(Modifiers.CurrentScore * Modifiers.koinMult);
+            enc.xpToGain += (long)((Modifiers.CurrentScore * arena.level) * Modifiers.xpMult);
         }
 
         internal bool WaveProgress(double score)
         {
-            return Modifiers.WaveProgress(NumbersM.CeilParse<long>(score * (gameMode switch
+            return Modifiers.WaveProgress(NumbersM.CeilParseLong(score * (gameMode switch
             {
                 ArenaMode.Survival => 5,
                 _ => 1,

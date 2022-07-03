@@ -276,7 +276,7 @@ namespace AMI.Neitsillia.Areas.Nests
                 Console.WriteLine("embed built");
 
                 if(!DISABLED)
-                    await GameMaster.SendToSubscribed("Nest Notification", embed.Build());
+                    await GameMaster.SendToSubscribed("Nest Notification", embed.Build(), g => g.gameNotification);
                 await Delete();
 
                 return false;
@@ -290,7 +290,7 @@ namespace AMI.Neitsillia.Areas.Nests
                             );
 
                 if (!DISABLED)
-                    await GameMaster.SendToSubscribed("Nest Notification", embed.Build());
+                    await GameMaster.SendToSubscribed("Nest Notification", embed.Build(), g => g.gameNotification);
 
                 await Delete();
 

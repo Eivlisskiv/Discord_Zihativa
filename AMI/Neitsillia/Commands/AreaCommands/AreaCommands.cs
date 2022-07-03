@@ -63,7 +63,7 @@ namespace AMI.Neitsillia.Commands
             }
             else await DUtils.Replydb(Context, "To travel, one must have a destination. `~Enter 'Area'` or use the `~tp` interface.");
         }
-        internal static async Task Enter(Player player, string areaName, ISocketMessageChannel chan)
+        internal static async Task Enter(Player player, string areaName, IMessageChannel chan)
         {
             //Player is in combat
             if (player.IsEncounter("Combat"))
@@ -99,7 +99,7 @@ namespace AMI.Neitsillia.Commands
                 $"{player.name}, {error} {Environment.NewLine} Use `~Travel Post` for accessible areas."));
         }
 
-        static async Task<string> TryEnter(Player player, string areaName, ISocketMessageChannel chan)
+        static async Task<string> TryEnter(Player player, string areaName, IMessageChannel chan)
         {
             switch(areaName)
             {
@@ -148,7 +148,7 @@ namespace AMI.Neitsillia.Commands
             }
         }
 
-        internal static async Task EnterFLoor(Player player, ISocketMessageChannel chan)
+        internal static async Task EnterFLoor(Player player, IMessageChannel chan)
         {
             EmbedBuilder result;
             string message = null;
@@ -205,7 +205,7 @@ namespace AMI.Neitsillia.Commands
             return Math.Min(Math.Max((player.level - player.Area.level) / 5, 1), 6);
         }
 
-        internal static async Task EnterJunction(Player player, Junction junction, ISocketMessageChannel chan)
+        internal static async Task EnterJunction(Player player, Junction junction, IMessageChannel chan)
         {
             await junction.PassJunction(player);
 
@@ -245,7 +245,7 @@ namespace AMI.Neitsillia.Commands
         public async Task ViewJunctions(int page = 1)
             => await ViewJunctions(Context.Player, Context.Channel, page - 1, false);
 
-        internal static async Task ViewJunctions(Player player, ISocketMessageChannel chan, int page, bool edit = true)
+        internal static async Task ViewJunctions(Player player, IMessageChannel chan, int page, bool edit = true)
         {
             string juncList = null;
             Area pArea = player.Area;
@@ -283,7 +283,7 @@ namespace AMI.Neitsillia.Commands
         public async Task Exploration()
             => await Exploration(Context.Player, Context.Channel);
 
-        internal static async Task Exploration(Player player, ISocketMessageChannel chan)
+        internal static async Task Exploration(Player player, IMessageChannel chan)
         {
             string message = "```You take a look around but fail to find anything of interest, there is nothing to explore here.```";
             EmbedBuilder embed = null;
@@ -332,7 +332,7 @@ namespace AMI.Neitsillia.Commands
             DUtils.DeleteMessage(await chan.SendMessageAsync(message));
         }
 
-        private static async Task ExploreEmbedResult(Player player, ISocketMessageChannel chan, string message, EmbedBuilder embed)
+        private static async Task ExploreEmbedResult(Player player, IMessageChannel chan, string message, EmbedBuilder embed)
         {
             embed.WithColor(player.userSettings.Color);
             MsgType menuType = MsgType.Main;
@@ -534,7 +534,7 @@ namespace AMI.Neitsillia.Commands
                         , MsgType.NewStronghold, $"{strongholdName}&{size}");
             }
         }
-        internal static async Task BuildStronghold(Player player, string name, int size, ISocketMessageChannel chan)
+        internal static async Task BuildStronghold(Player player, string name, int size, IMessageChannel chan)
         {
             Area area = player.Area;
             Area stronghold = await Area.NewStronghold(name, size, area, player);

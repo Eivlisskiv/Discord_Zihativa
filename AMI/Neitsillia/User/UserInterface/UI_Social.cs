@@ -33,18 +33,18 @@ namespace AMI.Neitsillia.User.UserInterface
                 Mail mail = await Mail.Load(ids[i - 1]);
                 if (mail == null) return;
                 var user = BotUser.Load(reaction.UserId);
-                await mail.Collect(Player.Load(user, Player.IgnoreException.All), reaction.Channel);
-                await SocialCommands.ViewInbox(user, page, reaction.Channel, true);
+                await mail.Collect(Player.Load(user, Player.IgnoreException.All), Channel);
+                await SocialCommands.ViewInbox(user, page, Channel, true);
             }
             else
             {
                 switch (emote)
                 {
                     case EUI.prev:
-                        await SocialCommands.ViewInbox(BotUser.Load(reaction.UserId), page - 1, reaction.Channel, true);
+                        await SocialCommands.ViewInbox(BotUser.Load(reaction.UserId), page - 1, Channel, true);
                         break;
                     case EUI.next:
-                        await SocialCommands.ViewInbox(BotUser.Load(reaction.UserId), page + 1, reaction.Channel, true);
+                        await SocialCommands.ViewInbox(BotUser.Load(reaction.UserId), page + 1, Channel, true);
                         break;
                 }
             }
@@ -54,7 +54,7 @@ namespace AMI.Neitsillia.User.UserInterface
         public async Task PartyInvite(SocketReaction reaction, IUserMessage msg)
         {
             if (reaction.Emote.ToString() == EUI.cancel) { await TryDeleteMessage(); return; }
-            if (await player.LoadCheck(true, reaction.Channel, Player.IgnoreException.None))
+            if (await player.LoadCheck(true, Channel, Player.IgnoreException.None))
             {
                 Player inviter = Player.Load(data, Player.IgnoreException.None);
                 if (inviter.AreaInfo.path == player.AreaInfo.path &&

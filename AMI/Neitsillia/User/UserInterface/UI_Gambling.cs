@@ -67,7 +67,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         {
                             switch (i)
                             {
-                                case 1: await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel); break;
+                                case 1: await GamblingCommands.DiceGame_EvenOdd(player, Channel); break;
                             }
                         }
                         else
@@ -79,7 +79,7 @@ namespace AMI.Neitsillia.User.UserInterface
                             };
                             if (i > games.Length) return;
 
-                            await GamblingGame.SelectInitialBet(player, reaction.Channel, games[i]); break;
+                            await GamblingGame.SelectInitialBet(player, Channel, games[i]); break;
                         }
 
                     }
@@ -106,18 +106,18 @@ namespace AMI.Neitsillia.User.UserInterface
                     if (player.IsSolo)
                     {
                         await GamblingGame.Initialise(
-                            player, d[0], bet, reaction.Channel);
+                            player, d[0], bet, Channel);
                         return;
                     }
                     bool accepted = false;
                     if(d.Length == 3) bool.TryParse(d[2], out accepted);
 
                     await GamblingGame.ConfirmInitialBet(
-                        player, d[0], bet, accepted, reaction.Channel);
+                        player, d[0], bet, accepted, Channel);
                     return;
             }
 
-            await GamblingGame.SelectInitialBet(player, reaction.Channel, d[0], bet);
+            await GamblingGame.SelectInitialBet(player, Channel, d[0], bet);
         }
 
         public async Task DiceGame(SocketReaction reaction, IUserMessage _)
@@ -129,17 +129,17 @@ namespace AMI.Neitsillia.User.UserInterface
 
             int i = EUI.Dice(reaction.Emote.ToString());
             if (i != -1)
-                await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel, i, coins, streak);
+                await GamblingCommands.DiceGame_EvenOdd(player, Channel, i, coins, streak);
             switch (reaction.Emote.ToString())
             {
-                case EUI.cancel: await GameCommands.ShortStatsDisplay(player, reaction.Channel); break;
+                case EUI.cancel: await GameCommands.ShortStatsDisplay(player, Channel); break;
 
-                case EUI.prev: await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel, -1, Math.Max(coins - 10, 10), streak); break;
-                case EUI.next: await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel, -1, coins + 10, streak); break;
+                case EUI.prev: await GamblingCommands.DiceGame_EvenOdd(player, Channel, -1, Math.Max(coins - 10, 10), streak); break;
+                case EUI.next: await GamblingCommands.DiceGame_EvenOdd(player, Channel, -1, coins + 10, streak); break;
 
-                case EUI.two: await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel, -1, coins * 2, streak); break;
-                case EUI.five: await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel, -1, coins * 5, streak); break;
-                case EUI.zero: await GamblingCommands.DiceGame_EvenOdd(player, reaction.Channel, -1, coins * 10, streak); break;
+                case EUI.two: await GamblingCommands.DiceGame_EvenOdd(player, Channel, -1, coins * 2, streak); break;
+                case EUI.five: await GamblingCommands.DiceGame_EvenOdd(player, Channel, -1, coins * 5, streak); break;
+                case EUI.zero: await GamblingCommands.DiceGame_EvenOdd(player, Channel, -1, coins * 10, streak); break;
             }
         }
         public async Task CardGame(SocketReaction reaction, IUserMessage msg)
@@ -152,7 +152,7 @@ namespace AMI.Neitsillia.User.UserInterface
 
             if (player.GamblingHand.turn != null)
             {
-                await reaction.Channel.SendMessageAsync(
+                await Channel.SendMessageAsync(
                     $"You've already played your turn for this round: {player.GamblingHand.turn}");
                 return;
             }
@@ -185,7 +185,7 @@ namespace AMI.Neitsillia.User.UserInterface
             }
             await player.GamblingHandKey.Delete();
             player.SaveFileMongo();
-            await reaction.Channel.SendMessageAsync("You quit the game");
+            await Channel.SendMessageAsync("You quit the game");
         }
     }
 }

@@ -96,7 +96,7 @@ namespace AMI.Neitsillia.User
             return (options, DUtils.NewField($"{cycle} Quests", board));
         }
 
-        internal async Task ShowBoard(Player player, ISocketMessageChannel chan)
+        internal async Task ShowBoard(Player player, IMessageChannel chan)
         {
             EmbedBuilder embed = DUtils.BuildEmbed($"{player.name}'s Quest Board", "Use the reactions to accept Quests.", null, player.userSettings.Color);
             List<int> options = new List<int>();

@@ -1,7 +1,6 @@
 ﻿using AMI.AMIData.Events;
 using AMI.Commands;
 using AMI.Methods;
-using AMI.Methods.Graphs;
 using AMI.Neitsillia;
 using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Crafting;
@@ -25,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Module
 {
-    public class GameCommands : ModuleBase<CustomCommandContext>
+	public class GameCommands : ModuleBase<CustomCommandContext>
     {
         //23.20..8.22.19.4.8.26..2.22.16.15.4.26.13.
         ////////////Neitsillia Discord RPG Game 
@@ -144,7 +143,7 @@ namespace AMI.Module
             await ShortStatsDisplay(Player.Load(Context.User.Id, Player.IgnoreException.Resting)
                 , Context.Channel);
         }
-        internal static async Task ShortStatsDisplay(Player player, ISocketMessageChannel chan)
+        internal static async Task ShortStatsDisplay(Player player, IMessageChannel chan)
         {
             EmbedBuilder nChar = StatsStart(player);
             nChar.Description += Stats_General(player);
@@ -158,7 +157,7 @@ namespace AMI.Module
             await EquipmentDisplay(Player.Load(Context.User.Id, Player.IgnoreException.Resting), Context.Channel);
             await DUtils.DeleteContextMessageAsync(Context);
         }
-        internal static async Task EquipmentDisplay(Player player, ISocketMessageChannel chan)
+        internal static async Task EquipmentDisplay(Player player, IMessageChannel chan)
         {
             ///
             EmbedBuilder nChar = new EmbedBuilder();
@@ -178,7 +177,7 @@ namespace AMI.Module
         {
             await ViewXP(Player.Load(Context.User.Id, Player.IgnoreException.Resting), Context.Channel);
         }
-        internal static async Task ViewXP(Player player, ISocketMessageChannel chan)
+        internal static async Task ViewXP(Player player, IMessageChannel chan)
         {
             EmbedBuilder nXP = new EmbedBuilder();
             nXP = player.UserEmbedColor(nXP);
@@ -198,7 +197,7 @@ namespace AMI.Module
                 await player.NewUI(await chan.SendMessageAsync("Experience Info", embed: nXP.Build()),
                     MsgType.XP);
         }
-        internal static async Task SkillUpgradePage(Player player, ISocketMessageChannel chan)
+        internal static async Task SkillUpgradePage(Player player, IMessageChannel chan)
         {
             EmbedBuilder em = new EmbedBuilder();
             em.WithTitle(player.name);
@@ -225,7 +224,7 @@ namespace AMI.Module
             await SheetDisplay(Player.Load(user.Id, Player.IgnoreException.Resting), Context.Channel);
             await DUtils.DeleteContextMessageAsync(Context);
         }
-        internal static async Task SheetDisplay(Player player, ISocketMessageChannel chan)
+        internal static async Task SheetDisplay(Player player, IMessageChannel chan)
         {
                 EmbedBuilder sheetm = new EmbedBuilder();
                 sheetm = player.UserEmbedColor(sheetm);
@@ -307,13 +306,13 @@ namespace AMI.Module
         public async Task ViewSchems(int displayPage = 1)
             => await ViewSchems(Player.Load(Context.User.Id, Player.IgnoreException.Resting), Context.Channel, displayPage);
 
-        internal static async Task ViewSchems(Player player, ISocketMessageChannel chan, int displayPage = 1)
+        internal static async Task ViewSchems(Player player, IMessageChannel chan, int displayPage = 1)
         {
             int count = player.schematics.Count;
             if (count == 0) throw NeitsilliaError.ReplyError("No known schematics.");
 
             const int itemPerPage = 15;
-            int pages = NumbersM.CeilParse<int>(count / (double)itemPerPage);
+            int pages = NumbersM.CeilParseInt(count / (double)itemPerPage);
             displayPage = Verify.MinMax(displayPage, pages, 1);
 
             int start = (displayPage - 1) * itemPerPage;
@@ -353,7 +352,7 @@ namespace AMI.Module
             }
         }
 
-        internal static async Task Abilities(Player player, ISocketMessageChannel chan)
+        internal static async Task Abilities(Player player, IMessageChannel chan)
         {
             EmbedBuilder abs = new EmbedBuilder();
             string list = null;
@@ -474,7 +473,7 @@ namespace AMI.Module
         [Alias("fixf")]
         public async Task Fix_File()
         { await FixFile(Player.Load(Context.User.Id, Player.IgnoreException.All), Context.Channel); }
-        internal static async Task FixFile(Player player, ISocketMessageChannel chan)
+        internal static async Task FixFile(Player player, IMessageChannel chan)
         {
             string message = null;
             int errorsFixed = 0;

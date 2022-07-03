@@ -37,7 +37,7 @@ namespace AMI.Neitsillia.User.UserInterface
         public async Task Inventory(SocketReaction reaction, IUserMessage msg)
         {
             (int i, string filter) = InventoryControls(reaction);
-            await GameCommands.DisplayInventory(player, reaction.Channel, i, filter, true);
+            await GameCommands.DisplayInventory(player, Channel, i, filter, true);
         }
     }
 }

@@ -41,12 +41,12 @@ namespace AMI.Neitsillia.User.UserInterface
                     {
                         if (Dynasty.Exist(data))
                         {
-                            await reaction.Channel.SendMessageAsync(
+                            await Channel.SendMessageAsync(
                                 $"Dyansty name {data} is already in use");
                             return;
                         }
                         Dynasty dan = await Dynasty.CreateDynasty(player, data);
-                        await DynastyCommands.DynastyHub(player, dan, null, reaction.Channel);
+                        await DynastyCommands.DynastyHub(player, dan, null, Channel);
                     }
                     else
                     {
@@ -69,7 +69,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         Guid id = Guid.Parse(data);
                         Dynasty dan = await Dynasty.Load(id);
                         var mem = await dan.AddMemeber(player);
-                        await DynastyCommands.DynastyHub(player, dan, mem, reaction.Channel);
+                        await DynastyCommands.DynastyHub(player, dan, mem, Channel);
                     }
                     else
                     {
@@ -77,7 +77,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         if(player.dynasty != null)
                         {
                             await dan.RemoveMember(player);
-                            await reaction.Channel.SendMessageAsync($"You've left the {dan.name} Dynasty");
+                            await Channel.SendMessageAsync($"You've left the {dan.name} Dynasty");
                         }
                     }
                     break;
@@ -93,7 +93,7 @@ namespace AMI.Neitsillia.User.UserInterface
             if(index > -1)
             {
                 string[] ids = data?.Split(';');
-                await DynastyCommands.DynastyUser(player, 0, reaction.Channel, ids[index]);
+                await DynastyCommands.DynastyUser(player, 0, Channel, ids[index]);
             }
         }
 
@@ -102,25 +102,25 @@ namespace AMI.Neitsillia.User.UserInterface
             (Dynasty dan, DynastyMember manager) = await DynastyCommands.GetDynasty(player);
             if(manager.PlayerId == data)
             {
-                await reaction.Channel.SendMessageAsync("You may not perform these actions on yourself");
+                await Channel.SendMessageAsync("You may not perform these actions on yourself");
                 return;
             }
             DynastyMember target = dan.GetMember(data);
             if (manager.rank > 3 || manager.rank > target.rank)
             {
-                await reaction.Channel.SendMessageAsync("You do not have the authority for this.");
+                await Channel.SendMessageAsync("You do not have the authority for this.");
                 return;
             }
             switch (reaction.Emote.ToString())
             {
                 case EUI.greaterthan:
                     if (target.rank < 2)
-                        await reaction.Channel.SendMessageAsync("You may not promote this member further");
+                        await Channel.SendMessageAsync("You may not promote this member further");
                     else
                     {
                         target.rank--;
                         await dan.Save();
-                        DUtils.DeleteMessage(await reaction.Channel.SendMessageAsync(
+                        DUtils.DeleteMessage(await Channel.SendMessageAsync(
                                 $"{target.name} was promoted to {dan.rankNames[target.rank]}"));
                         _ = msg.ModifyAsync(m => m.Embed = DynastyCommands.DynastyMemberEmbed(
                             dan, manager, target, out _).WithColor(player.userSettings.Color).Build());
@@ -128,12 +128,12 @@ namespace AMI.Neitsillia.User.UserInterface
                     break;
                 case EUI.lowerthan:
                     if (target.rank > dan.rankNames.Length - 1)
-                        await reaction.Channel.SendMessageAsync("You may not demote this member further");
+                        await Channel.SendMessageAsync("You may not demote this member further");
                     else
                     {
                         target.rank++;
                         await dan.Save();
-                        DUtils.DeleteMessage(await reaction.Channel.SendMessageAsync(
+                        DUtils.DeleteMessage(await Channel.SendMessageAsync(
                             $"{target.name} was demoted to {dan.rankNames[target.rank]}"));
                         _ = msg.ModifyAsync(m => m.Embed = DynastyCommands.DynastyMemberEmbed(
                            dan, manager, target, out _).WithColor(player.userSettings.Color).Build());

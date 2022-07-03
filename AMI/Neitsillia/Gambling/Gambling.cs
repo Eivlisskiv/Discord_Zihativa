@@ -64,7 +64,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands
             await player.EditUI(null, games.Build(), chan, MsgType.GamblingGames, "Tavern");
         }
 
-        internal static async Task DiceGame_EvenOdd(Player player, ISocketMessageChannel chan, int bet = -1, int coins = 10, int streak = 0)
+        internal static async Task DiceGame_EvenOdd(Player player, IMessageChannel chan, int bet = -1, int coins = 10, int streak = 0)
         {
             if (player.Area.type != Areas.AreaType.Tavern) throw NeitsilliaError.ReplyError("You are no longer in a Tavern. You must be in a tavern to play these games.");
             if (player.KCoins < coins) throw NeitsilliaError.ReplyError("You don't have the funds to make this bet.");

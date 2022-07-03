@@ -20,23 +20,28 @@ namespace AMI.Handlers
             Log.LogS(e);
             _ = UniqueChannels.Instance.SendToLog(e, $"ReactionAdded type {ui?.type}, emote: {emote}, data: {ui.data ?? "null"}", chan);
         }
-        public static Task ReactionAddedEvent(Cacheable<IUserMessage, ulong> cachedMessage, 
-            ISocketMessageChannel channel, SocketReaction reaction)
+
+        public static Task ReactionAddedEvent(Cacheable<IUserMessage, ulong> cachedMessage,
+            Cacheable<IMessageChannel, ulong> cachedChannel, SocketReaction reaction)
         {
+            IMessageChannel channel = null;
             Task.Run(async () =>
             {
                 try
                 {
 
-                    if (Program.CurrentState != Program.State.Ready
-                        || !reaction.User.IsSpecified
-                        || reaction.User.Value.IsBot)
-                        return;
+                    if (Program.CurrentState != Program.State.Ready) return;
+
+                    var user = reaction.User.IsSpecified ? reaction.User.Value 
+                    : await Program.clientCopy.GetUserAsync(reaction.UserId);
+                    if(user?.IsBot ?? true) return;
 
                     IUserMessage message = cachedMessage.Value ?? (reaction.Message.IsSpecified ? reaction.Message.Value : await cachedMessage.GetOrDownloadAsync());
 
                     //Currently, the bot does not need to check reactions on messages that are not its own
                     if (message == null || message.Author.Id != Program.clientCopy.CurrentUser.Id) return;
+
+                    channel = cachedChannel.Value ?? reaction.Channel ?? message.Channel;
 
                     GuildSettings gset = channel is IGuildChannel chan ?
                         gset = GuildSettings.Load(chan.Guild) : null;
@@ -51,7 +56,8 @@ namespace AMI.Handlers
                 catch (Exception e)
                 {
                     Log.LogS(e);
-                    _ = UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
+                    if(channel != null)
+                        _ = UniqueChannels.Instance.SendToLog(e, "ReactionAdded Error", channel);
                 }
 
                 CommandHandler.running.Remove(reaction.UserId);
@@ -75,7 +81,7 @@ namespace AMI.Handlers
             guildSettings = gset;
         }
 
-        public async Task<bool> IsUserUI()
+		public async Task<bool> IsUserUI()
         {
             if (botUser?.ui?.msgId != reaction.MessageId) return false;
 

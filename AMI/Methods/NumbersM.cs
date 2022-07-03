@@ -7,52 +7,18 @@ namespace AMI.Methods
 {
     static class NumbersM
     {
+        internal static int CeilParseInt(double v)
+        {
+            v = Math.Ceiling(v);
+            return Convert.ToInt32(v);
+        }
 
-        internal static dynamic NParse<T>(double v) where T : IComparable<T>
-        {
-            v = Math.Round(v);
-            if (typeof(T) == typeof(int))
-                return Convert.ToInt32(v);
-            else if (typeof(T) == typeof(long))
-                return Convert.ToInt64(v);
-            return v;
-        }
-        internal static dynamic NParse<T>(decimal v) where T : IComparable<T>
-        {
-            v = Math.Round(v);
-            if (typeof(T) == typeof(int))
-                return Convert.ToInt32(v);
-            else if (typeof(T) == typeof(long))
-                return Convert.ToInt64(v);
-            return v;
-        }
-        internal static dynamic NParse<T>(float f) where T : IComparable<T>
-        {
-            double v = Math.Round(f);
-            if (typeof(T) == typeof(int))
-                return Convert.ToInt32(v);
-            else if (typeof(T) == typeof(long))
-                return Convert.ToInt64(v);
-            return v;
-        }
-        internal static dynamic CeilParse<T>(double v) where T : IComparable<T>
+        internal static long CeilParseLong(double v)
         {
             v = Math.Ceiling(v);
-            if (typeof(T) == typeof(int))
-                return Convert.ToInt32(v);
-            else if (typeof(T) == typeof(long))
-                return Convert.ToInt64(v);
-            return v;
+            return Convert.ToInt64(v);
         }
-        internal static dynamic CeilParse<T>(decimal v) where T : IComparable<T>
-        {
-            v = Math.Ceiling(v);
-            if (typeof(T) == typeof(int))
-                return Convert.ToInt32(v);
-            else if (typeof(T) == typeof(long))
-                return Convert.ToInt64(v);
-            return v;
-        }
+
         internal static dynamic CeilParse<T>(float f) where T : IComparable<T>
         {
             double v = Math.Ceiling(f);

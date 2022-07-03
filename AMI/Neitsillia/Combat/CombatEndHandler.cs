@@ -186,9 +186,9 @@ namespace AMI.Neitsillia.Combat
 
         public static string DefeatCost(Player player, NPC mob, double intensity = 1)
         {
-            long xpDropped = NumbersM.NParse<long>(player.XPDrop(mob.level) * intensity);
+            long xpDropped = (long)(player.XPDrop(mob.level) * intensity);
             player.experience -= xpDropped;
-            long coinsLost = Verify.Max(NumbersM.NParse<long>(((mob.Rank() + mob.level) * 2) * intensity), player.KCoins);
+            long coinsLost = Verify.Max((long)(((mob.Rank() + mob.level) * 2) * intensity), player.KCoins);
             player.KCoins -= coinsLost;
             //Log.CombatData(mob, player, xpDropped);
             mob.XpGain(xpDropped);
@@ -228,12 +228,12 @@ namespace AMI.Neitsillia.Combat
             else if (s >= -1)
             {
                 long fullHealthCost = Verify.Max(
-                    NumbersM.NParse<long>(100 - (((n.health + 0.00) / n.Health()) * 100))
+                    (long)(100 - (((n.health + 0.00) / n.Health()) * 100))
                     , n.KCoins);
                 if (fullHealthCost > 0)
                 {
                     n.KCoins -= fullHealthCost;
-                    n.health += NumbersM.CeilParse<long>(n.Health() * (fullHealthCost / 100.00));
+                    n.health += NumbersM.CeilParseLong(n.Health() * (fullHealthCost / 100.00));
                 }
                 n.stamina = n.Stamina();
                 n.SelfGear();
@@ -356,7 +356,7 @@ namespace AMI.Neitsillia.Combat
                 if (currentArea.arena.WaveProgress(MainAreaPath.floor * scoreMult))
                     currentArea.level++;
 
-                xpGain = NumbersM.CeilParse<long>(xpGain * (float)(currentArea.arena.Modifiers?.xpMult ?? 1));
+                xpGain = NumbersM.CeilParseLong(xpGain * (float)(currentArea.arena.Modifiers?.xpMult ?? 1));
 
                 await currentArea.UploadToDatabase();
             }
@@ -370,7 +370,7 @@ namespace AMI.Neitsillia.Combat
 
             if (party != null)
             {
-                kuts = NumbersM.CeilParse<long>(kuts / (double)party.MemberCount);
+                kuts = NumbersM.CeilParseLong(kuts / (double)party.MemberCount);
                 return $"+{kuts} Kutsyei Coins Per Party Member." + Environment.NewLine;
             }
 

@@ -703,7 +703,7 @@ namespace AMI.Neitsillia.InventoryCommands
 
             amount = Math.Min(amount, player.inventory.GetCount(kiti)); //change amount to use to minimum how much is available
 
-            amount = Math.Min(amount, NumbersM.CeilParse<int>((gear.durability - gear.condition) / (double)kit.condition)); //change the amount to maximum required for max cnd
+            amount = Math.Min(amount, NumbersM.CeilParseInt((gear.durability - gear.condition) / (double)kit.condition)); //change the amount to maximum required for max cnd
 
             gear.condition = Math.Min(gear.condition + (amount * kit.condition), gear.durability);
 
@@ -903,7 +903,7 @@ namespace AMI.Neitsillia.InventoryCommands
         [Command("Loot")]
         public async Task CollectLoot(string loot_target = "all")
             => await CollectLoot(Context.Player, Context.Channel, loot_target);
-        internal static async Task CollectLoot(Player player, ISocketMessageChannel chan, string arg = "all")
+        internal static async Task CollectLoot(Player player, IMessageChannel chan, string arg = "all")
         {
             int index, amount;
             string result;

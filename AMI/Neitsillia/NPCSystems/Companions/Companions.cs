@@ -21,7 +21,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions
                 await ReplyAsync("You have no egg pocket");
             else await PocketUi(player, Context.Channel);
         }
-        internal static async Task PocketUi(Player player, ISocketMessageChannel chan)
+        internal static async Task PocketUi(Player player, IMessageChannel chan)
         {
             if (player.EggPocket == null) throw NeitsilliaError.ReplyError(player.name + " does not have an egg pocket.");
             EmbedBuilder e = DUtils.BuildEmbed(player.name + "'s Egg Pocket",
@@ -75,7 +75,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions
             }
         }
 
-        internal static async Task ViewPets(Player player, ISocketMessageChannel channel)
+        internal static async Task ViewPets(Player player, IMessageChannel channel)
         {
             PetList pl = player.PetList;
             await pl.BuildUI(player, channel);

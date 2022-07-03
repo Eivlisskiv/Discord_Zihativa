@@ -7,14 +7,11 @@ using AMYPrototype;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public partial class GameMaster
+	public partial class GameMaster
     {
         [Command("AnimRate")]
         public void AnimRate(int seconds)
@@ -75,54 +72,51 @@ namespace AMI.AMIData.OtherCommands
             await ReplyAsync($"{popu.Count} population eradicated");
         }
 
-        [Command("New NPC")]
-        public async Task New_NPC(string areaName, int amount = 1, string profession = "Child", int level = 0)
+        [Command("New NPC"), Alias("spawn npc")]
+        public async Task New_NPC(string areaName = null, int amount = 1, string profession = "Child", int level = 0)
         {
-            if (IsGMLevel(4).Result)
+            if (!await IsGMLevel(4)) return;
+
+            if (amount < 1)
             {
-                //areaName = Area.AreaDataExist(areaName);
-                if (areaName != null)
-                {
-                    NPC[] npcs = new NPC[amount];
-                    for (int i = 0; i < amount; i++)
-                        npcs[i] = NPC.NewNPC(level, profession, null);
-
-                    Area area = Area.LoadFromName(areaName);
-                    string populationId = area.GetPopulation(Neitsillia.Areas.AreaExtentions.Population.Type.Population)._id;
-
-                    EmbedBuilder noti = new EmbedBuilder();
-                    noti.WithTitle($"{area.name} Population");
-                    amount = 0;
-                    if (npcs != null && npcs.Length > 0)
-                    {
-                        foreach (NPC n in npcs)
-                        {
-                            if (n != null)
-                            {
-                                if (n.profession == Neitsillia.ReferenceData.Profession.Child)
-                                {
-                                    if (area.parent == null)
-                                        n.origin = area.name;
-                                    else
-                                        n.origin = area.parent;
-                                    n.displayName = n.name + " Of " + n.origin;
-                                }
-                                else
-                                    n.displayName = n.name;
-                                PopulationHandler.Add(populationId, n);
-                                amount++;
-                            }
-                        }
-                    }
-
-                    if (amount != 0) await ReplyAsync("NPCs created");
-                    else await ReplyAsync("No new NPC were created");
-                }
-                else await DUtils.Replydb(Context, "Area not found.");
+                await ReplyAsync("Invalid count.");
+                return;
             }
-        }
 
-        [Command("New Bounty")]
+            areaName ??= Context.GetPlayer(Player.IgnoreException.None).areaPath.path;
+
+			NPC[] npcs = new NPC[amount];
+			for (int i = 0; i < amount; i++)
+				npcs[i] = NPC.NewNPC(level, profession);
+
+			Area area = Area.LoadFromName(areaName);
+			string populationId = area.GetPopulation(Neitsillia.Areas.AreaExtentions.Population.Type.Population)._id;
+
+			EmbedBuilder noti = new EmbedBuilder();
+			noti.WithTitle($"{area.name} Population");
+			amount = 0;
+
+			for (int i = 0; i < npcs.Length; i++)
+			{
+				NPC n = npcs[i];
+                if (n == null) continue;
+
+				if (n.profession == Neitsillia.ReferenceData.Profession.Child)
+				{
+					n.origin = area.parent ?? area.name;
+					n.displayName = n.name + " Of " + n.origin;
+				}
+				else n.displayName = n.name;
+				PopulationHandler.Add(populationId, n);
+				amount++;
+			}
+
+			if (amount != 0) await ReplyAsync("NPCs created");
+			else await ReplyAsync("No new NPC were created");
+
+		}
+
+		[Command("New Bounty")]
         public async Task New_Bounty(string areaName, string creatureName = null, int floor = 0, int level = 1, string grantDrop = null)
         {
             if (IsGMLevel(4).Result)

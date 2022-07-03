@@ -154,7 +154,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 case AreaType.BeastMasterShop:
                     return true;
             }
-            return false;
+            return eMobRate <= 0;
         }
 
         internal bool ValidTable(IEnumerable<string>[] table) =>  table != null && table.Length > 0;
@@ -169,10 +169,10 @@ namespace AMI.Neitsillia.Areas.AreaPartials
         internal int GetAreaFloorLevel(Random rng, int floor = -1)
         {
             double range = 0.20;
-            int fl = NumbersM.NParse<int>(level * ( 1 + (floor / (5.00 * level))));
+            int fl = (int)(level * ( 1 + (floor / (5.00 * level))));
 
-            int min = NumbersM.NParse<int>(fl * (1 - range));
-            int max = NumbersM.NParse<int>(fl * (1 + range));
+            int min = (int)(fl * (1 - range));
+            int max = (int)(fl * (1 + range));
             return rng.Next(min, max + 1);
         }
     }

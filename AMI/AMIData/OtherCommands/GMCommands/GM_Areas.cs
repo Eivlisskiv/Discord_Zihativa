@@ -105,7 +105,7 @@ namespace AMI.AMIData.OtherCommands
                 Area from = Area.LoadFromName(fromId);
                 Area to = Area.LoadFromName(toId);
 
-                from.junctions = from.junctions ?? new List<NeitsilliaEngine.Junction>();
+                from.junctions ??= new List<NeitsilliaEngine.Junction>();
                 int index = from.junctions.FindIndex(NeitsilliaEngine.Junction.FindName(to.name));
                 if (index == -1)
                     from.junctions.Add(new NeitsilliaEngine.Junction(to, floor, returnFloor));

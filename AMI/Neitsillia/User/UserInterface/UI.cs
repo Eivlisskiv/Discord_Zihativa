@@ -16,7 +16,6 @@ using AMYPrototype.Commands;
 using AMI.Neitsillia.Items.Quests;
 using AMI.Neitsillia.NPCSystems.Companions;
 using AMI.Neitsillia.NeitsilliaCommands;
-using AMI.Neitsillia.Gambling.Games;
 using System.Linq;
 using AMI.AMIData;
 using AMI.Neitsillia.User.PlayerPartials;
@@ -25,10 +24,12 @@ using AMI.Neitsillia.Areas.InteractiveAreas;
 using AMI.Neitsillia.Items.Abilities;
 using AMI.Neitsillia.Items.Abilities.Load;
 using AMI.Handlers;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace AMI.Neitsillia.User.UserInterface
 {
-    public partial class UI
+	[BsonIgnoreExtraElements]
+	public partial class UI
     {
         private static readonly ReflectionCache<UI> reflectionCache = new ReflectionCache<UI>();
 
@@ -38,10 +39,14 @@ namespace AMI.Neitsillia.User.UserInterface
         public MsgType type;
         public string data;
 
+        public ulong UserId => botUser?._id ?? player.userid; 
+
         private IUserMessage message;
         private Player player;
-        private IMessageChannel _channel;
-        internal IMessageChannel Channel => _channel ?? message?.Channel;
+        private BotUser botUser;
+
+		[BsonIgnore]
+        public IMessageChannel Channel { get; private set; }
 
         //
         [JsonConstructor]
@@ -64,6 +69,23 @@ namespace AMI.Neitsillia.User.UserInterface
             else options = player.ui?.options;
         }
 
+        public UI(IUserMessage argMsg, MsgType argType, BotUser buser, string argData = null, bool loadReaction = true)
+        {
+            message = argMsg;
+            msgId = argMsg.Id;
+            channelID = argMsg.Channel.Id;
+            type = argType;
+            botUser = buser;
+            data = argData;
+
+            InitialiseOption();
+            VerifyOptions();
+
+            if (loadReaction) LoadOptions(argMsg);
+
+            else options = player.ui?.options;
+        }
+
         public async Task<UI> Edit(Player player, string content, Embed embed, MsgType type, string data, bool editEmotes = true)
         {
             this.type = type;
@@ -72,6 +94,12 @@ namespace AMI.Neitsillia.User.UserInterface
 
             //Edit Message
             IUserMessage msg = await GetUiMessage();
+
+            if(msg == null)
+			{
+
+			}
+
             await msg.ModifyAsync(x =>
             {
                 x.Content = content;
@@ -86,7 +114,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 VerifyOptions();
 
                 oldops.RemoveAll(e => options.Contains(e));
-                _ = msg.RemoveReactionsAsync(Handlers.DiscordBotHandler.Client.CurrentUser, oldops.Select(x => EUI.ToEmote(x)).ToArray());
+                _ = msg.RemoveReactionsAsync(DiscordBotHandler.Client.CurrentUser, oldops.Select(x => EUI.ToEmote(x)).ToArray());
 
                 LoadOptions(msg);
             }
@@ -158,10 +186,18 @@ namespace AMI.Neitsillia.User.UserInterface
         #region Message Methods
         internal async Task<IUserMessage> GetUiMessage()
         {
-            try {
-                return message ??= (IUserMessage)await ((ISocketMessageChannel)Handlers.DiscordBotHandler.Client.GetChannel(channelID)).GetMessageAsync(msgId);
+            try 
+            {
+                if (message != null) return message;
+                Channel ??= ((IMessageChannel)await DiscordBotHandler.Client.GetChannelAsync(channelID))
+                    ?? (await DiscordBotHandler.Client.GetDMChannelAsync(channelID));
 
-            } catch (Exception) { return null; }
+				return Channel == null ? null : (message = (IUserMessage)await Channel.GetMessageAsync(msgId));
+			}
+			catch (Exception) 
+            {
+                return null; 
+            }
         }
         internal async Task TryDeleteMessage()
         {
@@ -237,31 +273,31 @@ namespace AMI.Neitsillia.User.UserInterface
         public async Task Click(SocketReaction reaction, IUserMessage msg, Player argplayer)
         {
             this.player = argplayer;
-            this._channel = reaction.Channel;
+            this.Channel = reaction.Channel ?? msg.Channel;
             this.message = msg;
 
             switch (reaction.Emote.ToString())
             {
                 case inv:
-                    await GameCommands.DisplayInventory(player, reaction.Channel, 0);
+                    await GameCommands.DisplayInventory(player, Channel, 0);
                     break;
                 case sheet:
-                    await GameCommands.SheetDisplay(player, reaction.Channel);
+                    await GameCommands.SheetDisplay(player, Channel);
                     break;
                 case xp:
-                    await GameCommands.ViewXP(player, reaction.Channel);
+                    await GameCommands.ViewXP(player, Channel);
                     break;
                 case explore:
-                    await Commands.Areas.Exploration(player, reaction.Channel);
+                    await Commands.Areas.Exploration(player, Channel);
                     break;
                 case tpost:
-                    await Commands.Areas.ViewJunctions(player, reaction.Channel, 0);
+                    await Commands.Areas.ViewJunctions(player, Channel, 0);
                     break;
                 case ability:
-                    await GameCommands.Abilities(player, reaction.Channel);
+                    await GameCommands.Abilities(player, Channel);
                     break;
                 case enterFloor:
-                    await EnterFloor(null, reaction.Channel);
+                    await EnterFloor(null, Channel);
                     break;
                 case loot:
                     {
@@ -270,26 +306,26 @@ namespace AMI.Neitsillia.User.UserInterface
                         else
                         {
                             int.TryParse(data, out int page);
-                            await InventoryCommands.Inventory.ViewLoot(player, reaction.Channel, page);
+                            await InventoryCommands.Inventory.ViewLoot(player, Channel, page);
                         }
                     } break;
                 case schem:
-                    await GameCommands.ViewSchems(player, reaction.Channel);
+                    await GameCommands.ViewSchems(player, Channel);
                     break;
                 case stats:
-                    await GameCommands.ShortStatsDisplay(player, reaction.Channel);
+                    await GameCommands.ShortStatsDisplay(player, Channel);
                     break;
                 default:
-                    await Click2(reaction, msg);
+                    await AnonymousClick(reaction, msg);
                     break;
             }
         }
-        public async Task Click2(SocketReaction reaction, IUserMessage msg)
+        public async Task AnonymousClick(SocketReaction reaction, IUserMessage msg)
         {
             string emote = reaction.Emote.ToString(); 
             if (emote == help)  await AllHelp(reaction, msg);
             else if (type != MsgType.SpecSelection && ArrayM.IsInArray(emote, specs))
-                await player.Specialization.MainMenu(player, reaction.Channel);
+                await player.Specialization.MainMenu(player, Channel);
             else if (options.Contains(emote))
             {
                 string function = type.ToString();
@@ -299,7 +335,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 }
                 catch (Exception e) 
                 {
-                    if (!await NeitsilliaError.SpecialExceptions(e, reaction.Channel, player))
+                    if (!await NeitsilliaError.SpecialExceptions(e, Channel, player))
                         ReactionHandler.LogReactionError(this, e, reaction.Emote, msg.Channel);
                 }
             }
@@ -328,7 +364,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 Environment.NewLine + "Request one via the support server or the `suggest` command in the bot's DM." :
                 $"Use the `Help {helpType}` command for related commands.");
 
-            await reaction.Channel.SendMessageAsync(reactionsInfo);
+            await Channel.SendMessageAsync(reactionsInfo);
 
         }
         #endregion
@@ -364,10 +400,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case ok:
-                    await CharacterCommands.AutoCharacter(player, reaction.Channel, false);
+                    await CharacterCommands.AutoCharacter(player, msg.Channel, false);
                     break;
                 case next:
-                    await CharacterCommands.SetSkills(player, reaction.Channel, 0, null, new[] { false, false, false, false, false, false });
+                    await CharacterCommands.SetSkills(player, Channel, 0, null, new[] { false, false, false, false, false, false });
                     break;
                 case info:
                     EmbedBuilder em = DUtils.BuildEmbed("Character Creation",
@@ -387,9 +423,9 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 BotUser buser = BotUser.Load(reaction.UserId);
                 if (buser.ResourceCrates[i] > 0)
-                    await buser.CharListForCrate(reaction.Channel, i);
+                    await buser.CharListForCrate(Channel, i);
                 else
-                    await reaction.Channel.SendMessageAsync("You do not own any of this crate type.");
+                    await Channel.SendMessageAsync("You do not own any of this crate type.");
             }
         }
         public async Task ResourceCrateOpening(SocketReaction reaction, IUserMessage msg)
@@ -419,12 +455,12 @@ namespace AMI.Neitsillia.User.UserInterface
                         });
                     }
                     else
-                        await reaction.Channel.SendMessageAsync(r);
+                        await Channel.SendMessageAsync(r);
                 }
                 else
                 {
-                    await reaction.Channel.SendMessageAsync("You do not own any of this crate type.");
-                    await buser.CratesListUI(reaction.Channel);
+                    await Channel.SendMessageAsync("You do not own any of this crate type.");
+                    await buser.CratesListUI(Channel);
                 }
             }
         }
@@ -472,7 +508,7 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 player.SaveFileMongo();
                 await TryMSGDel(msg);
-                await CharacterCommands.StarterAbilities(player, reaction.Channel, 0);
+                await CharacterCommands.StarterAbilities(player, Channel, 0);
             }
         }
         public async Task SetSkill(SocketReaction reaction, IUserMessage msg)
@@ -482,7 +518,7 @@ namespace AMI.Neitsillia.User.UserInterface
             string[] arrays = data.Split(';');
             bool[] rused = Utils.JSON<bool[]>(arrays[1]);
             if (!rused[result - 1])
-                await CharacterCommands.SetSkills(player, reaction.Channel, result,
+                await CharacterCommands.SetSkills(player, Channel, result,
                     Utils.JSON<int[]>(arrays[0]), rused, true);
         }
         public async Task StarterAbilities(SocketReaction reaction, IUserMessage msg)
@@ -499,21 +535,21 @@ namespace AMI.Neitsillia.User.UserInterface
                     player.abilities.Add(a);
                 if (x > -1)
                 {
-                    string prefix = CommandHandler.GetPrefix(reaction.Channel);
+                    string prefix = CommandHandler.GetPrefix(Channel);
                     player.level = 0;
                     await EditMessage("Character creation completed");
-                    await GameCommands.StatsDisplay(player, reaction.Channel);
-                    await reaction.Channel.SendMessageAsync("Welcome to Neitsillia, Traveler. To guide you, you've been given the \"Tutorial\" Quest line."
+                    await GameCommands.StatsDisplay(player, Channel);
+                    await Channel.SendMessageAsync("Welcome to Neitsillia, Traveler. To guide you, you've been given the \"Tutorial\" Quest line."
                         + Environment.NewLine + "Use the `Quest` command to view your quest list and inspect the quest using the assigned emote. Follow the Tutorial quest to learn to play.");
                 }
                 else
-                    await CharacterCommands.StarterAbilities(player, reaction.Channel, p);
+                    await CharacterCommands.StarterAbilities(player, Channel, p);
                 player.SaveFileMongo();
             }
             else if (reaction.Emote.ToString() == next)
-                await CharacterCommands.StarterAbilities(player, reaction.Channel, p + 1, x, z);
+                await CharacterCommands.StarterAbilities(player, Channel, p + 1, x, z);
             else if (reaction.Emote.ToString() == prev)
-                await CharacterCommands.StarterAbilities(player, reaction.Channel, p - 1, x, z);
+                await CharacterCommands.StarterAbilities(player, Channel, p - 1, x, z);
         }
         #endregion
 
@@ -523,11 +559,11 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 case EUI.prev:
                     if (player.Area.type == Areas.AreaType.Tavern)
-                        await TavernInteractive.GenerateBountyFile(player, player.Area, int.Parse(data) - 1, reaction.Channel);
+                        await TavernInteractive.GenerateBountyFile(player, player.Area, int.Parse(data) - 1, Channel);
                     break;
                 case EUI.next:
                     if (player.Area.type == Areas.AreaType.Tavern)
-                        await TavernInteractive.GenerateBountyFile(player, player.Area, int.Parse(data) + 1, reaction.Channel);
+                        await TavernInteractive.GenerateBountyFile(player, player.Area, int.Parse(data) + 1, Channel);
                     break;
             }
         }
@@ -539,41 +575,61 @@ namespace AMI.Neitsillia.User.UserInterface
                 case brawl:
                     {
                         if (player.Encounter.Name == Encounter.Names.PVP)
-                            await CombatCommands.PVPTurn(player, data, reaction.Channel);
+                            await CombatCommands.PVPTurn(player, data, Channel);
                         else
-                            await CombatCommands.AutoBrawl(player, reaction.Channel);
+                            await CombatCommands.AutoBrawl(player, Channel);
                     }
                     break;
                 case run:
                     {
-                        await CombatCommands.Run(player, reaction.Channel, true);
+                        await CombatCommands.Run(player, Channel, true);
                         await TryMSGDel(msg); break;
                     }
             }
         }
         public async Task ConfirmCharDel(SocketReaction reaction, IUserMessage msg)
         {
-            if (reaction.Emote.ToString() == ok)
-            {
-                string id = reaction.UserId + "\\" + data;
-                Player p = Player.Load(id, Player.IgnoreException.All);
-                await p.DeleteFileMongo();
+            string emote = reaction.Emote.ToString();
 
-                if (p.Area != null && p.Area.name != "Moceoy's Basement")
-                {
-                    NPCSystems.NPC revival = NPCSystems.NPC.GenerateNPC(p.level, "Choichoith");
-                    if (revival != null)
-                    {
-                        revival.inventory.inv.AddRange(p.inventory.inv);
-                        NPCSystems.PopulationHandler.Add(p.Area, revival);
-                    }
-                }
+            if(emote == cancel)
+			{
                 await TryMSGDel(msg);
-                await CharacterCommands.ListCharacters(reaction.User.Value, reaction.Channel);
+                return;
             }
-            else if (reaction.Emote.ToString() == cancel)
-                await TryMSGDel(msg);
+
+            Player p = await DeleteCharacter(reaction, msg);
+
+            if (emote == bounties || p.Area == null || p.Area.name == "Moceoy's Basement") return;
+
+            NPCSystems.NPC revival = emote switch
+            {
+                ok => p.Area.IsNonHostileArea()
+                        ? new NPCSystems.NPC(p)
+                        : NPCSystems.NPC.GenerateNPC(p.level, "Choichoith"),
+                npc => new NPCSystems.NPC(p),
+                _ => null,
+            };
+
+            if (revival == null) return;
+
+            if (revival.profession == ReferenceData.Profession.Creature)
+                revival.inventory.inv.AddRange(p.inventory.inv);
+
+            NPCSystems.PopulationHandler.Add(p.Area, revival);
         }
+
+        private async Task<Player> DeleteCharacter(SocketReaction reaction, IUserMessage msg)
+		{
+            string id = reaction.UserId + "\\" + data;
+            Player p = Player.Load(id, Player.IgnoreException.All);
+
+            await p.DeleteFileMongo();
+            await TryMSGDel(msg);
+            await CharacterCommands.ListCharacters(reaction.User.Value, Channel);
+
+            return player;
+        }
+
         public async Task ConfirmOffer(SocketReaction reaction, IUserMessage msg)
         {
             if (reaction.Emote.ToString() == ok)
@@ -590,9 +646,9 @@ namespace AMI.Neitsillia.User.UserInterface
                 player.inventory.Remove(index, amount);
                 player.SaveFileMongo();
 
-                IMessageChannel chan = reaction.Channel is IGuildChannel gChan
-                    && (await gChan.Guild.GetUserAsync(target.userid)) != null ? reaction.Channel :
-                    (IMessageChannel)(await DiscordBotHandler.Client.GetUser(target.userid).GetOrCreateDMChannelAsync());
+                IMessageChannel chan = Channel is IGuildChannel gChan
+                    && (await gChan.Guild.GetUserAsync(target.userid)) != null ? Channel :
+                    (IMessageChannel)(await DiscordBotHandler.Client.GetUser(target.userid).CreateDMChannelAsync());
 
                 await chan.SendMessageAsync($"<@{target.userid}>, You've received a new offer. View all offers using " +
                     $"`Received Offers`");
@@ -608,7 +664,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 player.stamina = player.Stamina();
                 player.SaveFileMongo();
                 await TryMSGDel(msg);
-                await CharacterCommands.ChooseRace(player, reaction.Channel);
+                await CharacterCommands.ChooseRace(player, Channel);
             }
             else if (reaction.Emote.ToString() == cancel)
             {
@@ -621,7 +677,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 player.stats.perception = 0;
                 player.SaveFileMongo();
                 await TryMSGDel(msg);
-                await CharacterCommands.SetSkills(player, reaction.Channel, 0, rolls, new bool[6]);
+                await CharacterCommands.SetSkills(player, Channel, 0, rolls, new bool[6]);
             }
         }
 
@@ -630,7 +686,7 @@ namespace AMI.Neitsillia.User.UserInterface
             await TryMSGDel(msg);
             if (reaction.Emote.ToString() == ok)
                 await Commands.InventoryCommands.Crafting.ProceedItemUpgrade(player,
-                    reaction.Channel, data);
+                    Channel, data);
         }
 
         public async Task DuelOffer(SocketReaction reaction, IUserMessage msg)
@@ -656,10 +712,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case cancel:
-                    await player.NewUI(await reaction.Channel.SendMessageAsync("Are you sure you want to discard this egg?"), MsgType.ConfirmEggDiscard);
+                    await player.NewUI(await Channel.SendMessageAsync("Are you sure you want to discard this egg?"), MsgType.ConfirmEggDiscard);
                     break;
                 case pets:
-                    await CompanionCommands.ViewPets(player, reaction.Channel);
+                    await CompanionCommands.ViewPets(player, Channel);
                     break;
             }
         }
@@ -670,10 +726,10 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 case ok:
                     player.EggPocket.egg = null;
-                    await CompanionCommands.PocketUi(player, reaction.Channel);
+                    await CompanionCommands.PocketUi(player, Channel);
                     break;
                 case cancel:
-                    await CompanionCommands.PocketUi(player, reaction.Channel);
+                    await CompanionCommands.PocketUi(player, Channel);
                     break;
             }
         }
@@ -684,9 +740,9 @@ namespace AMI.Neitsillia.User.UserInterface
         {
             await TryMSGDel(msg);
             if (reaction.Emote.ToString() == ok)
-                await Commands.Areas.EndRest(player, reaction.Channel);
+                await Commands.Areas.EndRest(player, Channel);
         }
-        public async Task EnterFloor(SocketReaction setToNull, ISocketMessageChannel channel)
+        public async Task EnterFloor(SocketReaction setToNull, IMessageChannel channel)
         {
             await Commands.Areas.Enter(player, player.Encounter.Name.ToString(), channel);
         }
@@ -714,8 +770,8 @@ namespace AMI.Neitsillia.User.UserInterface
                                     player.SaveFileMongo();
                                     offerer.SaveFileMongo();
                                     await offer.DeleteAsync();
-                                    await reaction.Channel.SendMessageAsync("Trade completed!");
-                                    await ItemOffer.GetOffers(player, 0, ItemOffer.OfferQuery.Receiver, reaction.Channel);
+                                    await Channel.SendMessageAsync("Trade completed!");
+                                    await ItemOffer.GetOffers(player, 0, ItemOffer.OfferQuery.Receiver, Channel);
                                 }
                             }
                         }
@@ -733,10 +789,10 @@ namespace AMI.Neitsillia.User.UserInterface
                             Player sender = Player.Load(offer.sender, Player.IgnoreException.All);
                             sender.inventory.Add(offer.offer, -1);
                             sender.SaveFileMongo();
-                            await sender.SendMessageToDM("Offer Items returned to inventory.", em, reaction.Channel);
+                            await sender.SendMessageToDM("Offer Items returned to inventory.", em, Channel);
                             await offer.DeleteAsync();
-                            await reaction.Channel.SendMessageAsync("Trade Denied!");
-                            await NeitsilliaCommands.Social.ItemOffer.GetOffers(player, 0, ItemOffer.OfferQuery.Receiver, reaction.Channel);
+                            await Channel.SendMessageAsync("Trade Denied!");
+                            await NeitsilliaCommands.Social.ItemOffer.GetOffers(player, 0, ItemOffer.OfferQuery.Receiver, Channel);
                         }
                         else if (offer.sender == reaction.UserId)
                         {
@@ -747,10 +803,10 @@ namespace AMI.Neitsillia.User.UserInterface
                             Player receiver = Player.Load(offer.receiver, Player.IgnoreException.All);
                             player.inventory.Add(offer.offer, -1);
                             player.SaveFileMongo();
-                            await receiver.SendMessageToDM(null, em, reaction.Channel);
+                            await receiver.SendMessageToDM(null, em, Channel);
                             await offer.DeleteAsync();
-                            await reaction.Channel.SendMessageAsync("Trade Canceled, Items retrieved!");
-                            await ItemOffer.GetOffers(player, 0, ItemOffer.OfferQuery.Sender, reaction.Channel);
+                            await Channel.SendMessageAsync("Trade Canceled, Items retrieved!");
+                            await ItemOffer.GetOffers(player, 0, ItemOffer.OfferQuery.Sender, Channel);
                         }
                     }
                     break;
@@ -764,17 +820,17 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case loot:
-                    await InventoryCommands.Inventory.CollectLoot(player, reaction.Channel, "all");
+                    await InventoryCommands.Inventory.CollectLoot(player, Channel, "all");
                     await TryMSGDel(msg);
                     break;
                 case next:
                     int.TryParse(data, out p);
                     await TryMSGDel(msg);
-                    await InventoryCommands.Inventory.ViewLoot(player, reaction.Channel, p + 1); break;
+                    await InventoryCommands.Inventory.ViewLoot(player, Channel, p + 1); break;
                 case prev:
                     int.TryParse(data, out p);
                     await TryMSGDel(msg);
-                    await InventoryCommands.Inventory.ViewLoot(player, reaction.Channel, p - 1); break;
+                    await InventoryCommands.Inventory.ViewLoot(player, Channel, p - 1); break;
             }
         }
 
@@ -785,9 +841,9 @@ namespace AMI.Neitsillia.User.UserInterface
             if (i > -1)
             {
                 if (player.PetList[i].status == NPCSystems.Companions.Pets.Pet.PetStatus.InParty)
-                    await reaction.Channel.SendMessageAsync("Use the `Follower` command to inspect pets in your party");
+                    await Channel.SendMessageAsync("Use the `Follower` command to inspect pets in your party");
                 else
-                    await player.PetList[i].GetInfo(player, reaction.Channel, i);
+                    await player.PetList[i].GetInfo(player, Channel, i);
             }
         }
         public async Task InspectPet(SocketReaction reaction, IUserMessage msg)
@@ -809,7 +865,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         switch (petslot.status)
                         {
                             case NPCSystems.Companions.Pets.Pet.PetStatus.InParty:
-                                await reaction.Channel.SendMessageAsync($"{petslot.pet.displayName} is already in a party.");
+                                await Channel.SendMessageAsync($"{petslot.pet.displayName} is already in a party.");
                                 return;
 
                             case NPCSystems.Companions.Pets.Pet.PetStatus.Idle:
@@ -817,18 +873,18 @@ namespace AMI.Neitsillia.User.UserInterface
                                 player.Party.NPCMembers.Add(petslot.pet);
                                 await player.Party.SaveData();
                                 player.PetList.Save();
-                                await reaction.Channel.SendMessageAsync($"{petslot.pet.displayName} has joined {player.Party.partyName}");
+                                await Channel.SendMessageAsync($"{petslot.pet.displayName} has joined {player.Party.partyName}");
                                 return;
                         }
                     } break;
                 case skills:
                     {
                         var petslot = player.PetList[i];
-                        await petslot.UpgradeOptionsUI(player, reaction.Channel, i);
+                        await petslot.UpgradeOptionsUI(player, Channel, i);
                     }
                     break;
-                case whistle: await player.PetList[i].ToggleFetching(player, reaction.Channel, i); break;
-                case pickSpec: await player.PetList[i].ViewEvolves(player, reaction.Channel, i); break;
+                case whistle: await player.PetList[i].ToggleFetching(player, Channel, i); break;
+                case pickSpec: await player.PetList[i].ViewEvolves(player, Channel, i); break;
             }
         }
         public async Task PetUpgrade(SocketReaction reaction, IUserMessage msg)
@@ -845,7 +901,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 case uturn:
                     {
                         Func<Player, IMessageChannel, int, bool, Task> func = (split.Length == 2 ? (Func<Player, IMessageChannel, int, bool, Task>)petslot.UpgradeOptionsUI : petslot.GetInfo);
-                        await func(player, reaction.Channel, i, true);
+                        await func(player, Channel, i, true);
                     }
                     break;
 
@@ -861,14 +917,14 @@ namespace AMI.Neitsillia.User.UserInterface
                 if (petslot.UpgradePet((NPCSystems.Companions.Pets.PetUpgrades.Upgrade)k, n))
                 {
                     player.PetList.Save();
-                    await petslot.UpgradeStatUI(player, reaction.Channel, i, k);
+                    await petslot.UpgradeStatUI(player, Channel, i, k);
                 }
-                else await reaction.Channel.SendMessageAsync("Not enough points for this training.");
+                else await Channel.SendMessageAsync("Not enough points for this training.");
 
             }
             else
             {
-                await petslot.UpgradeStatUI(player, reaction.Channel, i, n);
+                await petslot.UpgradeStatUI(player, Channel, i, n);
             }
         }
         public async Task PetEvolve(SocketReaction reaction, IUserMessage msg)
@@ -881,11 +937,11 @@ namespace AMI.Neitsillia.User.UserInterface
             NPCSystems.Companions.Pets.Pet pet = player.PetList[i];
             (int level, string name) = NPCSystems.Companions.Pets.Evolves.GetOptions(pet.pet.race, pet.pet.name)[k];
             if (pet.pet.level < level)
-                await reaction.Channel.SendMessageAsync($"{pet.pet.displayName} must be level {level} to evolve into a {name}");
+                await Channel.SendMessageAsync($"{pet.pet.displayName} must be level {level} to evolve into a {name}");
             else
             {
-                await reaction.Channel.SendMessageAsync(NPCSystems.Companions.Pets.Evolves.Evolve(pet, name));
-                await pet.GetInfo(player, reaction.Channel, i);
+                await Channel.SendMessageAsync(NPCSystems.Companions.Pets.Evolves.Evolve(pet, name));
+                await pet.GetInfo(player, Channel, i);
             }
         }
         #endregion
@@ -896,10 +952,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch(reaction.Emote.ToString())
             {
                 case next:
-                    await GameCommands.ViewSchems(player, reaction.Channel, page + 1);
+                    await GameCommands.ViewSchems(player, Channel, page + 1);
                     break;
                 case prev:
-                    await GameCommands.ViewSchems(player, reaction.Channel, page - 1);
+                    await GameCommands.ViewSchems(player, Channel, page - 1);
                     break;
             }
         }
@@ -944,8 +1000,8 @@ namespace AMI.Neitsillia.User.UserInterface
                     player.SaveFileMongo();
                     await TryMSGDel(msg);
                     if (player.skillPoints == 0)
-                        await GameCommands.ViewXP(player, reaction.Channel);
-                    else await GameCommands.SkillUpgradePage(player, reaction.Channel);
+                        await GameCommands.ViewXP(player, Channel);
+                    else await GameCommands.SkillUpgradePage(player, Channel);
                 }
             }
         }
@@ -956,10 +1012,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch(reaction.Emote.ToString())
             {
                 case EUI.classAbility:
-                    await player.Specialization.ShowAbilityList(player, reaction.Channel);
+                    await player.Specialization.ShowAbilityList(player, Channel);
                     break;
                 case EUI.classPerk:
-                    await player.Specialization.ShowPerkList(player, reaction.Channel);
+                    await player.Specialization.ShowPerkList(player, Channel);
                     break;
             }
         }
@@ -971,7 +1027,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 if (emote.Equals(EUI.specs[i]))
                     j = i;
             if (j > -1)
-                await Specialization.Specialization.LoadChosenSpec(player, j, reaction.Channel);
+                await Specialization.Specialization.LoadChosenSpec(player, j, Channel);
             await msg.DeleteAsync();
         }
         public async Task SpecPerks(SocketReaction reaction, IUserMessage msg)
@@ -979,7 +1035,7 @@ namespace AMI.Neitsillia.User.UserInterface
             if (reaction.Emote.ToString() == uturn)
             {
                 await TryMSGDel(msg);
-                await player.Specialization.MainMenu(player, reaction.Channel);
+                await player.Specialization.MainMenu(player, Channel);
             }
             else
             {
@@ -997,7 +1053,7 @@ namespace AMI.Neitsillia.User.UserInterface
             if (reaction.Emote.ToString() == uturn)
             {
                 await TryMSGDel(msg);
-                await player.Specialization.MainMenu(player, reaction.Channel);
+                await player.Specialization.MainMenu(player, Channel);
             }
             else
             {
@@ -1023,15 +1079,15 @@ namespace AMI.Neitsillia.User.UserInterface
             Guid[] guids = JsonConvert.DeserializeObject<Guid[]>(args[3]);
             switch(reaction.Emote.ToString())
             {
-                case next: await ItemOffer.GetOffers(player, page + 1, q, reaction.Channel); break;
-                case prev: await ItemOffer.GetOffers(player, page - 1, q, reaction.Channel); break;
+                case next: await ItemOffer.GetOffers(player, page + 1, q, Channel); break;
+                case prev: await ItemOffer.GetOffers(player, page - 1, q, Channel); break;
                 default:
                     {
                         int i = GetNum(reaction.Emote.ToString())-1;
                         if (i > -1 && i < guids.Length)
                         {
                             var v = ItemOffer.IdLoad(guids[i]);
-                            await v.InspectOffer(player, reaction.Channel);
+                            await v.InspectOffer(player, Channel);
                         }
                     } break;
             }
@@ -1045,12 +1101,12 @@ namespace AMI.Neitsillia.User.UserInterface
             string[] juncIds = JsonConvert.DeserializeObject<string[]>(args[2]);
             switch (reaction.Emote.ToString())
             {
-                case next: await Commands.Areas.ViewJunctions(player, reaction.Channel, page + 1); break;
-                case prev: await Commands.Areas.ViewJunctions(player, reaction.Channel, page - 1); break;
+                case next: await Commands.Areas.ViewJunctions(player, Channel, page + 1); break;
+                case prev: await Commands.Areas.ViewJunctions(player, Channel, page - 1); break;
                 default:
                     {
                         int i = GetNum(reaction.Emote.ToString());
-                        await Commands.Areas.Enter(player, juncIds[i], reaction.Channel);
+                        await Commands.Areas.Enter(player, juncIds[i], Channel);
                     }
                     break;
             }
@@ -1062,9 +1118,9 @@ namespace AMI.Neitsillia.User.UserInterface
             if (reaction.Emote.ToString() == ticket)
             {
                 if(Program.data.lottery != null)
-                    await EditMessage(Program.data.lottery.AddEntry(player), chan: reaction.Channel);
+                    await EditMessage(Program.data.lottery.AddEntry(player), chan: Channel);
                 else
-                    await EditMessage("No Lottery currently available.", chan: reaction.Channel);
+                    await EditMessage("No Lottery currently available.", chan: Channel);
             }
         }
         public async Task NewStronghold(SocketReaction reaction, IUserMessage msg)
@@ -1072,7 +1128,7 @@ namespace AMI.Neitsillia.User.UserInterface
             if (reaction.Emote.ToString() == ok)
             {
                 string[] ds = data.Split('&');
-                await Commands.Areas.BuildStronghold(player, ds[0], int.Parse(ds[1]), reaction.Channel);
+                await Commands.Areas.BuildStronghold(player, ds[0], int.Parse(ds[1]), Channel);
             }
             await TryMSGDel(msg);
         }
@@ -1083,15 +1139,15 @@ namespace AMI.Neitsillia.User.UserInterface
             int.TryParse(data, out int page);
             int qIndex = GetNum(reaction.Emote.ToString());
             if (qIndex > -1)
-                await Quest.QuestInfo(player, page, (page * Quest.PerPage) + qIndex, reaction.Channel);
+                await Quest.QuestInfo(player, page, (page * Quest.PerPage) + qIndex, Channel);
             else
             switch (reaction.Emote.ToString())
             {
                 case prev:
-                    await Quest.QuestList(player, page - 1, reaction.Channel, true);
+                    await Quest.QuestList(player, page - 1, Channel, true);
                     break;
                 case next:
-                    await Quest.QuestList(player, page + 1, reaction.Channel, true);
+                    await Quest.QuestList(player, page + 1, Channel, true);
                     break;
             }
 
@@ -1104,13 +1160,13 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case uturn:
-                    await Quest.QuestList(player, page, reaction.Channel);
+                    await Quest.QuestList(player, page, Channel);
                     break;
                 case prev:
-                    await Quest.QuestInfo(player, page, index - 1, reaction.Channel);
+                    await Quest.QuestInfo(player, page, index - 1, Channel);
                     break;
                 case next:
-                    await Quest.QuestInfo(player, page, index + 1, reaction.Channel);
+                    await Quest.QuestInfo(player, page, index + 1, Channel);
                     break;
             }
             
@@ -1131,7 +1187,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 };
                 Items.Quests.Quest q = Items.Quests.Quest.Load(id);
                 player.quests.Insert(0, q);
-                await reaction.Channel.SendMessageAsync(player.name + ", New Quest Accepted!", embed: q.AsEmbed().Build());
+                await Channel.SendMessageAsync(player.name + ", New Quest Accepted!", embed: q.AsEmbed().Build());
                 player.SaveFileMongo();
             }
         }
@@ -1149,11 +1205,11 @@ namespace AMI.Neitsillia.User.UserInterface
                 int p = player.quests.Count /Quest.PerPage;
 
                 player.Quest_Trigger(Quest.QuestTrigger.QuestLine, "XI");
-                await reaction.Channel.SendMessageAsync($"Quest {quest.title} accepted!");
+                await Channel.SendMessageAsync($"Quest {quest.title} accepted!");
 
                 await msg.RemoveReactionAsync(reaction.Emote, Handlers.DiscordBotHandler.Client.CurrentUser);
 
-                await dq.ShowBoard(player, reaction.Channel);
+                await dq.ShowBoard(player, Channel);
 
             }
         }
@@ -1164,10 +1220,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch(reaction.Emote.ToString())
             {
                 case skills:
-                    await GameCommands.SkillUpgradePage(player, reaction.Channel);
+                    await GameCommands.SkillUpgradePage(player, Channel);
                     break;
                 case pickSpec:
-                    await Specialization.Specialization.SpecializationChoice(player, reaction.Channel);
+                    await Specialization.Specialization.SpecializationChoice(player, Channel);
                     break;
             }
         }

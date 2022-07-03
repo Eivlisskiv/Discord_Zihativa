@@ -47,7 +47,7 @@ namespace AMI.Neitsillia.NPCSystems.Companions.Pets
             Database.UpdateRecord("PetList", MongoDatabase.FilterEqual<PetList, string>("_id", _id), this);
         }
 
-        internal async Task BuildUI(Player player, ISocketMessageChannel channel)
+        internal async Task BuildUI(Player player, IMessageChannel channel)
         {
             EmbedBuilder e = DUtils.BuildEmbed($"{player.name}'s Pets", Pets.Count > 0 ? null : $"{player.name} has no pets", null, player.userSettings.Color);
             if(Pets.Count > 0)

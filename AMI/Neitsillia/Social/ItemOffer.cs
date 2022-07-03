@@ -14,7 +14,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social
 {
     class ItemOffer
     {
-        internal static async Task GetOffers(Player player, int page, OfferQuery q, ISocketMessageChannel chan)
+        internal static async Task GetOffers(Player player, int page, OfferQuery q, IMessageChannel chan)
         {
             int itemPerPage = 5;
 
@@ -33,7 +33,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social
             }
             if (array != null && array.Length > 0)
             {
-                page = Methods.Verify.MinMax(page, Methods.NumbersM.CeilParse<int>(array.Length / 5.00));
+                page = Methods.Verify.MinMax(page, Methods.NumbersM.CeilParseInt(array.Length / 5.00));
                 int x = 1;
                 List<Guid> guids = new List<Guid>();
                 for (int p = (itemPerPage * page); p < (itemPerPage * (page + 1))

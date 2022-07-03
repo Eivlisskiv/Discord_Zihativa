@@ -173,7 +173,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
             explore.Description = "While exploring " + name + " you've discovered loot.";
 
             //Get Loot Count
-            int perBonus = NumbersM.CeilParse<int>(player.stats.GetPER() * Collections.Stats.LootPerPerc);
+            int perBonus = NumbersM.CeilParseInt(player.stats.GetPER() * Collections.Stats.LootPerPerc);
 
             //Get the level to scale gear to
             int level = GetAreaFloorLevel(rng, player.AreaInfo.floor);
@@ -195,7 +195,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
             //Coins
             int minCoins = Verify.Min(level, 2) * 6;
-            int coinslooted = rng.Next(NumbersM.CeilParse<int>(minCoins * 0.75), NumbersM.CeilParse<int>(minCoins * 1.25));
+            int coinslooted = rng.Next(NumbersM.CeilParseInt(minCoins * 0.75), NumbersM.CeilParseInt(minCoins * 1.25));
             if (player.Party != null)
             {
                 coinslooted /= player.Party.members.Count;
@@ -250,7 +250,7 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 int partyCount = player.Party?.MemberCount ?? 1;
                 int rngMobNum = (player.level < 10 ? 0 : 15) + (partyCount * 7);
 
-                int mobCount = Verify.MinMax(NumbersM.NParse<int>(rng.Next(rngMobNum / 4, rngMobNum + 1) / 10.00), 6, 1);
+                int mobCount = Verify.MinMax((int)(rng.Next(rngMobNum / 4, rngMobNum + 1) / 10.00), 6, 1);
                 mob = new NPC[mobCount];
 
                 for (int i = 0; i < mob.Length; i++)

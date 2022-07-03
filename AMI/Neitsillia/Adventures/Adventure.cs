@@ -66,7 +66,7 @@ namespace AMI.Neitsillia.Adventures
             await player.NewUI(await chan.SendMessageAsync(embed: embed.Build()), MsgType.Adventure, "Q");
         }
 
-        public static async Task SelectIntensity(Player player, ISocketMessageChannel chan, int quest)
+        public static async Task SelectIntensity(Player player, IMessageChannel chan, int quest)
         {
             Intensity[] diffs = (Intensity[])Enum.GetValues(typeof(Intensity));
             EmbedFieldBuilder[] fields = new EmbedFieldBuilder[diffs.Length];
@@ -318,7 +318,7 @@ namespace AMI.Neitsillia.Adventures
                     }
                 }
 
-                dmg = NumbersM.CeilParse<int>(Math.Max(dmg, 1) * (1 + (MultiplierReference - (int)intensity) / Percentage)) * mult;
+                dmg = NumbersM.CeilParseInt(Math.Max(dmg, 1) * (1 + (MultiplierReference - (int)intensity) / Percentage)) * mult;
                 player.health -= dmg;
 
                 looted.x += (Math.Max(player.Area.level, 1) * (1 + i + k) * xpMult * mult);

@@ -40,7 +40,7 @@ namespace AMI.Module
         public async Task ViewNPCInv(int viewType = 1) 
             => await ViewNPCInv(Context.Player, Context.Channel, viewType, false);
 
-        internal static async Task ViewNPCInv(Player player, ISocketMessageChannel chan, int page, bool edit)
+        internal static async Task ViewNPCInv(Player player, IMessageChannel chan, int page, bool edit)
         {
             if (player.Encounter != null && player.Encounter.IsNPC())
             {
@@ -51,7 +51,7 @@ namespace AMI.Module
             await chan.SendMessageAsync("You are not in an interaction.");
         }
 
-        private static async Task ViewTradeInventory(Player player, ISocketMessageChannel chan, int page, bool edit)
+        private static async Task ViewTradeInventory(Player player, IMessageChannel chan, int page, bool edit)
         {
             NPC n = player.Encounter.npc;
             page = Verify.MinMax(page, (n.inventory.Count / 15) + 1, 1);
@@ -188,7 +188,7 @@ namespace AMI.Module
                 }
             }
         }
-        async Task ComfirmRecruitNPC(Player player, long cost, ISocketMessageChannel chan)
+        async Task ComfirmRecruitNPC(Player player, long cost, IMessageChannel chan)
         {
             NPC n = player.Encounter.npc;
             player.KCoins -= cost;
@@ -282,7 +282,7 @@ namespace AMI.Module
         private static long GetCost(Item item, Player player, NPC npc) 
             => (item.tier * (100 - ((item.condition*100) / item.durability))) * Math.Max(1, npc.stats.GetCHA() - player.stats.GetCHA()) / 2;
 
-        public static async Task ConfirmNPCRepair(Player player, int index, ISocketMessageChannel chan)
+        public static async Task ConfirmNPCRepair(Player player, int index, IMessageChannel chan)
         {
             Item item = player.inventory.GetItem(index);
             NPC npc = player.Encounter.npc;

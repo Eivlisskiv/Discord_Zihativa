@@ -271,7 +271,7 @@ namespace AMYPrototype
         void RefreshActivityThread()
         {
             DateTime toEnd = activity.start.AddDays(7);
-            long time = NumbersM.NParse<long>((toEnd - DateTime.UtcNow).TotalMilliseconds);
+            long time = (long)((toEnd - DateTime.UtcNow).TotalMilliseconds);
             ActivityThread((int)time, (int)(time - int.MaxValue));
         }
 

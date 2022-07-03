@@ -139,7 +139,7 @@ namespace AMI.Neitsillia.Combat
         public async Task Run()
             => await Run(Context.Player, Context.Channel, false);
 
-        internal static async Task Run(Player player, ISocketMessageChannel chan, bool edit)
+        internal static async Task Run(Player player, IMessageChannel chan, bool edit)
         {
             if (!player.IsEncounter("Combat"))
                 await chan.SendMessageAsync("You are not in combat");
@@ -196,7 +196,7 @@ namespace AMI.Neitsillia.Combat
             await chan.SendMessageAsync(embed: enc.GetEmbed(null).Build());
         }
 
-        internal static async Task AutoBrawl(Player player, ISocketMessageChannel chan)
+        internal static async Task AutoBrawl(Player player, IMessageChannel chan)
         {
             if(player.duel == null)
             {
@@ -211,7 +211,7 @@ namespace AMI.Neitsillia.Combat
                 player.duel.abilityName = player.abilities[0].name;
             await TurnCombat(player, player.duel.abilityName, chan, true);
         }
-        internal static async Task TurnCombat(Player player, string abilityName, ISocketMessageChannel chan, bool editMessage = false)
+        internal static async Task TurnCombat(Player player, string abilityName, IMessageChannel chan, bool editMessage = false)
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -404,7 +404,7 @@ namespace AMI.Neitsillia.Combat
                        MsgType.DuelOffer, $"{player.userid}/{player.name}");
             }
         }
-        internal static async Task PVPTurn(Player player, string abilityName, ISocketMessageChannel chan)
+        internal static async Task PVPTurn(Player player, string abilityName, IMessageChannel chan)
         {
             Player enemy = Player.Load(player.duel.opponentPlayerPath);
             if (enemy == null)

@@ -28,7 +28,7 @@ namespace AMI.Neitsillia.Areas.InteractiveAreas
                     , MsgType.Tavern);
         }
 
-        internal static async Task GenerateBountyFile(Player player, Area area, int i, ISocketMessageChannel chan)
+        internal static async Task GenerateBountyFile(Player player, Area area, int i, IMessageChannel chan)
         {
             if (i >= area.junctions.Count)
                 i = -1;

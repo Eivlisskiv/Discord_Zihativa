@@ -46,15 +46,15 @@ namespace AMI.Neitsillia.Items
 
             #region Excluded stats
             foreach (int r in item.resistance)
-                l += r != 0 ? NumbersM.CeilParse<int>(n * r * resistance) : 0;
+                l += r != 0 ? NumbersM.CeilParseInt(n * r * resistance) : 0;
 
             try
             {
-                l += NumbersM.CeilParse<long>(item.healthBuff * health * n)
+                l += NumbersM.CeilParseLong(item.healthBuff * health * n)
                     +
-                     NumbersM.CeilParse<long>(item.staminaBuff * stamina * n)
+                     NumbersM.CeilParseLong(item.staminaBuff * stamina * n)
                     +
-                     NumbersM.CeilParse<long>( 
+                     NumbersM.CeilParseLong( 
                          (
                                 item.durability + item.agility
                                 + item.critChance
@@ -75,7 +75,7 @@ namespace AMI.Neitsillia.Items
             for (int k = 0; k < item.damage.Length; k++)
             {
                 if (item.damage[k] > 0)
-                    item.damage[k] = NumbersM.CeilParse<long>(
+                    item.damage[k] = NumbersM.CeilParseLong(
                         (item.damage[k] * m) +
                         ((damage * l / i) / damage));
             }
@@ -91,8 +91,8 @@ namespace AMI.Neitsillia.Items
             #region Excluded stats
             long l = 0;
             foreach (int r in item.damage)
-                l += r > 0 ? NumbersM.CeilParse<long>(n * r * damage) : 0;
-            l += NumbersM.CeilParse<long>(
+                l += r > 0 ? NumbersM.CeilParseLong(n * r * damage) : 0;
+            l += NumbersM.CeilParseLong(
                 + (item.durability + item.agility
                 + Convert.ToInt64(item.critChance)
                 + Convert.ToInt64(item.critMult)
@@ -113,12 +113,12 @@ namespace AMI.Neitsillia.Items
 
             //Update stats
             item.healthBuff = item.healthBuff != 0 ?
-                item.healthBuff = NumbersM.CeilParse<long>(
+                item.healthBuff = NumbersM.CeilParseLong(
                         (item.healthBuff * m) +
                         ((health * (l + 0.00) / i) / health)) : 0;
 
             item.staminaBuff = item.staminaBuff != 0 ?
-                item.staminaBuff = NumbersM.CeilParse<int>(
+                item.staminaBuff = NumbersM.CeilParseInt(
                         (item.staminaBuff * m) +
                         ((stamina * (l+0.00) / i) / stamina)) : 0;
 

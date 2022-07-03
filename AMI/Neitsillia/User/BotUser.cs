@@ -84,7 +84,7 @@ namespace AMI.Neitsillia.User
         internal void NewUI(IUserMessage userMessage, MsgType type,
             string adata = null)
         {
-            ui = new UI(userMessage, type, null, argData: adata);
+            ui = new UI(userMessage, type, this, argData: adata);
             Save();
         }
 
@@ -151,7 +151,7 @@ namespace AMI.Neitsillia.User
             return ReferenceData.ResourceCrate.Wooden;
         }
 
-        public async Task CratesListUI(ISocketMessageChannel chan)
+        public async Task CratesListUI(IMessageChannel chan)
         {
             if (ResourceCrates == null)
                 ResourceCrates = new int[5];
@@ -169,7 +169,7 @@ namespace AMI.Neitsillia.User
             NewUI(await chan.SendMessageAsync(embed: em.Build()), MsgType.ResourceCrateList);
         }
 
-        public async Task CharListForCrate(ISocketMessageChannel chan, int crateNum)
+        public async Task CharListForCrate(IMessageChannel chan, int crateNum)
         {
             string desc = null;
             var chars = GetCharFiles(_id);

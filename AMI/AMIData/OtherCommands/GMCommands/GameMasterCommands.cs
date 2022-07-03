@@ -2,14 +2,8 @@
 using AMI.Commands;
 using AMI.Methods;
 using AMI.Module;
-using AMI.Neitsillia;
-using AMI.Neitsillia.Areas.AreaPartials;
 using AMI.Neitsillia.Collections;
-using AMI.Neitsillia.Crafting;
 using AMI.Neitsillia.Encounters;
-using AMI.Neitsillia.Items.Abilities;
-using AMI.Neitsillia.Items.Perks.PerkLoad;
-using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.Social.Mail;
 using AMI.Neitsillia.User;
 using AMI.Neitsillia.User.PlayerPartials;
@@ -29,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace AMI.AMIData.OtherCommands
 {
-    public partial class GameMaster : ModuleBase<AMI.Commands.CustomCommandContext>
+	public partial class GameMaster : ModuleBase<AMI.Commands.CustomCommandContext>
     {
         internal static MongoDatabase Database => AMYPrototype.Program.data.database;
         //level 0; GMs wanna-be, low and always random, monthly limits

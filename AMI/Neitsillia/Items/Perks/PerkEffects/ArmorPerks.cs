@@ -16,7 +16,7 @@ namespace AMI.Neitsillia.Items
                     enemy.sentHit = true;
                 if (enemy.SentHit && RNG(101) <= 10)
                 {
-                    long healed = owner.character.Healing(NumbersM.CeilParse<long>(owner.character.Health() * 0.10), true);
+                    long healed = owner.character.Healing(NumbersM.CeilParseLong(owner.character.Health() * 0.10), true);
                     owner.perkProcs.Add($"{owner.Name} proc'ed {name}'s healing [+{healed} health]");
                 }
             }
@@ -27,7 +27,7 @@ namespace AMI.Neitsillia.Items
             if (enemy.abilityUsed != null && enemy.SentHit &&
                 enemy.abilityUsed.type == Ability.AType.Martial)
             {
-                long reflectedDamage = NumbersM.NParse<long>(enemy.baseDamage[0] *
+                long reflectedDamage = (long)(enemy.baseDamage[0] *
                 Verify.Max(owner.character.stats.GetEND() * 0.01, 0.25));
                 if (reflectedDamage > 0)
                 {
@@ -45,7 +45,7 @@ namespace AMI.Neitsillia.Items
                 if (RNG(101) <= 10 + (5 * rank))
                 {
                     owner.perkProcs.Add($"Gained " + owner.character.StaminaE(
-                        NumbersM.NParse<int>(toxicdmg * (0.25 + (0.5 * rank)))) +
+                        (int)(toxicdmg * (0.25 + (0.5 * rank)))) +
                           $" Stamina from Toxin Filter");
                     rank = 0;
                 }

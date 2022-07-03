@@ -8,14 +8,13 @@ using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype.Commands;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.Commands
 {
-    public partial class Areas
+	public partial class Areas
     {
         const int HP_SECONDS_PER_PERCENT = 216;
         const int SP_SECONDS_PER_PERCENT = 154;
@@ -122,7 +121,7 @@ namespace AMI.Neitsillia.Commands
         private static double RestorePerSeconds(int dex, bool isHP)
             => (0.01 + (dex * Collections.Stats.restSpeed)) / (isHP ? HP_SECONDS_PER_PERCENT : SP_SECONDS_PER_PERCENT);
 
-        internal static async Task EndRest(Player player, ISocketMessageChannel chan)
+        internal static async Task EndRest(Player player, IMessageChannel chan)
         {
             if (player.IsResting)
             {

@@ -16,6 +16,7 @@ namespace AMYPrototype
             get;
             private set;
         }
+
         public static DiscordSocketClient clientCopy => DiscordBotHandler.Client;
         public static bool FirstBoot { get; private set; } = true;
 
@@ -171,7 +172,7 @@ namespace AMYPrototype
             => i > 0 && rng.Next(100) + rng.NextDouble() <= i;
 
         internal static int RandomInterval(int i, double m)
-            => rng.Next(NumbersM.NParse<int>(i * (1 - m)), NumbersM.NParse<int>(i * (1 + m)));
+            => rng.Next((int)(i * (1 - m)), (int)(i * (1 + m)));
 
 
         #region Boot Verifications

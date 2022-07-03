@@ -42,7 +42,7 @@ namespace AMI.Neitsillia.User.Specialization
         internal int SpentPoints => (AbilitiesObtained.Count * 50) + (PerksObtained.Count * 20);
 
         //Static Methods
-        internal static async Task SpecializationChoice(Player player, ISocketMessageChannel chan)
+        internal static async Task SpecializationChoice(Player player, IMessageChannel chan)
         {
             EmbedBuilder embed = player.UserEmbedColor();
             embed.WithTitle("Character Class/Specialization");
@@ -60,7 +60,7 @@ namespace AMI.Neitsillia.User.Specialization
             }
             await player.NewUI(await chan.SendMessageAsync(embed: embed.Build()), MsgType.SpecSelection, data);
         }
-        internal static async Task LoadChosenSpec(Player player, int specindex, ISocketMessageChannel chan)
+        internal static async Task LoadChosenSpec(Player player, int specindex, IMessageChannel chan)
         {
             player.Specialization = new Specialization(specindex, player.level);
             player.SaveFileMongo();
@@ -108,7 +108,7 @@ namespace AMI.Neitsillia.User.Specialization
             }
         }
 
-        internal async Task MainMenu(Player player, ISocketMessageChannel chan)
+        internal async Task MainMenu(Player player, IMessageChannel chan)
         {
             EmbedBuilder e = new EmbedBuilder();
             e.WithTitle(specType.ToString() + " " + player.name);
@@ -170,7 +170,7 @@ namespace AMI.Neitsillia.User.Specialization
             e.WithFooter($"{specPoints} Specialization Points");
             return e;
         }
-        internal async Task ShowAbilityList(Player player, ISocketMessageChannel chan)
+        internal async Task ShowAbilityList(Player player, IMessageChannel chan)
         {
             EmbedBuilder e = AbilityListEmbed(player, out string available);
             await player.NewUI(await chan.SendMessageAsync(embed: e.Build()), MsgType.SpecAbility, available);
@@ -212,7 +212,7 @@ namespace AMI.Neitsillia.User.Specialization
             e.WithFooter($"{specPoints} Specialization Points");
             return e;
         }
-        internal async Task ShowPerkList(Player player, ISocketMessageChannel chan)
+        internal async Task ShowPerkList(Player player, IMessageChannel chan)
         {
             EmbedBuilder e = PerkListEmbed(player, out string available);
             await player.NewUI(await chan.SendMessageAsync(embed: e.Build()), MsgType.SpecPerks, available);

@@ -1,8 +1,4 @@
-﻿using AMI.Methods.Graphs;
-using AMI.Neitsillia.Areas.Arenas;
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace AMI.Methods
 {

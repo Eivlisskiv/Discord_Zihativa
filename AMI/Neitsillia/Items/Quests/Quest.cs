@@ -95,7 +95,7 @@ namespace AMI.Neitsillia.Items.Quests
         }
 
         internal static async System.Threading.Tasks.Task QuestInfo(
-            Player player, int page, int qIndex, ISocketMessageChannel channel)
+            Player player, int page, int qIndex, IMessageChannel channel)
         {
             Quest q = player.quests[qIndex];
             await player.NewUI(await channel.SendMessageAsync(embed:
@@ -104,7 +104,7 @@ namespace AMI.Neitsillia.Items.Quests
         }
 
         internal static async System.Threading.Tasks.Task QuestList(
-            Player player, int page, ISocketMessageChannel channel, bool edit = false)
+            Player player, int page, IMessageChannel channel, bool edit = false)
         {
             EmbedBuilder e = DUtils.BuildEmbed($"{player.name}'s Quests", 
                 "__Click on the emotes to view details of a quest__", null, player.userSettings.Color);
@@ -134,7 +134,7 @@ namespace AMI.Neitsillia.Items.Quests
         }
 
         internal static async System.Threading.Tasks.Task AvailableQuestList(
-            Player player, ISocketMessageChannel chan, params int[][] ids)
+            Player player, IMessageChannel chan, params int[][] ids)
         {
             string data = null;
             EmbedBuilder embed = new EmbedBuilder();
@@ -159,7 +159,7 @@ namespace AMI.Neitsillia.Items.Quests
         }
 
         internal static async System.Threading.Tasks.Task AvailableQuestList(
-            Player player, ISocketMessageChannel chan, string data)
+            Player player, IMessageChannel chan, string data)
         {
             string[] ids = data.Split(';');
             EmbedBuilder embed = new EmbedBuilder();
@@ -189,7 +189,7 @@ namespace AMI.Neitsillia.Items.Quests
             await player.NewUI(await chan.SendMessageAsync(embed: embed.Build()), MsgType.AcceptQuests, data);
         }
 
-        static async Task<int> CheckDelivery(Player player, int i, ISocketMessageChannel chan)
+        static async Task<int> CheckDelivery(Player player, int i, IMessageChannel chan)
         {
             Quest q = player.quests[i];
             string[] items = q.objective.Split(';')[1].Split(',');
@@ -222,7 +222,7 @@ namespace AMI.Neitsillia.Items.Quests
             return i;
         }
 
-        internal static async Task CheckDeliveries(Player player, ISocketMessageChannel chan)
+        internal static async Task CheckDeliveries(Player player, IMessageChannel chan)
         {
             int deliveries = 0;
             for(int i = 0; i < player.quests.Count;)

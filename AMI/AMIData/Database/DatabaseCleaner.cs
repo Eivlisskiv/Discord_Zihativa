@@ -43,7 +43,7 @@ namespace AMI.Handlers
                 "{$and: [ {loaded:null}, {ui:null}, {$or: [{ResourceCrates:null}, {ResourceCrates: [0,0,0,0,0]} ]} ]}");
         }
 
-        async Task CleanAreas()
+        private async Task CleanAreas()
         {
             Log.LogS("Cleaning Areas");
             var list = database.LoadRecords<Neitsillia.Areas.AreaPartials.Area>("Area");
@@ -53,10 +53,22 @@ namespace AMI.Handlers
                 var area = list[i];
 
                 //If the area or nest does not exist
-                area.junctions.RemoveAll(j =>
-                    !list.Exists(a => a.AreaId == j.filePath) &&
-                    database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
-                );
+                if(area.junctions == null)
+				{
+                    area.junctions = new List<NeitsilliaEngine.Junction>();
+				}
+
+                if (area.junctions.Count == 0)
+                {
+                    Log.LogS($"{area.AreaId} has no junctions");
+                }
+                else
+                {
+                    area.junctions.RemoveAll(j =>
+                        !list.Exists(a => a.AreaId == j.filePath) &&
+                        database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
+                    );
+                }
 
                 if (area.passiveEncounter == null)
                 {

@@ -83,7 +83,7 @@ namespace AMI.Handlers
             _client.Ready += OnReady;
             _client.JoinedGuild += OnJoinedGuild;
             _client.LeftGuild += OnLeftGuild;
-            _client.ReactionAdded += ReactionHandler.ReactionAddedEvent;
+			_client.ReactionAdded += ReactionHandler.ReactionAddedEvent;
 
             _client.Disconnected += OnDisconnect;
         }

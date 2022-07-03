@@ -44,7 +44,7 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 case EUI.mainQuest:
                     {
-                        await Quest.AvailableQuestList(player, reaction.Channel, data);
+                        await Quest.AvailableQuestList(player, Channel, data);
 
                     } break;
             }
@@ -54,7 +54,7 @@ namespace AMI.Neitsillia.User.UserInterface
         {
             if (EUI.Dice(reaction.Emote.ToString()) == 1)
             {
-                await GamblingCommands.TavernGames(player, reaction.Channel);
+                await GamblingCommands.TavernGames(player, Channel);
                 return;
             }
             switch (reaction.Emote.ToString())
@@ -62,7 +62,7 @@ namespace AMI.Neitsillia.User.UserInterface
                 case EUI.sideQuest:
                     {
                         var qt = User.DailyQuestBoard.Load(player._id);
-                        await qt.ShowBoard(player, reaction.Channel);
+                        await qt.ShowBoard(player, Channel);
                     }
                     break;
                 case EUI.bounties:
@@ -70,7 +70,7 @@ namespace AMI.Neitsillia.User.UserInterface
                         Areas.AreaPartials.Area tavern = player.Area;
                         if (tavern.parent != null)
                             tavern = Areas.AreaPartials.Area.LoadArea(tavern.GeneratePath(false) + tavern.parent);
-                        await TavernInteractive.GenerateBountyFile(player, tavern, -1, reaction.Channel);
+                        await TavernInteractive.GenerateBountyFile(player, tavern, -1, Channel);
                     }
                     break;
             }
@@ -82,11 +82,11 @@ namespace AMI.Neitsillia.User.UserInterface
             {
                 case EUI.sideQuest:
                     var data = await ArenaGlobalData.Load(player.AreaInfo.path);
-                    await data.DiscordUI(player, reaction.Channel);
+                    await data.DiscordUI(player, Channel);
                     break;
 
                 case EUI.bounties:
-                    await Arena.SelectMode(player, 0, reaction.Channel, true);
+                    await Arena.SelectMode(player, 0, Channel, true);
                     break;
             }
         }
@@ -99,15 +99,15 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (e)
             {
                 case EUI.ok:
-                    await data.StartFight(int.Parse(this.data), player, reaction.Channel);
+                    await data.StartFight(int.Parse(this.data), player, Channel);
                     break;
                 case EUI.uturn:
-                    await data.DiscordUI(player, reaction.Channel);
+                    await data.DiscordUI(player, Channel);
                     break;
                 default:
                     int i = EUI.GetNum(e) - 1;
                     if (i < 0) return;
-                    await data.DiscordUI(i, player, reaction.Channel);
+                    await data.DiscordUI(i, player, Channel);
                     break;
             }
         }
@@ -119,10 +119,10 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case EUI.prev:
-                    await Arena.SelectMode(player, page - 1, reaction.Channel, true);
+                    await Arena.SelectMode(player, page - 1, Channel, true);
                     break;
                 case EUI.next:
-                    await Arena.SelectMode(player, page + 1, reaction.Channel, true);
+                    await Arena.SelectMode(player, page + 1, Channel, true);
                     break;
                 case EUI.cancel:
                     await msg.DeleteAsync();
@@ -135,14 +135,14 @@ namespace AMI.Neitsillia.User.UserInterface
                                     page.ToString(),
                                     0,
                                     string.Join(",", new int[mods]),
-                                reaction.Channel, true);
+                                Channel, true);
                         else
                         {
                             await Arena.Generate(player.Area, player, page, null);
                             await EditMessage(null, DUtils.BuildEmbed($"Entered {player.Area.name}", 
                                 "Complete your challenge to gain rewards." + Environment.NewLine +
                                 "**Warning:** Running away, dying or leaving the area will end the challenge" + Environment.NewLine +
-                                "Use the `Explore` command to continue", null, player.userSettings.Color).Build(), reaction.Channel);
+                                "Use the `Explore` command to continue", null, player.userSettings.Color).Build(), Channel);
                         }
                     }
                     break;
@@ -156,13 +156,13 @@ namespace AMI.Neitsillia.User.UserInterface
             switch (reaction.Emote.ToString())
             {
                 case EUI.uturn:
-                    await Arena.SelectMode(player, 0, reaction.Channel, true);
+                    await Arena.SelectMode(player, 0, Channel, true);
                     break;
                 case EUI.prev:
-                    await Arena.SelectModifiers(player, args[0], page - 1, args[2], reaction.Channel, true);
+                    await Arena.SelectModifiers(player, args[0], page - 1, args[2], Channel, true);
                     break;
                 case EUI.next:
-                    await Arena.SelectModifiers(player, args[0], page + 1, args[2], reaction.Channel, true);
+                    await Arena.SelectModifiers(player, args[0], page + 1, args[2], Channel, true);
                     break;
 
                 case EUI.ok:

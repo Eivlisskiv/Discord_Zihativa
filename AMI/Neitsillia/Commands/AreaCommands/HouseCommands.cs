@@ -7,6 +7,7 @@ using AMI.Neitsillia.Areas.Sandbox.Schematics;
 using AMI.Neitsillia.User.PlayerPartials;
 using AMI.Neitsillia.User.UserInterface;
 using AMYPrototype.Commands;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
@@ -17,7 +18,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
     [Name("House")]
     public class HouseCommands : ModuleBase<AMI.Commands.CustomCommandContext>
     {
-        private static async Task<House> LoadHouse(Player player, ISocketMessageChannel chan)
+        private static async Task<House> LoadHouse(Player player, IMessageChannel chan)
         {
             if(player.Area.type != Neitsillia.Areas.AreaType.Town)
                 throw NeitsilliaError.ReplyError("You may only access your house from a town.");
@@ -44,7 +45,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             return house;
         }
 
-        internal static async Task Upgrade(Player player, ISocketMessageChannel channel)
+        internal static async Task Upgrade(Player player, IMessageChannel channel)
         {
             House house = await House.Load(player.userid);
             if (house == null) //new house
@@ -86,7 +87,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await ViewHouseInfo(player, house, Context.Channel, false);
         }
 
-        public static async Task ViewHouseInfo(Player player, House house, ISocketMessageChannel chan, bool edit = true)
+        public static async Task ViewHouseInfo(Player player, House house, IMessageChannel chan, bool edit = true)
             => await player.EnUI(edit, "House options", house.sandbox.ToEmbed("House", player), chan, MsgType.Sandbox, 
                 $"house;{(house.sandbox.CanUpgrade(Sandbox.MAX_TIER_HOUSE) ? "upgrade" : "none")}");
 
@@ -151,7 +152,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
                 );
         }
 
-        public static async Task BuildTile(Player player, SandboxTile.TileType type, ISocketMessageChannel chan)
+        public static async Task BuildTile(Player player, SandboxTile.TileType type, IMessageChannel chan)
         {
             House house = await LoadHouse(player, chan);
             Sandbox sb = house.sandbox;
@@ -161,7 +162,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await SandboxActions.InspectTile(player, sb, "house", sb.tiles.Count - 1, chan);
         }
 
-        public static async Task UpgradeTile(Player player, int index, ISocketMessageChannel chan)
+        public static async Task UpgradeTile(Player player, int index, IMessageChannel chan)
         {
             House house = await LoadHouse(player, chan);
             Sandbox sb = house.sandbox;
@@ -171,7 +172,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await SandboxActions.InspectTile(player, sb, "house", sb.tiles.Count - 1, chan);
         }
 
-        internal static async Task DestroyTile(Player player, int index, ISocketMessageChannel channel)
+        internal static async Task DestroyTile(Player player, int index, IMessageChannel channel)
         {
             House house = await LoadHouse(player, channel);
             Sandbox sb = house.sandbox;
@@ -180,7 +181,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await channel.SendMessageAsync("Tile was destoyed");
         }
 
-        internal static async Task Produce(Player player, int tileIndex, ProductionRecipe recipe, int amount, ISocketMessageChannel channel)
+        internal static async Task Produce(Player player, int tileIndex, ProductionRecipe recipe, int amount, IMessageChannel channel)
         {
             House house = await LoadHouse(player, channel);
             Sandbox sb = house.sandbox;
@@ -190,7 +191,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await SandboxActions.InspectTile(player, sb, "house", tileIndex, channel);
         }
 
-        internal static async Task CollectProduction(Player player, int i, ISocketMessageChannel channel)
+        internal static async Task CollectProduction(Player player, int i, IMessageChannel channel)
         {
             House house = await LoadHouse(player, channel);
             Sandbox sb = house.sandbox;
@@ -199,7 +200,7 @@ namespace AMI.Neitsillia.Commands.AreaCommands
             await SandboxActions.InspectTile(player, sb, "house", i, channel);
         }
 
-        internal static async Task CancelProduction(Player player, int i, ISocketMessageChannel channel)
+        internal static async Task CancelProduction(Player player, int i, IMessageChannel channel)
         {
             House house = await LoadHouse(player, channel);
             Sandbox sb = house.sandbox;

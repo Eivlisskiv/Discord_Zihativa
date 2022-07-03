@@ -164,7 +164,7 @@ namespace AMI.Neitsillia.Items
                         {
                             int i = rng.Next(item.damage.Length);
                             if (item.damage[i] > 0)
-                                item.damage[i] = NumbersM.CeilParse<long>(item.damage[i] * 1.5);
+                                item.damage[i] = NumbersM.CeilParseLong(item.damage[i] * 1.5);
                             else if (item.damage[i] < 0)
                                 item.damage[i] /= 2;
                             else
@@ -174,7 +174,7 @@ namespace AMI.Neitsillia.Items
                         {
                             int i = rng.Next(item.resistance.Length);
                             if (item.resistance[i] > 0)
-                                item.resistance[i] = NumbersM.CeilParse<int>(item.resistance[i] * 1.5);
+                                item.resistance[i] = NumbersM.CeilParseInt(item.resistance[i] * 1.5);
                             else if (item.resistance[i] < 0)
                                 item.resistance[i] /= 2;
                             else
@@ -188,7 +188,7 @@ namespace AMI.Neitsillia.Items
                         if (item.type != Item.IType.Weapon)
                         {
                             if (item.healthBuff > 0)
-                                item.healthBuff += NumbersM.CeilParse<long>(item.healthBuff * 1.5);
+                                item.healthBuff += NumbersM.CeilParseLong(item.healthBuff * 1.5);
                             else
                                 item.healthBuff += Verify.MinMax(item.tier / 2, player.level / 2, 2);
                         }
@@ -363,7 +363,7 @@ namespace AMI.Neitsillia.Items
             if (enemy.abilityUsed != null && enemy.SentHit &&
                 enemy.abilityUsed.type == Ability.AType.Martial)
             {
-                long reflectedDamage = NumbersM.NParse<long>(enemy.baseDamage[0] *
+                long reflectedDamage = (long)(enemy.baseDamage[0] *
                 Verify.Max(owner.character.stats.GetEND() * 0.05, 0.5));
                 if (reflectedDamage > 0)
                 {
@@ -718,7 +718,7 @@ namespace AMI.Neitsillia.Items
         public object[] FullBreaths(CombatResult owner)
         {
             int msp = user.Stamina();
-            user.stamina += Math.Min(NumbersM.CeilParse<int>(Math.Max(msp * .05, 1)), msp - user.stamina);
+            user.stamina += Math.Min(NumbersM.CeilParseInt(Math.Max(msp * .05, 1)), msp - user.stamina);
             rank--;
             return new object[] { owner };
         }
@@ -782,7 +782,7 @@ namespace AMI.Neitsillia.Items
             if (item.CanBeEquip())
             {
                 int buff = user.stats.GetEND() + user.stats.GetINT() + 24;
-                int bonus = NumbersM.CeilParse<int>(item.durability * (buff / 100.00));
+                int bonus = NumbersM.CeilParseInt(item.durability * (buff / 100.00));
                 item.durability += bonus;
                 item.condition += bonus;
                 item.CalculateStats(true);
@@ -817,7 +817,7 @@ namespace AMI.Neitsillia.Items
                 if (rng >= 85 - user.stats.GetINT())
                 {
                     double staminaReturn = 0.20 + (user.stats.GetINT() / 100.00);
-                    int amount = NumbersM.CeilParse<int>((int)healing * staminaReturn);
+                    int amount = NumbersM.CeilParseInt((int)healing * staminaReturn);
                     user.stamina += Verify.Max(amount, user.Stamina() - user.stamina);
                 }
             }
@@ -927,7 +927,7 @@ namespace AMI.Neitsillia.Items
             {
                 if(Program.Chance(owner == target ? 10 : 20))
                 {
-                    target.character.Status("Vigorous", 8, NumbersM.CeilParse<int>(owner.character.Health(false) / 100.00));
+                    target.character.Status("Vigorous", 8, NumbersM.CeilParseInt(owner.character.Health(false) / 100.00));
                     target.perkProcs.Add("Received a bamboo snack from " + owner.Name);
                 }
             }

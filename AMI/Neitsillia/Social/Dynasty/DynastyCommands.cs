@@ -31,7 +31,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             await DynastyHub(player, dan, membership, Context.Channel);
         }
 
-        public static async Task DynastyHub(Player player, Dynasty dynasty, DynastyMember membership, ISocketMessageChannel chan)
+        public static async Task DynastyHub(Player player, Dynasty dynasty, DynastyMember membership, IMessageChannel chan)
         {
             membership ??= dynasty.GetMember(player);
             await chan.SendMessageAsync(embed: dynasty.ToEmbed(
@@ -146,7 +146,7 @@ namespace AMI.Neitsillia.NeitsilliaCommands.Social.Dynasty
             await DynastyUser(Context.Player, user.Id, Context.Channel, null);
         }
 
-        public static async Task DynastyUser(Player player, ulong user, ISocketMessageChannel chan, string playerId)
+        public static async Task DynastyUser(Player player, ulong user, IMessageChannel chan, string playerId)
         {
             bool listing = playerId == null && user != 0;
             bool manage = false;

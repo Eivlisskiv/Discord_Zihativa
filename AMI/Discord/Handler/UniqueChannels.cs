@@ -1,14 +1,13 @@
 ﻿using AMI.Methods;
 using AMYPrototype;
 using Discord;
-using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AMI.Handlers
 {
-    class UniqueChannels
+	class UniqueChannels
     {
         private static UniqueChannels _instance;
         public static UniqueChannels Instance => _instance ?? (_instance = new UniqueChannels());
@@ -21,7 +20,7 @@ namespace AMI.Handlers
 
             GetChannel("Suggestion", Program.isDev ? (ulong)795723733615509534 : 531191291543945227, 201877884313403392);
             GetChannel("BugReport", Program.isDev ? (ulong)795723756731498506 : 741897200317104149, 201877884313403392);
-            GetChannel("Population", Program.isDev ? (ulong)795723814259392544 : 795706716137586738, 201877884313403392);
+            GetChannel("Population", Program.isDev ? (ulong)795723814259392544 : 992958101722497055, 201877884313403392);
         }
 
         public IMessageChannel GetChannel(string name, ulong? id = null, ulong? gid = null)
@@ -85,7 +84,7 @@ namespace AMI.Handlers
                 {
                     if(!channels.TryGetValue("AdminDM", out IMessageChannel chan))
                     {
-                        chan = await Program.clientCopy.GetUser(201875246091993088).GetOrCreateDMChannelAsync();
+                        chan = await Program.clientCopy.GetUser(201875246091993088).CreateDMChannelAsync();
                         channels.Add("AdminDM", chan);
                     }
                     try { await chan.SendMessageAsync($"``` {msg} ```"); } catch (Exception) { }

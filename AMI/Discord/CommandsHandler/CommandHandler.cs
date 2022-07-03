@@ -293,7 +293,7 @@ namespace AMYPrototype.Commands
             return GuildSettings.Load(guildID)?.prefix ?? "~";
         }
 
-        internal static string GetPrefix(ISocketMessageChannel chan)
+        internal static string GetPrefix(IMessageChannel chan)
         {
             return chan is IGuildChannel gChan ? GetPrefix(gChan.GuildId) : "";
         }

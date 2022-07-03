@@ -15,7 +15,6 @@ using AMI.Neitsillia.NPCSystems;
 using AMI.Neitsillia.NPCSystems.Companions;
 using AMI.Neitsillia.User.UserInterface;
 using Discord;
-using Discord.WebSocket;
 using MongoDB.Bson.Serialization.Attributes;
 using AMI.Neitsillia.Items.ItemPartials;
 using Neitsillia.Methods;
@@ -27,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace AMI.Neitsillia.User.PlayerPartials
 {
-    [BsonIgnoreExtraElements]
+	[BsonIgnoreExtraElements]
     public partial class Player : CharacterMotherClass
     {
         public string _id;
@@ -345,7 +344,7 @@ namespace AMI.Neitsillia.User.PlayerPartials
         }
         public long XpGain(double xpgain)
         {
-            long xp = NumbersM.NParse<long>(xpgain);
+            long xp = (long)(xpgain);
             return XpGain(xp);
         }
         public override long XpGain(long xpGain, int mod)
@@ -480,9 +479,9 @@ namespace AMI.Neitsillia.User.PlayerPartials
         }
 
         internal async Task<IMessageChannel> DMChannel()
-            => await AMYPrototype.Program.clientCopy.GetUser(userid).GetOrCreateDMChannelAsync();
+            => await AMYPrototype.Program.clientCopy.GetUser(userid).CreateDMChannelAsync();
         internal async Task<IUserMessage> SendMessageToDM(string message = null, EmbedBuilder embed = null,
-            ISocketMessageChannel backup = null)
+            IMessageChannel backup = null)
         {
             try
             {

@@ -139,14 +139,14 @@ namespace AMI.Neitsillia.Social.Mail
                 var user = DiscordBotHandler.Client.GetUser(receiver);
                 if (user != null)
                 {
-                    var dms = await user.GetOrCreateDMChannelAsync();
+                    var dms = await user.CreateDMChannelAsync();
                     await dms.SendMessageAsync("I've been looking for you. Got something I'm supposed to deliver - your hands only." +
                         Environment.NewLine + " Use the `mail` command to view your mail.", embed: ToEmbed().Build());
                 }
             });
         }
 
-        public async Task Collect(Player player, Discord.WebSocket.ISocketMessageChannel channel)
+        public async Task Collect(Player player, IMessageChannel channel)
         {
             if (player != null)
             {

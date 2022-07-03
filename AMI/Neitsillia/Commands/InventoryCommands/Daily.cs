@@ -114,7 +114,7 @@ namespace AMI.Neitsillia.InventoryCommands
                 Program.rng.Next(3)), 1);
 
             if (dailyressource.item.tier < player.level * 1.5)
-                dailyressource.count = Verify.MinMax(NumbersM.CeilParse<int>((player.level /5.00) - dailyressource.item.tier), 10, 1);
+                dailyressource.count = Verify.MinMax(NumbersM.CeilParseInt((player.level /5.00) - dailyressource.item.tier), 10, 1);
             if (!player.CollectItem(dailyressource))
             {
                 player.KCoins += dailyressource.item.baseValue * dailyressource.count;

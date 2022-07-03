@@ -343,7 +343,7 @@ namespace AMI.Neitsillia.Commands.InventoryCommands
             else DUtils.DeleteMessage(await ReplyAsync("You may only upgrade gear"), 0.5);
         }
 
-        internal static async Task ProceedItemUpgrade(Player player, ISocketMessageChannel channel, string data)
+        internal static async Task ProceedItemUpgrade(Player player, IMessageChannel channel, string data)
         {
             int[] i = JsonConvert.DeserializeObject<int[]>(data);
             int amount = 1;

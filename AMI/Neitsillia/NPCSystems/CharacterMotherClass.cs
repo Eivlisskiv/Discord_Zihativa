@@ -41,6 +41,23 @@ namespace AMI.Neitsillia.NPCSystems
         public long experience;
         #endregion
 
+        public CharacterMotherClass() { }
+
+        protected CharacterMotherClass(CharacterMotherClass toClone)
+		{
+            this.health = toClone.health;
+            this.stamina = toClone.stamina;
+            this.level = toClone.level;
+            this.name = toClone.name;
+            this.stats = toClone.stats;
+            this.equipment = toClone.equipment;
+            this.specter = toClone.specter;
+            this.perks = toClone.perks;
+            this.inventory = toClone.inventory;
+            this.schematics = toClone.schematics;
+            this.KCoins = toClone.KCoins;
+            this.experience = toClone.experience;
+		}
 
         /// <summary>
         /// 
@@ -113,7 +130,7 @@ namespace AMI.Neitsillia.NPCSystems
                     return 0;
                 else if (percentage < 0 && stamina <= 0)
                     return 0;
-                return StaminaE(Math.Max(1, NumbersM.NParse<int>(maxSP * percentage)));
+                return StaminaE(Math.Max(1, (int)(maxSP * percentage)));
             }
             return 0;
         }
@@ -145,13 +162,13 @@ namespace AMI.Neitsillia.NPCSystems
         internal long PercentHealing(int percent, bool canOverheal = false)
         {
             if (percent > 0)
-                return Healing(NumbersM.NParse<long>(Health() * (percent / 100.00)), canOverheal);
+                return Healing((long)(Health() * (percent / 100.00)), canOverheal);
             return 0;
         }
         internal long PercentHealing(double percent, bool canOverheal = false)
         {
             if (percent > 0)
-                return Healing(NumbersM.NParse<long>(Health() * percent), canOverheal);
+                return Healing((long)(Health() * percent), canOverheal);
             return 0;
         }
 
@@ -203,7 +220,7 @@ namespace AMI.Neitsillia.NPCSystems
         public double Efficiency() => stats.Efficiency();
         public long PowerLevel()
         {
-            long power = Health() + Stamina() + Agility() + NumbersM.NParse<long>(CritChance() +
+            long power = Health() + Stamina() + Agility() + (long)(CritChance() +
                 CritMult());
             for (int i = 0; i < ReferenceData.DmgType.Length; i++)
                 power += Damage(i) + Resistance(i);
