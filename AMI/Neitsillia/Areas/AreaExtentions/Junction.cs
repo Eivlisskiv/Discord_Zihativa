@@ -19,7 +19,8 @@ namespace NeitsilliaEngine
         { }
         public Junction(Area area, int argFloor, int retFloor)
         {
-            destination = area.name; floorRequirement = argFloor;
+            destination = area.name; 
+			floorRequirement = argFloor;
             returnfloor = retFloor;
             if (area.AreaId == null)
                 area.AreaId = area.GeneratePath();
@@ -33,12 +34,10 @@ namespace NeitsilliaEngine
         }
         public override string ToString()
         {
-            if(floorRequirement > 0)
-                return destination + " |F: " + floorRequirement;
-            return destination;
-        }
+			return floorRequirement > 0 ? destination + " |F: " + floorRequirement : destination;
+		}
 
-        internal async Task<Area> PassJunction(Player player)
+		internal async Task<Area> PassJunction(Player player)
         {
             player.EndEncounter();
             Area area = Area.LoadArea(filePath, destination);

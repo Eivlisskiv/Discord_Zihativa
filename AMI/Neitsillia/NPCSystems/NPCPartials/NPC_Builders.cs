@@ -44,7 +44,7 @@ namespace AMI.Neitsillia.NPCSystems
                 abilities = new List<Ability>()
                 {
                     LoadAbility.Taunt("Taunt"),
-                    LoadAbility.Brawl("Heal")
+                    LoadAbility.Heal("Heal")
                 }
             };
 

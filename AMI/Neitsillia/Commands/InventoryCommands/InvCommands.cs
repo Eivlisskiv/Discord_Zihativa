@@ -464,7 +464,8 @@ namespace AMI.Neitsillia.InventoryCommands
             while (index > -1 && player.health < mhp)// While has healing item and health not full
             {
                 //Consume and write information
-                var field = Consume(player, player.inventory.GetItem(index), player.inventory.GetCount(index), out int ate);
+                var field = Consume(player, player.inventory.GetItem(index), 
+					player.inventory.GetCount(index), out int ate);
 
                 if(embed.Fields.Count >= 24)
                 {
@@ -501,11 +502,11 @@ namespace AMI.Neitsillia.InventoryCommands
             for (; consumed < amount; consumed++)
             {
                 bool hp = item.healthBuff > 0 && mhp > (player.health + healing);
-                bool sp = (item.staminaBuff > 0 || item.healthBuff > 0) && msp > (player.stamina + stamRegen);
+                bool sp = (item.staminaBuff > 0 || item.healthBuff > 1) && msp > (player.stamina + stamRegen);
                 if (hp || sp)
                 {
                     if (hp) healing += item.healthBuff;
-                    if (sp) stamRegen += ((int)item.healthBuff / 2) + item.staminaBuff;
+                    if (sp) stamRegen += (int)(item.healthBuff / 2) + item.staminaBuff;
                 }
                 else break;
             }
@@ -671,7 +672,7 @@ namespace AMI.Neitsillia.InventoryCommands
             amount = Math.Min(amount, player.inventory.GetCount(runei)); //change amount to use to minimum how much is available
 
             amount = Math.Min(amount,
-                NumbersM.FloorParse<int>(((player.level * 5) - gear.tier)/5.00)
+				NumbersM.FloorParse<int>(((player.level * 5) - gear.tier) / 5.00)
                 ); //change the amount to maximum allowed for level
 
             int tiers = rune.tier * amount;

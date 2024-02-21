@@ -97,11 +97,8 @@ namespace AMI.Neitsillia.Areas.AreaPartials
 
         public override string ToString()
         {
-            if (parent == null)
-                return name;
-            else
-                return name + " Of " + parent;
-        }
+			return parent == null ? name : name + " Of " + parent;
+		}
 
         public bool IsDungeon => type == AreaType.Dungeon || type == AreaType.Arena;
         #endregion
@@ -140,8 +137,6 @@ namespace AMI.Neitsillia.Areas.AreaPartials
                 type == AreaType.Dungeon || type == AreaType.Arena ? "Dungeons" : "Area",
                 "_id", AreaId, this);
         }
-
-
 
         public bool IsNonHostileArea()
         {

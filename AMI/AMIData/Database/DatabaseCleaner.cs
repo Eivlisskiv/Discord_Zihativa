@@ -4,6 +4,7 @@ using AMI.Neitsillia.User.PlayerPartials;
 using AMYPrototype;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AMI.Handlers
@@ -69,6 +70,17 @@ namespace AMI.Handlers
                         database.LoadRecord<Neitsillia.Areas.Nests.Nest, string>("Nest", j.filePath) == null
                     );
                 }
+
+				if (area.parent != null)
+				{
+					string parentPath = area.GeneratePath(false) + area.parent;
+					bool hasParentJunction = area.junctions.Any(j => j.filePath == parentPath);
+
+					if (!hasParentJunction)
+					{
+						area.junctions.Add(new NeitsilliaEngine.Junction(area.parent, 0, parentPath));
+					}
+				}
 
                 if (area.passiveEncounter == null)
                 {

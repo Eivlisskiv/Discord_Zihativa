@@ -627,7 +627,7 @@ namespace AMI.Neitsillia.User.UserInterface
             await TryMSGDel(msg);
             await CharacterCommands.ListCharacters(reaction.User.Value, Channel);
 
-            return player;
+            return p;
         }
 
         public async Task ConfirmOffer(SocketReaction reaction, IUserMessage msg)

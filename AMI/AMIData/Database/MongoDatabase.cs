@@ -78,8 +78,8 @@ namespace AMI.AMIData
                 { IsUpsert = true });
 
         internal async Task UpdateRecordAsync<T>(string tableKey, FilterDefinition<T> filter, T record)
-       => await database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOneAsync(filter, record, new ReplaceOptions
-       { IsUpsert = true });
+			=> await database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOneAsync(filter, record, new ReplaceOptions
+			{ IsUpsert = true });
 
         internal void UpdateRecord<T>(string tableKey, FilterDefinition<T> filter, T record)
             => database.GetCollection<T>(TableName<T>(tableKey)).ReplaceOne(

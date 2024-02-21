@@ -25,6 +25,7 @@ namespace AMI.Neitsillia.Items.ItemPartials
                     i.RebaseDurability(20);
                 return i;
             }
+
             Log.LogS($"Item {name} was not found");
             return null;
         }

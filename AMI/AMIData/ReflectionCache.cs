@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace AMI.AMIData
 {
-    class ReflectionCache<T> : ReflectionCache where T : class
+    public class ReflectionCache<T> : ReflectionCache where T : class
     {
 
         Dictionary<string, MethodInfo> instanceMethods;
@@ -43,7 +43,7 @@ namespace AMI.AMIData
             => (R)GetProperty(name, instanceProperties)?.GetValue(instance);
     }
 
-    class ReflectionCache
+    public class ReflectionCache
     {
         Type type;
 
